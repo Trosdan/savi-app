@@ -1,44 +1,51 @@
 import React, { Component } from "react";
-
+import { Text } from "react-native";
+import { Avatar, Button, Card, Title, Paragraph } from "react-native-paper";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
 
 class OffersList extends Component {
   render() {
-    console.log(this.props);
-    return <></>;
+    console.log(this.props.data.offers.results);
+    return (
+      <>
+        {this.props.data.offers.results.map(results => (
+          <Text>{results.id}</Text>
+        ))}
+      </>
+    );
   }
 }
 
-const OffersQuery = gql`
-  query {
-    offers(where: { name: { equalTo: "Makaia" } }) {
-      results {
-        id
-        offerResponsable
-        nursery
-        shelter
-        clothes
-        developmentArea
-        education
-        name
-        local {
-          id
-        }
-      }
-    }
-  }
-`;
+let organizarionName = "Makaia";
 
-export default graphql(
-  OffersQuery,
-  { name: "offers_query" },
-  {
+const OffersQuery = gql(`query {
+  offers(where: { name: { equalTo: "${organizarionName}" } }) {
+    results {
+      id
+      offerResponsable
+      nursery
+      shelter
+      clothes
+      developmentArea
+      education
+      name
+      local {
+        id
+      }
+    } 
+  }
+}
+  `);
+
+export default graphql(OffersQuery, {
+  options: {
     context: {
       headers: {
-        "X-Parse-Application-Id": "47RAnYvxm7rWLUTUZYHt9SItJjd9FnmWj5ZK5g92",
-        "X-Parse-Master-Key": "7qesIb1ZkUrjHEzxloP5j173OLMr8XI9u05BEeyh"
+        "X-Parse-Application-Id": "",
+        "X-Parse-Master-Key": "",
+        "X-Parse-Client-Key": ""
       }
     }
   }
-)(OffersList);
+})(OffersList);
