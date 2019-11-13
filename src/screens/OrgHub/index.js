@@ -1,16 +1,17 @@
-import React, { Component } from 'react';
-import { ApolloProvider } from 'react-apollo';
-import GlobalStyles from '../../GlobalStyles';
-import apolloClient from '../../services/apollo'
-import OffersList from '../../components/OffersList';
-import { SafeAreaView } from 'react-native';
+import React, { Component } from "react";
+import { ApolloProvider } from "react-apollo";
 
+import apolloClient from "../../services/apollo";
+import OffersList from "../../components/OffersList";
 
-export default OrgHub = ({ navigation }) =>(
-  <ApolloProvider client={apolloClient}>
-    <SafeAreaView style={GlobalStyles.droidSafeArea}>
+class App extends Component {
+  render() {
+    return (
+      <ApolloProvider client={apolloClient}>
+        <OffersList />
+      </ApolloProvider>
+    );
+  }
+}
 
-      <OffersList navigation={navigation} />
-    </SafeAreaView>
-  </ApolloProvider>
-);
+export default App;

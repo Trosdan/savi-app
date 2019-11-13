@@ -1,121 +1,103 @@
-import React, {useState} from 'react';
-import { TextInput, Button, Text } from 'react-native-paper'
-import gql from "graphql-tag"
-import { useQuery } from '@apollo/react-hooks'
-import {AsyncStorage} from 'react-native';
-import { sendGridEmail } from 'react-native-sendgrid'
+import React from "react";
+import {
 
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator
+} from "react-native";
+import { useState, useEffect } from "react";
+import { fetchData, storeData } from "../../storage";
+import { sendEmail } from "../../services/email";
 
-// import { Container } from './styles';
+export default  OrgLogin = ({ navigation }) =>{
+  console.log(navigation)
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [runned, setRunned] = useState(false);
+  //const [isValid, setValid] = useState(false); //utilizar posteriormente na validação de email.
 
-const OrgLogin = ({navigation}) => {
+  const getRandomInt = (min, max) => {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;
+  };
 
-  const [email, setEmail] = useState('')
-
-  storeData = async (key, value) => {
-    try {
-      await AsyncStorage.setItem(key, value);
-    } catch (error) {
-      // Error saving data
+  const login = verificationCode => {
+    verificationCode = getRandomInt(100000, 999999);
+    storeData("code", verificationCode);
+    fetchData("code").then(code => {
+      console.log("codigo dentro do fetch ta:", code);
+    });
+    console.log("codigo de verificação:", verificationCode);
+    if (email === "") {
+      return null;
     }
-    };
-  fetchData = async (key) => {
-      try {
-          const value = await AsyncStorage.getItem(key)
-          if (value !== null) {
-              return value
-          }
-      } catch (error) {
 
-      }
-  }
+    setIsLoading(true);
+    return fetch("https://parseapi.back4app.com/graphql", {
+      credentials: "omit",
+      headers: {
+        Accept: "*/*",
+        "content-type": "application/json",
+        "X-Parse-Application-Id": "47RAnYvxm7rWLUTUZYHt9SItJjd9FnmWj5ZK5g92",
+        "X-Parse-Master-Key": "7qesIb1ZkUrjHEzxloP5j173OLMr8XI9u05BEeyh",
+        "X-Parse-Client-Key": "jLJjTD2ATpWq6cwofTkpBBgL8Mt4nVewhugNmZX7"
+      },
 
-
-  getRandomInt = (min, max) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
-  }
-  sendEmail = (destination) => {
-
-  verificationCode = getRandomInt(0, 999999)  //gera um código de verificação aleatório
-  storeData("verificationCode", verificationCode) //armazena localmente
-
-  const SENDGRIDAPIKEY = "";
-  const FROMEMAIL = "no-reply@savi.com";
-  const TOMEMAIL = email;
-  const SUBJECT = `Código de verificação:${verificationCode}`;
-
-  const sendRequest = sendGridEmail(SENDGRIDAPIKEY, TOMEMAIL, FROMEMAIL, SUBJECT )
-        sendRequest.then((response) => {
-            console.log("Success")
-        }).catch((error) =>{
-            console.log(error)
-        });
-  }
-
-  login = ({navigation}) => {
-    const credentialsCheck = gql(`
-    query {
-      organizations(where: { email: { equalTo: "${email}"} }) {
-        results {
-          id
-          name
+      body: `{"operationName":null,"variables":{},"query":"{\\n  organizations(where: {email: {equalTo: \\"${email}\\"}}) {\\n    results {\\n      email\\n    }\\n  }\\n}\\n"}`,
+      method: "POST",
+      mode: "cors"
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        console.log(responseJson.data.organizations.results[0].email);
+        let responseEmail = responseJson.data.organizations.results[0].email;
+        if (responseEmail != null) {
+          sendEmail(verificationCode, responseEmail);
+          console.log("response email: ", responseEmail);
+          setIsLoading(false);
+          navigation.navigate('OrgConfirmNumber')
         }
-      }
-    }
-    `)
-    const { data, loading, error } = useQuery(credentialsCheck)
-    if (data.organizations.results==[]){
-      return(
-          <Text style={{color:'red'}}>
-          Não achamos o seu cadastro :/
-          </Text>
-      )
-    }
-    else{ 
-          sendEmail(data.organizations.results.email)
-          navigation.navigate("ConfirmOrganizationNumber")
-    }
+        //
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.error(error);
+        setIsLoading(false);
+      });
+      
+  };
 
-    
-  }
+  const styles = StyleSheet.create({
+    button: {
+      borderRadius: 4,
+      borderWidth: 0.5,
+      borderColor: "#d6d7da",
+      height: 50,
+      width: 80
+    }
+  });
 
+  useEffect(() => {
+    console.log(email);
+  });
+  if (isLoading) {
     return (
-    <>
-    <Text>Digite o email da sua organização.</Text>
-    <TextInput
-        label='Email'
-        value={email}
-        onChangeText={email => setEmail({ email })}
-    />
-    
-    <Button onPress={login()}>Confirmar</Button>
-    </>
+      <View style={{ flex: 1, padding: 20 }}>
+        <ActivityIndicator style={{ flex: 1, width: 200 }}/>
+      </View>
     );
+  }
+  return (
+    <>
+      <Text>Digite o email da sua organização.</Text>
+      <TextInput label="Email" onChangeText={name => setEmail(name)} />
+
+      <TouchableOpacity style={styles.button} onPress={() => login()} />
+      <TouchableOpacity style={styles.button} onPress={navigation.navigate("OrgConfirmNumber")} />
+    </>
+  );
 }
-
-export default OrgLogin;
-
-
-
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 

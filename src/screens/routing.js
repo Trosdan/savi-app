@@ -1,6 +1,6 @@
 import React from 'react';
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
-import {AppRegistry} from 'react-native';
+
 import { createStackNavigator } from 'react-navigation-stack';
 import {createAppContainer} from 'react-navigation';
 import OrgHub from './OrgHub';
@@ -63,7 +63,6 @@ const Stack = createStackNavigator({
 const Routes = createAppContainer(Stack)
 
 export default () =>
-
     (<PaperProvider theme={theme}>
         <Routes />
     </PaperProvider>)
