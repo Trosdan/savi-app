@@ -29,7 +29,7 @@ confirm = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/images/saviwhite.png")}
+        source={require("../../assets/images/saviwhite.png")}
         resizeMode="contain"
         style={styles.image}
         imageStyle={styles.image_imageStyle}

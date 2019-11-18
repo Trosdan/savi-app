@@ -12,7 +12,7 @@ import { useState, useEffect } from "react";
 import { fetchData, storeData } from "../../storage";
 import { sendEmail } from "../../services/email";
 
-export default  OrgLogin = ({ navigation }) =>{
+export default OrgLogin = ({ navigation }) =>{
   console.log(navigation)
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");

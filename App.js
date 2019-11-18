@@ -1,5 +1,5 @@
 import { AppRegistry } from "react-native";
-import App from "./src/screens/OrgLogin";
+import App from "./src/screens/routing";
 AppRegistry.registerComponent("savi_app", () => App);
 
 
