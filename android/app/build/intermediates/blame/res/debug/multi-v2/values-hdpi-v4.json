@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "/home/davi/SaviTaskforce/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-hdpi-v4/values-hdpi-v4.xml",
+            "map": [
+                {
+                    "source": "/home/davi/.gradle/caches/transforms-2/files-2.1/eabc9b7b706234b06f3b65bc2789ba45/res/values-hdpi-v4/values-hdpi-v4.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "6",
+                        "endColumns": "13",
+                        "endOffsets": "327"
+                    }
+                }
+            ]
+        }
+    ]
+}

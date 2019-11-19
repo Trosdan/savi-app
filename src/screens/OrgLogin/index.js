@@ -1,6 +1,6 @@
 import React from "react";
-import {
 
+import {
   View,
   Text,
   StyleSheet,
@@ -8,12 +8,12 @@ import {
   TouchableOpacity,
   ActivityIndicator
 } from "react-native";
+
 import { useState, useEffect } from "react";
 import { fetchData, storeData } from "../../storage";
 import { sendEmail } from "../../services/email";
-
+ 
 export default OrgLogin = ({ navigation }) =>{
-  console.log(navigation)
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [runned, setRunned] = useState(false);
@@ -25,10 +25,11 @@ export default OrgLogin = ({ navigation }) =>{
     return Math.floor(Math.random() * (max - min)) + min;
   };
 
-  const login = verificationCode => {
+  const login = async (navigation) => {
     verificationCode = getRandomInt(100000, 999999);
-    storeData("code", verificationCode);
-    fetchData("code").then(code => {
+    await storeData("code", verificationCode);
+    storeData("loginType", 'org');
+    await fetchData("code").then(code => {
       console.log("codigo dentro do fetch ta:", code);
     });
     console.log("codigo de verificação:", verificationCode);
@@ -42,9 +43,9 @@ export default OrgLogin = ({ navigation }) =>{
       headers: {
         Accept: "*/*",
         "content-type": "application/json",
-        "X-Parse-Application-Id": "47RAnYvxm7rWLUTUZYHt9SItJjd9FnmWj5ZK5g92",
-        "X-Parse-Master-Key": "7qesIb1ZkUrjHEzxloP5j173OLMr8XI9u05BEeyh",
-        "X-Parse-Client-Key": "jLJjTD2ATpWq6cwofTkpBBgL8Mt4nVewhugNmZX7"
+        "X-Parse-Application-Id": "",
+        "X-Parse-Master-Key": "",
+        "X-Parse-Client-Key": ""
       },
 
       body: `{"operationName":null,"variables":{},"query":"{\\n  organizations(where: {email: {equalTo: \\"${email}\\"}}) {\\n    results {\\n      email\\n    }\\n  }\\n}\\n"}`,
@@ -59,7 +60,7 @@ export default OrgLogin = ({ navigation }) =>{
           sendEmail(verificationCode, responseEmail);
           console.log("response email: ", responseEmail);
           setIsLoading(false);
-          navigation.navigate('OrgConfirmNumber')
+          navigation.navigate('ConfirmationCode')
         }
         //
         setIsLoading(false);
@@ -93,11 +94,11 @@ export default OrgLogin = ({ navigation }) =>{
   }
   return (
     <>
+    
       <Text>Digite o email da sua organização.</Text>
       <TextInput label="Email" onChangeText={name => setEmail(name)} />
 
-      <TouchableOpacity style={styles.button} onPress={() => login()} />
-      <TouchableOpacity style={styles.button} onPress={navigation.navigate("OrgConfirmNumber")} />
+      <TouchableOpacity style={styles.button} onPress={() => login(navigation)} />
     </>
   );
 }
