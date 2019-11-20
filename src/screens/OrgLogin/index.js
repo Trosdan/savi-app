@@ -1,18 +1,18 @@
 import React from "react";
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import { RFPercentage } from "react-native-responsive-fontsize";
 
 import {
   View,
   Text,
   StyleSheet,
-  TextInput,
-  TouchableOpacity,
   ActivityIndicator
 } from "react-native";
-
+import {TextInput, Button, Title} from 'react-native-paper'
 import { useState, useEffect } from "react";
 import { fetchData, storeData } from "../../storage";
 import { sendEmail } from "../../services/email";
- 
+creds = require("../../../credentials.json")
 export default OrgLogin = ({ navigation }) =>{
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -24,9 +24,10 @@ export default OrgLogin = ({ navigation }) =>{
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min;
   };
-
+  
   const login = async (navigation) => {
     verificationCode = getRandomInt(100000, 999999);
+    verificationCode = verificationCode.toString()
     await storeData("code", verificationCode);
     storeData("loginType", 'org');
     await fetchData("code").then(code => {
@@ -43,9 +44,9 @@ export default OrgLogin = ({ navigation }) =>{
       headers: {
         Accept: "*/*",
         "content-type": "application/json",
-        "X-Parse-Application-Id": "",
-        "X-Parse-Master-Key": "",
-        "X-Parse-Client-Key": ""
+        "X-Parse-Application-Id": creds.appid,
+        "X-Parse-Master-Key": creds.masterkey,
+        "X-Parse-Client-Key": creds.clientkey
       },
 
       body: `{"operationName":null,"variables":{},"query":"{\\n  organizations(where: {email: {equalTo: \\"${email}\\"}}) {\\n    results {\\n      email\\n    }\\n  }\\n}\\n"}`,
@@ -74,12 +75,26 @@ export default OrgLogin = ({ navigation }) =>{
 
   const styles = StyleSheet.create({
     button: {
-      borderRadius: 4,
-      borderWidth: 0.5,
-      borderColor: "#d6d7da",
-      height: 50,
-      width: 80
-    }
+      width: wp("28%"),
+      marginLeft: wp("5%"),
+      marginBottom: hp("2%"),
+      alignSelf:'center',
+      color:'black'
+    },
+    email:{
+      width: wp("84%"),
+      marginLeft: wp("8%")
+    },
+    title:{
+      fontSize: RFPercentage(3),
+      marginLeft: wp("7%"),
+      marginRight: wp("7%"),    
+      alignSelf: 'center',
+      color: '#000',
+      textAlign: 'center',
+      marginTop: hp("2%")
+    },
+    container:{}
   });
 
   useEffect(() => {
@@ -93,12 +108,12 @@ export default OrgLogin = ({ navigation }) =>{
     );
   }
   return (
-    <>
+    <View style={styles.container}>
     
-      <Text>Digite o email da sua organização.</Text>
-      <TextInput label="Email" onChangeText={name => setEmail(name)} />
+      <Title style={styles.title}>Digite o email da sua organização.</Title>
+      <TextInput  mode='outlined' style={styles.email} label="Email" onChangeText={name => setEmail(name)} />
 
-      <TouchableOpacity style={styles.button} onPress={() => login(navigation)} />
-    </>
+      <Button  style={styles.button} onPress={() => login(navigation)} >Enviar</Button>
+    </View>
   );
 }

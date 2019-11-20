@@ -8,7 +8,19 @@ import { TouchableHighlight } from 'react-native-gesture-handler';
 // import { Container } from './styles';
 
 export default class index extends Component {
+    registrate = () => {
+        fetch(`https://parseapi.back4app.com/graphql",{"credentials":"omit","headers":{"accept":"*/*","accept-language":"pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7","content-type":"application/json","sec-fetch-mode":"cors","sec-fetch-site":"same-site","x-parse-application-id":"47RAnYvxm7rWLUTUZYHt9SItJjd9FnmWj5ZK5g92","x-parse-client-key":"WLyCpihyllj8cxhhuVZk9b15JkbMeSt5q2IURgAW","x-parse-master-key":"32qb1Of9n8jESGsr3TESg9RUAxJTrZbpGVVKIk3v"},"referrer":"https://parse-dashboard.back4app.com/apps/2e02d985-4038-4b1e-91e7-09d9e451c149/api_console/graphql","referrerPolicy":"no-referrer-when-downgrade","body":"{\"operationName\":null,\"variables\":{},\"query\":\"mutation {\\n  createRefugee(fields: {name: \\\"${this.state.firstName}\\\", age: \\\"${this.state.age}\\\", job: \\\"${this.state.job}\\\", gender: \\\"${this.state.selectedGender}\\\", identificationDocumentType: \\\"${this.state.docType}\\\", familyID: 1, primaryContact: true, scholarity: \\\"${this.state.scholarity}\\\", email: \\\"${this.state.email}\\\", needs: \\\"${this.state.needs}\\\", identificationDocument: \\\"${this.state.doc}\\\"}) {\\n    name\\n  }\\n}\\n\"}","method":"POST","mode":"cors"});
+        navigate("RegistrationRefugeeFamily`)
+    }
     state = {
+        firstName:'',
+        lastName:'',
+        docType: '',
+        doc: '',
+        selectedGender:'',
+        age:'',
+        selectedYear:'',
+        selectedDay:'',
         fadeAnim: new Animated.Value(0),
         scrollRef: null,
         isMonthSelectorVisible: false,
@@ -25,6 +37,7 @@ export default class index extends Component {
         const {navigate} = this.props.navigation;
         const SCREEN_WIDTH = Dimensions.get("window").width;
         this.state.scrollRef = React.createRef();
+
         const { fadeAnim, isMonthSelectorVisible, selectedMonth } = this.state;
         function hideAnimFunc () {
             Animated.spring(
@@ -120,11 +133,15 @@ export default class index extends Component {
                                     style={style.NameInput}
                                     label='Nome'
                                     mode='outlined'
+                                    onChangeText={firstName => this.setState({firstName:firstName})}
+                                    value={this.state.firstName}
                                 />
                                 <TextInput
                                     style={style.LastnameInput}
                                     label='Sobrenome'
                                     mode='outlined'
+                                    onChangeText={lastName => this.setState({lastName:lastName})}
+                                    value={this.state.lastName}
                                 />
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
                                     <Button
@@ -184,11 +201,15 @@ export default class index extends Component {
                                     style={style.NameInput}
                                     label='Documento de Identidade'
                                     mode='outlined'
+                                    onChangeText={doc => this.setState({doc:doc})}
+                                    value={this.state.doc}
                                 />
                                 <TextInput
                                     style={style.TextInput}
                                     label='Tipo de Documento de Identidade'
                                     mode='outlined'
+                                    onChangeText={docType => this.setState({docType:docType})}
+                                    value={this.state.docType}
                                 />
                                 <View style={{
                                     flexDirection: 'row',
@@ -201,6 +222,8 @@ export default class index extends Component {
                                         style={style.DayInput}
                                         label='Dia'
                                         mode='outlined'
+                                        onChangeText={selectedDay => this.setState({selectedDay:selectedDay})}
+                                        value={this.state.selectedDay}
                                     />
                                     <TouchableOpacity
                                         onPress={this._showDialog}
@@ -405,7 +428,7 @@ export default class index extends Component {
                                         marginBottom: hp("2%"),
                                         alignSelf:'flex-end'
                                         }}
-                                        onPress={() => navigate("RegistrationRefugeeFamily")}
+                                        onPress={registrate()}
                                     >
                                         <Text style={{ color: '#ffffff', fontSize: 12 }}>Continuar</Text>
                                     </Button>
@@ -480,4 +503,4 @@ const style = StyleSheet.create({
         textAlign: 'center',
         marginBottom: hp('3%')
     },
-});
+});fetch("https://parseapi.back4app.com/graphql", {"credentials":"omit","headers":{"accept":"*/*","accept-language":"pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7","content-type":"application/json","sec-fetch-mode":"cors","sec-fetch-site":"same-site","x-parse-application-id":"47RAnYvxm7rWLUTUZYHt9SItJjd9FnmWj5ZK5g92","x-parse-client-key":"WLyCpihyllj8cxhhuVZk9b15JkbMeSt5q2IURgAW","x-parse-master-key":"32qb1Of9n8jESGsr3TESg9RUAxJTrZbpGVVKIk3v"},"referrer":"https://parse-dashboard.back4app.com/apps/2e02d985-4038-4b1e-91e7-09d9e451c149/api_console/graphql","referrerPolicy":"no-referrer-when-downgrade","body":"{\"operationName\":null,\"variables\":{},\"query\":\"mutation {\\n  createRefugee(fields: {name: \\\"Teste\\\", age: \\\"21\\\", job: \\\"motorista de uber\\\", gender: \\\"masculino\\\", identificationDocumentType: \\\"teste\\\", familyID: 1, primaryContact: true, scholarity: \\\"ensino teste completo\\\", email: \\\"teste@teste.com\\\", needs: \\\"comida e teste\\\", identificationDocument: \\\"436696134776\\\"}) {\\n    name\\n  }\\n}\\n\"}","method":"POST","mode":"cors"});

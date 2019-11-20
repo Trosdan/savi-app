@@ -6,28 +6,42 @@ import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-nativ
 import {SafeAreaView} from 'react-native';
 import {fetchData, storeData} from "../../../storage"
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { Button } from 'react-native-paper';
 
 
 
 ConfCode = ({ navigation }) => {
-  const [inputCode, setInputCode] = useState(0)
-  const [failedWarn, setFailedWarn] = useState(true)
-  const checkCode = () => {
-    console.log('checkcode')
-    fetchData("code").then(code => {
-      fetchData("loginType").then(loginType =>{
-        console.log("codigo dentro do fetch ta:", code);
-        if(code === inputCode && loginType === "org"){
-            navigation.navigate("OrgHub")
-        }else if (code =! inputCode){
-            setFailedWarn(true)
-        }else if (code === inputCode && loginType === "refugee"){
-            navigation.navigate("MapScreen")
-        }
-      })
-      });
 
-    }
+  const [inputCode, setInputCode] = useState(0)
+  const [failedWarn, setFailedWarn] = useState(false)
+
+  const checkCode = () => {
+
+    console.log('checkcode')
+
+    fetchData("code").then(code => {
+
+      fetchData("loginType").then(loginType => {
+
+        console.log("codigo dentro do fetch ta:", code);
+        console.log(`foi inserido: ${inputCode}`)
+
+        if (code === inputCode && loginType === "org") {
+          console.log(`Navegando para orghub...`)
+          navigation.navigate("OrgHub")
+        } else if (code = !inputCode) {
+          setFailedWarn(true)
+        } else if (code === inputCode && loginType === "refugee") {
+          console.log(`Navegando para mapscreen...`)
+
+          navigation.navigate("MapScreen")
+        }
+
+      })
+      
+    });
+
+  }
   return(
         <SafeAreaView style={styles.container} behavior="position" enabled>
           <Image
@@ -35,9 +49,9 @@ ConfCode = ({ navigation }) => {
             resizeMode="contain"
             style={styles.LogoSavi}
           />
-          <TextInput placeholder="Insira o Código" style={styles.CodeInput}  onChange={code => setInputCode(code)} />
-          <Text style={{color:'red'}}>{failedWarn ? 'Código incorreto :/' : ""}</Text>
-          <TouchableOpacity style={styles.continueButton} onPress={checkCode()}/>
+          <TextInput placeholder="Insira o Código" value={inputCode} style={styles.CodeInput}  onChangeText={code => setInputCode(code)} />
+          {/* <Text style={{color:'red'}}>{failedWarn ? 'Código incorreto :/' : ""}</Text> */}
+          <Button style={styles.continueButton} onPress={() => checkCode()}/>
           <ButtonConfNotSend style={styles.confNotSendButton} onPress={() => navigation.navigate('ConfirmationNumber')}/>
         </SafeAreaView>
     );}
