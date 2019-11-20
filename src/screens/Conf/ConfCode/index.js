@@ -51,7 +51,7 @@ ConfCode = ({ navigation }) => {
           />
           <TextInput placeholder="Insira o Código" value={inputCode} style={styles.CodeInput}  onChangeText={code => setInputCode(code)} />
           {/* <Text style={{color:'red'}}>{failedWarn ? 'Código incorreto :/' : ""}</Text> */}
-          <Button style={styles.continueButton} onPress={() => checkCode()}/>
+          <Button style={styles.continueButton} onPress={checkCode()}>Confirmar</Button>
           <ButtonConfNotSend style={styles.confNotSendButton} onPress={() => navigation.navigate('ConfirmationNumber')}/>
         </SafeAreaView>
     );}

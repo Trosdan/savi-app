@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/react-hooks";
-import { Text } from "react-native";
+import { Text, StyleSheet } from "react-native";
+import { Avatar, Button, Card, Title, Paragraph } from 'react-native-paper';
 
 export default function OffersList() {
   let organizarionName = "Makaia";
@@ -33,9 +34,26 @@ export default function OffersList() {
   }
   return (
     <>
+    
       {data.offers.results.map(results => (
-        <Text>{results.id}</Text>
+
+        <Card style={styles.card}>
+        <Card.Title title="Card Title" subtitle="Card Subtitle" left={(props) => <Avatar.Icon {...props} icon="folder" />} />
+        <Card.Content>
+          <Title>{results.name}</Title>
+          <Paragraph>{results.developmentArea}</Paragraph>
+        </Card.Content>
+        <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
+        <Card.Actions>
+          <Button>Pausar oferta</Button>
+        </Card.Actions>
+      </Card>
       ))}
     </>
   );
 }
+ const styles = StyleSheet.create({
+   card:{
+     margin:'19px'
+   }
+ })

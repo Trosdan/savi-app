@@ -103,7 +103,7 @@ export default OrgLogin = ({ navigation }) =>{
   if (isLoading) {
     return (
       <View style={{ flex: 1, padding: 20 }}>
-        <ActivityIndicator style={{ flex: 1, width: 200 }}/>
+        <ActivityIndicator style={{ flex: 1, width: 500, alignSelf:'center' }}/>
       </View>
     );
   }

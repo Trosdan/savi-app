@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, Text } from "react-native";
 export default class ButtonConfCode extends Component {
   render() {
     return (
-      <TouchableOpacity style={[styles.container, this.props.style]} onPress={this.props.onPress}>
+      <TouchableOpacity {...this.props} style={[styles.container, this.props.style]} onPress={this.props.onPress}>
         <Text style={styles.caption}>Confirmar</Text>
       </TouchableOpacity>
     );
