@@ -13,14 +13,13 @@ export default class index extends Component {
         navigate("RegistrationRefugeeFamily`)
     }
     state = {
-        firstName:'',
-        lastName:'',
-        docType: '',
+        firstName: '',
+        lastName: '',
         doc: '',
-        selectedGender:'',
-        age:'',
-        selectedYear:'',
-        selectedDay:'',
+        selectedGender: '',
+        age: '',
+        selectedYear: '',
+        selectedDay: '',
         fadeAnim: new Animated.Value(0),
         scrollRef: null,
         isMonthSelectorVisible: false,
