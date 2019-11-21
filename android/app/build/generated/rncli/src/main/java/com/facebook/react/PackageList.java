@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import com.savitaskforce.BuildConfig;
 import com.savitaskforce.R;
 
+// @react-native-community/async-storage
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 // @react-native-community/datetimepicker
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 // @react-native-community/geolocation
@@ -62,6 +64,7 @@ public class PackageList {
   public ArrayList<ReactPackage> getPackages() {
     return new ArrayList<>(Arrays.<ReactPackage>asList(
       new MainReactPackage(),
+      new AsyncStoragePackage(),
       new RNDateTimePickerPackage(),
       new GeolocationPackage(),
       new RNGestureHandlerPackage(),

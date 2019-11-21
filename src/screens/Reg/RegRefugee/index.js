@@ -427,7 +427,7 @@ export default class index extends Component {
                                         marginBottom: hp("2%"),
                                         alignSelf:'flex-end'
                                         }}
-                                        onPress={registrate()}
+                                        onPress={() => {registrate()}}
                                     >
                                         <Text style={{ color: '#ffffff', fontSize: 12 }}>Continuar</Text>
                                     </Button>
