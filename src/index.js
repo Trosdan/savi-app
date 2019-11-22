@@ -1,6 +1,6 @@
 import React from 'react';
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
-import Routes from './screens';
+import Routes from './screens'
 import {KeyboardAvoidingView} from 'react-native';
 import { Provider as ReduxProvider } from 'react-redux';
 import store from './store';

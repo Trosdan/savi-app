@@ -2,14 +2,12 @@
 
 buildscript {
     ext {
-        buildToolsVersion = "28.0.3"
-        minSdkVersion = 16
-        compileSdkVersion = 28
-        targetSdkVersion = 28
-        supportLibVersion = "28.0.1"
-        playServicesVersion = "15.0.1" // or set latest version
-        androidMapsUtilsVersion = "0.5+"
-    }
+  buildToolsVersion = "28.0.3"
+  minSdkVersion = 16
+  compileSdkVersion = 28
+  targetSdkVersion = 28
+  supportLibVersion = "28.0.0"
+}
     repositories {
         google()
         jcenter()

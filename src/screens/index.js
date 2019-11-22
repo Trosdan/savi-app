@@ -15,7 +15,6 @@ import UserProfile from './Profile/UserProfile';
 import SearchMarker from './MarkerSearch';
 import MarkerPage from './Marker/MarkerPage';
 import OrgHub from './OrgHub';
-import OffersList from '../components/OffersList';
 import OrgLogin from './OrgLogin';
 import OrgRegister from './OrgRegister';
 import OrgConfirmNumber from './OrgConfirmNumber';
@@ -185,13 +184,6 @@ const Routes = createAppContainer(
                 title: 'OrgHub',
                 header: null
             },
-        },
-        OffersList: {
-            screen: OffersList,
-            navigationOptions:{
-                title: 'OffersList',
-                header:null
-            }
         },
     });
 

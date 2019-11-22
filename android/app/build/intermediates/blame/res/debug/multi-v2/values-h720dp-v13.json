@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/home/davi/SaviTaskforce/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-h720dp-v13/values-h720dp-v13.xml",
+            "outputFile": "/home/davi/gits/npx/SaviTaskforce/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-h720dp-v13/values-h720dp-v13.xml",
             "map": [
                 {
-                    "source": "/home/davi/.gradle/caches/transforms-2/files-2.1/eabc9b7b706234b06f3b65bc2789ba45/res/values-h720dp-v13/values-h720dp-v13.xml",
+                    "source": "/home/davi/.gradle/caches/transforms-2/files-2.1/95d3e9d62946402e59b0f9f05e844a43/res/values-h720dp-v13/values-h720dp-v13.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

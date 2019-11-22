@@ -1,27 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/home/davi/SaviTaskforce/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-tl/values-tl.xml",
+            "outputFile": "/home/davi/gits/npx/SaviTaskforce/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-tl/values-tl.xml",
             "map": [
                 {
-                    "source": "/home/davi/.gradle/caches/transforms-2/files-2.1/45a9a07eb5fb5de6191f1e75b8948e8b/res/values-tl/values.xml",
-                    "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "247",
-                        "endColumns": "204",
-                        "endOffsets": "451"
-                    },
-                    "to": {
-                        "startLines": "37",
-                        "startColumns": "4",
-                        "startOffsets": "4062",
-                        "endColumns": "204",
-                        "endOffsets": "4262"
-                    }
-                },
-                {
-                    "source": "/home/davi/.gradle/caches/transforms-2/files-2.1/e162c28f62c4724b4dd664bc1e6a4e27/res/values-tl/values-tl.xml",
+                    "source": "/home/davi/.gradle/caches/transforms-2/files-2.1/c53055111f653a805fe766e97ff243d2/res/values-tl/values-tl.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -38,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "/home/davi/.gradle/caches/transforms-2/files-2.1/eabc9b7b706234b06f3b65bc2789ba45/res/values-tl/values-tl.xml",
+                    "source": "/home/davi/.gradle/caches/transforms-2/files-2.1/95d3e9d62946402e59b0f9f05e844a43/res/values-tl/values-tl.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -55,7 +38,24 @@
                     }
                 },
                 {
-                    "source": "/home/davi/.gradle/caches/transforms-2/files-2.1/57490fd48e484bc30cffd51eaffdcf22/res/values-tl/values.xml",
+                    "source": "/home/davi/.gradle/caches/transforms-2/files-2.1/15e8a5123118c9946fd117d2f47af7c1/res/values-tl/values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "247",
+                        "endColumns": "204",
+                        "endOffsets": "451"
+                    },
+                    "to": {
+                        "startLines": "37",
+                        "startColumns": "4",
+                        "startOffsets": "4062",
+                        "endColumns": "204",
+                        "endOffsets": "4262"
+                    }
+                },
+                {
+                    "source": "/home/davi/.gradle/caches/transforms-2/files-2.1/f3989e239ede7d7717e1a19ee01c0cd0/res/values-tl/values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
                         "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",

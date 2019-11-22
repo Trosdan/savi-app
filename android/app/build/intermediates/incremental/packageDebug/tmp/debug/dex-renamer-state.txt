@@ -1,4 +1,4 @@
-#Thu Nov 21 08:42:52 BRT 2019
-base.0=/home/davi/SaviTaskforce/android/app/build/intermediates/transforms/dexMerger/debug/0
+#Fri Nov 22 11:11:38 BRT 2019
+base.0=/home/davi/gits/npx/SaviTaskforce/android/app/build/intermediates/transforms/dexMerger/debug/0
 path.0=classes.dex
 renamed.0=classes.dex
