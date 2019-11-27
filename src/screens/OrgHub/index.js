@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Text, StyleSheet } from "react-native";
 import { Avatar, Button, Card, Title, Paragraph } from 'react-native-paper';
-import {gfetch} from '../../services/grafetch'
-keys = require("./creds")
+import {gfetch} from '../../services/grafetch';
+const keys = require("./creds");
 
 export default function OffersList() {
   const creds = keys
-  const [result, setResult] = useState([]);
+  const [offers, setOffers] = useState([]);
 
   const organizarionName = "Makaia";
   const OffersQuery = `
@@ -31,29 +31,24 @@ export default function OffersList() {
 
 
  
-useEffect(()=>{
-  debugger;
-  console.log('xablau!')
-  gfetch("https://parseapi.back4app.com/graphql", creds.headers, OffersQuery)
-    .then(response => {
-      console.log("response: " + JSON.stringify(response.data.offers.results));
-      console.log(typeof(response.data.offers.results))
-      response.data.offers.results.forEach((item)=>{
-        setResult(result.push(item))
-      })
-      console.log(`result: ${result}`)
-    })
+useEffect(async ()=>{
+  const response = await gfetch("https://parseapi.back4app.com/graphql", creds.headers, OffersQuery)
+  console.log("response: " + JSON.stringify(response.data.offers.results));
+  console.log(typeof(response.data.offers.results))
+  setOffers([1,2])
+  setTimeout(() => {
+    console.log(1)
+    console.log(offers)
+  }, 20)
 
-    .catch(error => console.log);
-  
+  console.log(offers);
 },[])
 
    return (
     <>
-    
-      {result.map(results => (
-
-        <Card style={styles.card}>
+    <Title>teste</Title>
+      {offers.map(results => (
+        <Card style={styles.card} key={results.name}>
         <Card.Title title="Card Title" subtitle="Card Subtitle" left={(props) => <Avatar.Icon {...props} icon="folder" />} />
         <Card.Content>
           <Title>{results.name}</Title>
@@ -63,13 +58,13 @@ useEffect(()=>{
         <Card.Actions>
           <Button>Pausar oferta</Button>
         </Card.Actions>
-      </Card>
+       </Card>
       ))}
     </>
   );
 }
  const styles = StyleSheet.create({
    card:{
-     margin:'19px'
+     margin:19
    }
  })

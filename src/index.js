@@ -20,11 +20,12 @@ const theme = {
 };
 
 const App = () => (
-    <ReduxProvider store={store}>
+
         <PaperProvider theme={theme}>
+                <ReduxProvider store={store}>
             <Routes />
+            </ReduxProvider>
         </PaperProvider>
-    </ReduxProvider>
 );
 
 export default App;
