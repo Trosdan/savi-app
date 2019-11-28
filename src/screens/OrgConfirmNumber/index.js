@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   View,
@@ -6,14 +6,14 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  useState
+   
 } from "react-native";
 import Icon from "react-native-vector-icons/Entypo";
 import Svg, { Ellipse } from "react-native-svg";
 
 function OrgConfirmCode() {
-const [codeInput, setCodeInput] = useState(0)
-const [failedTry, setFailedTry] = useState(false)
+const [codeInput, setCodeInput] = useState(0);
+const [failedTry, setFailedTry] = useState(false);
 confirm = () => {
     fetchData("code").then(code => {
         console.log("codigo dentro do fetch ta:", code);
@@ -29,7 +29,7 @@ confirm = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../../assets/images/saviwhite.png")}
+        source={require("../../assets/images/savibranco.png")}
         resizeMode="contain"
         style={styles.image}
         imageStyle={styles.image_imageStyle}
@@ -42,7 +42,7 @@ confirm = () => {
       <View style={styles.rect}>
         <TextInput placeholder=""
         value={codeInput} 
-        onChange={(code)=>setCode(code)}
+        onChange={(code)=>setCodeInput(code)}
         style={styles.textInput} />
       </View>
       <View style={styles.buttonStack}>
