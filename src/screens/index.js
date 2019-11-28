@@ -108,7 +108,7 @@ const Routes = createAppContainer(
 
     const Stack = createStackNavigator({
         ConfirmationWho: {
-            screen: ConfWho,
+            screen: OrgHub,
             navigationOptions: {
                 title: "ConfirmationWho",
                 header: null

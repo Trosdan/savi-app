@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Text, StyleSheet } from "react-native";
-import { Avatar, Button, Card, Title, Paragraph } from 'react-native-paper';
+import { ScrollView, StyleSheet } from "react-native";
+import { Avatar, Button, Card, Title, Paragraph,  } from 'react-native-paper';
 import {gfetch} from '../../services/grafetch';
 const keys = require("./creds");
 
 export default function OffersList() {
   const creds = keys
   const [offers, setOffers] = useState([]);
-
+  const pause = ()=>{}
   const organizarionName = "Makaia";
   const OffersQuery = `
       query {
@@ -35,32 +35,26 @@ useEffect(async ()=>{
   const response = await gfetch("https://parseapi.back4app.com/graphql", creds.headers, OffersQuery)
   console.log("response: " + JSON.stringify(response.data.offers.results));
   console.log(typeof(response.data.offers.results))
-  setOffers([1,2])
-  setTimeout(() => {
-    console.log(1)
-    console.log(offers)
-  }, 20)
+  setOffers(response.data.offers.results)
 
-  console.log(offers);
+ 
 },[])
 
    return (
-    <>
-    <Title>teste</Title>
+    <ScrollView>
       {offers.map(results => (
         <Card style={styles.card} key={results.name}>
-        <Card.Title title="Card Title" subtitle="Card Subtitle" left={(props) => <Avatar.Icon {...props} icon="folder" />} />
+        <Card.Title title={results.name} subtitle={results.developmentArea} left={(props) => <Avatar.Icon {...props} icon="folder" />} />
         <Card.Content>
-          <Title>{results.name}</Title>
           <Paragraph>{results.developmentArea}</Paragraph>
         </Card.Content>
         <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
         <Card.Actions>
-          <Button>Pausar oferta</Button>
+          <Button onPress={pause()}>Pausar oferta</Button>
         </Card.Actions>
        </Card>
       ))}
-    </>
+    </ScrollView>
   );
 }
  const styles = StyleSheet.create({
