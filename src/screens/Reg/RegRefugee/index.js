@@ -5,12 +5,51 @@ import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-nativ
 import { Button, TextInput, Portal, Dialog, List } from 'react-native-paper';
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { TouchableHighlight } from 'react-native-gesture-handler';
-// import { Container } from './styles';
+import { gfetch } from '../../../services/grafetch'
+const {headers} = require('../../../../creds.json')
+import {storeData, fetchData} from "../../../storage"
 
 export default class index extends Component {
-    registrate = () => {
-        fetch(`https://parseapi.back4app.com/graphql",{"credentials":"omit","headers":{"accept":"*/*","accept-language":"pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7","content-type":"application/json","sec-fetch-mode":"cors","sec-fetch-site":"same-site","x-parse-application-id":"47RAnYvxm7rWLUTUZYHt9SItJjd9FnmWj5ZK5g92","x-parse-client-key":"WLyCpihyllj8cxhhuVZk9b15JkbMeSt5q2IURgAW","x-parse-master-key":"32qb1Of9n8jESGsr3TESg9RUAxJTrZbpGVVKIk3v"},"referrer":"https://parse-dashboard.back4app.com/apps/2e02d985-4038-4b1e-91e7-09d9e451c149/api_console/graphql","referrerPolicy":"no-referrer-when-downgrade","body":"{\"operationName\":null,\"variables\":{},\"query\":\"mutation {\\n  createRefugee(fields: {name: \\\"${this.state.firstName}\\\", age: \\\"${this.state.age}\\\", job: \\\"${this.state.job}\\\", gender: \\\"${this.state.selectedGender}\\\", identificationDocumentType: \\\"${this.state.docType}\\\", familyID: 1, primaryContact: true, scholarity: \\\"${this.state.scholarity}\\\", email: \\\"${this.state.email}\\\", needs: \\\"${this.state.needs}\\\", identificationDocument: \\\"${this.state.doc}\\\"}) {\\n    name\\n  }\\n}\\n\"}","method":"POST","mode":"cors"});
-        navigate("RegistrationRefugeeFamily`)
+    registrationQuety = `
+        mutation {createFamily(
+            fields:{
+              Members:${members}
+            }
+          ){
+            id
+          }
+          }
+          
+        `
+    addmember = async (name, age, job, gender, identificationDocumentType, familyID, primaryContact, scholarity, email, needs, identificationDocument) =>{
+        const createRefugee = `
+        mutation {
+            createRefugee(
+              fields: {
+                name: ${name}
+                age: ${age}
+                job: ${job}
+                gender: ${gender}
+                identificationDocumentType: ${identificationDocumentType} 
+                familyID: ${familyID}
+                primaryContact: ${primaryContact}
+                scholarity: ${scholarity} 
+                email: ${email}
+                needs: ${needs} 
+                identificationDocument: ${identificationDocument} 
+              }
+            ) {
+              name
+            }
+          }
+          `
+    }
+    registrate = async members => {
+        
+        const response = await gfetch('https://parseapi.back4app.com/graphql', headers, this.registrationQuety)
+        const familyid =  response.data.createFamily.id
+        await storeData('familyID', familyid)
+        navigate("RegistrationRefugeeFamily")
     }
     state = {
         firstName: '',
