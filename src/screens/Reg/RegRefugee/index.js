@@ -10,11 +10,11 @@ const {headers} = require('../../../../creds.json')
 import {storeData, fetchData} from "../../../storage"
 
 export default class index extends Component {
-    createFamily = async members =>{
+    createFamily = async ( members = '') =>{
         createFamilyQuery = `
         mutation {createFamily(
             fields:{
-            Members:${members}
+            Members:[${members}]
             }
         ){
             id
@@ -24,9 +24,12 @@ export default class index extends Component {
         `
         const response = await gfetch('https://parseapi.back4app.com/graphql', headers, createFamilyQuery)
         const familyid =  response.data.createFamily.id
+        return familyid
         await storeData('familyID', familyid)
     }
-    addMember = async (name, age, job, gender, identificationDocumentType, familyID, primaryContact, scholarity, email, needs, identificationDocument) =>{
+
+
+    addMember = async (name='', age='', job='', gender='', identificationDocumentType='', familyID='', primaryContact='', scholarity='', email='', needs='', identificationDocument='') =>{
         const createRefugee = `
         mutation {
             createRefugee(
@@ -49,10 +52,12 @@ export default class index extends Component {
           }
           `
           const response = await gfetch('https://parseapi.back4app.com/graphql', headers, createRefugee)
+          return response.data.createRefugee.name
 
     }
     registrate = async () => {
-        this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.identificationDocumentType, this.state.familyID, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.identificationDocument)
+        const familyid = await this.createFamily()
+        this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.identificationDocumentType, familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.identificationDocument)
         
 
 
