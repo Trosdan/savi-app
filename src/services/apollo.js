@@ -2,7 +2,7 @@ import { ApolloClient } from "apollo-client";
 import { HttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { setContext } from "apollo-link-context";
-const creds = require('../../credentials.json')
+const creds = require('../credentials.json')
 const httpLink = new HttpLink({
   uri: "https://parseapi.back4app.com/graphql"
 });

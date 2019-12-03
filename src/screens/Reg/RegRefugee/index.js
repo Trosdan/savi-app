@@ -10,18 +10,23 @@ const {headers} = require('../../../../creds.json')
 import {storeData, fetchData} from "../../../storage"
 
 export default class index extends Component {
-    registrationQuety = `
+    createFamily = async members =>{
+        createFamilyQuery = `
         mutation {createFamily(
             fields:{
-              Members:${members}
+            Members:${members}
             }
-          ){
+        ){
             id
-          }
-          }
-          
+        }
+        }
+        
         `
-    addmember = async (name, age, job, gender, identificationDocumentType, familyID, primaryContact, scholarity, email, needs, identificationDocument) =>{
+        const response = await gfetch('https://parseapi.back4app.com/graphql', headers, createFamilyQuery)
+        const familyid =  response.data.createFamily.id
+        await storeData('familyID', familyid)
+    }
+    addMember = async (name, age, job, gender, identificationDocumentType, familyID, primaryContact, scholarity, email, needs, identificationDocument) =>{
         const createRefugee = `
         mutation {
             createRefugee(
@@ -43,12 +48,14 @@ export default class index extends Component {
             }
           }
           `
+          const response = await gfetch('https://parseapi.back4app.com/graphql', headers, createRefugee)
+
     }
-    registrate = async members => {
+    registrate = async () => {
+        this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.identificationDocumentType, this.state.familyID, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.identificationDocument)
         
-        const response = await gfetch('https://parseapi.back4app.com/graphql', headers, this.registrationQuety)
-        const familyid =  response.data.createFamily.id
-        await storeData('familyID', familyid)
+
+
         navigate("RegistrationRefugeeFamily")
     }
     state = {
@@ -541,4 +548,4 @@ const style = StyleSheet.create({
         textAlign: 'center',
         marginBottom: hp('3%')
     },
-});fetch("https://parseapi.back4app.com/graphql", {"credentials":"omit","headers":{"accept":"*/*","accept-language":"pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7","content-type":"application/json","sec-fetch-mode":"cors","sec-fetch-site":"same-site","x-parse-application-id":"47RAnYvxm7rWLUTUZYHt9SItJjd9FnmWj5ZK5g92","x-parse-client-key":"WLyCpihyllj8cxhhuVZk9b15JkbMeSt5q2IURgAW","x-parse-master-key":"32qb1Of9n8jESGsr3TESg9RUAxJTrZbpGVVKIk3v"},"referrer":"https://parse-dashboard.back4app.com/apps/2e02d985-4038-4b1e-91e7-09d9e451c149/api_console/graphql","referrerPolicy":"no-referrer-when-downgrade","body":"{\"operationName\":null,\"variables\":{},\"query\":\"mutation {\\n  createRefugee(fields: {name: \\\"Teste\\\", age: \\\"21\\\", job: \\\"motorista de uber\\\", gender: \\\"masculino\\\", identificationDocumentType: \\\"teste\\\", familyID: 1, primaryContact: true, scholarity: \\\"ensino teste completo\\\", email: \\\"teste@teste.com\\\", needs: \\\"comida e teste\\\", identificationDocument: \\\"436696134776\\\"}) {\\n    name\\n  }\\n}\\n\"}","method":"POST","mode":"cors"});
+});

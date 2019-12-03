@@ -7,7 +7,7 @@ const keys = require("./creds");
 export default function OffersList() {
   const creds = keys
   const [offers, setOffers] = useState([]);
-  const pause = ()=>{}
+
   const organizarionName = "Makaia";
   const OffersQuery = `
       query {
