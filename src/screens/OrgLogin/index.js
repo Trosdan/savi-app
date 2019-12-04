@@ -12,7 +12,7 @@ import {TextInput, Button, Title} from 'react-native-paper'
 import { useState, useEffect } from "react";
 import { fetchData, storeData } from "../../storage";
 import { sendEmail } from "../../services/email";
-creds = require("../../../credentials.json")
+//creds = require("../../../credentials.json")
 export default OrgLogin = ({ navigation }) =>{
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");

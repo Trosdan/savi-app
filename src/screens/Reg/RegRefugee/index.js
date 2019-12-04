@@ -6,10 +6,13 @@ import { Button, TextInput, Portal, Dialog, List } from 'react-native-paper';
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { gfetch } from '../../../services/grafetch'
-const {headers} = require('../../../../creds.json')
+//const {headers} = require('../../../../creds.json')
 import {storeData, fetchData} from "../../../storage"
 
 export default class index extends Component {
+    bindMemberToFamily = async () => {
+        
+    }
     createFamily = async ( members = '') =>{
         createFamilyQuery = `
         mutation {createFamily(
@@ -25,7 +28,8 @@ export default class index extends Component {
         const response = await gfetch('https://parseapi.back4app.com/graphql', headers, createFamilyQuery)
         const familyid =  response.data.createFamily.id
         return familyid
-        await storeData('familyID', familyid)
+        const  storeOutput = await storeData('familyID', familyid)
+        console.log(storeOutput)
     }
 
 
