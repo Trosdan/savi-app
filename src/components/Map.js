@@ -1,4 +1,4 @@
-navigator.geolocation = require('@react-native-community/geolocation');
+//navigator.geolocation = require('@react-native-community/geolocation');
 
 //import Geolocation from '@react-native-community/geolocation';
 import React, { useEffect, Fragment } from 'react';
@@ -7,6 +7,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import MapStyle from '../components/MapStyle';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import * as Location from 'expo-location';
+import * as Permissions from 'expo-permissions';
 
 
 export default function components() {
@@ -35,21 +37,33 @@ export default function components() {
                 return addMarkers(res.data.result);
             });
         }
-    }   
+    }  
+    
+    _getLocationAsync = async () => {
+        let { status } = await Permissions.askAsync(Permissions.LOCATION);
+        if (status !== 'granted') {
+          console.log('error');
+        }    
+        let location = await Location.getCurrentPositionAsync({ coords: { latitude, longitude } });
+        changeActive(latitude, longitude);
+        console.log('essa é a localizacao'+latitude)
+    };
+    
 
     useEffect(() => {
-        navigator.geolocation.getCurrentPosition(
-            ({ coords: { latitude, longitude } }) => {
-               changeActive(latitude, longitude);
-               console.log(latitude, longitude); 
-            },
-            () => {},
-            {
-                timeout: 20000,
-                enableHighAccuracy: false,
-                maximumAge: 10000,
-            }
-        );
+        // navigator.geolocation.getCurrentPosition(
+        //     ({ coords: { latitude, longitude } }) => {
+        //        changeActive(latitude, longitude);
+        //        console.log(latitude, longitude); 
+        //     },
+        //     () => {},
+        //     {
+        //         timeout: 20000,
+        //         enableHighAccuracy: false,
+        //         maximumAge: 10000,
+        //     }
+        // );
+         _getLocationAsync();
         read_offers({position: {latitude: latitude, longitude: longitude}, filter: 0});
     },[]);
 

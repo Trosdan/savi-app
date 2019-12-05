@@ -1,6 +1,6 @@
 import React, { useEffect, Fragment, useState } from 'react';
 import Map from '../../components/Map';
-import { View, Image, TouchableOpacity, StyleSheet, Text, ScrollView, Animated } from 'react-native';
+import { View, Image, TouchableOpacity, StyleSheet, Text, ScrollView, Animated, SafeAreaView } from 'react-native';
 import { Appbar, Surface, Button, FAB, ActivityIndicator, Card, Divider } from 'react-native-paper';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { useSelector, useDispatch } from 'react-redux';
@@ -123,7 +123,8 @@ export default function MapScreen ({ navigation }) {
     }
 
     return (
-        <View style={{flex: 1, backgroundColor: '#000'}}>   
+        <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ backgroundColor: '#000'}}>   
             <View style={{ backgroundColor:"#ff7043" ,height: hp("8%"), justifyContent:'center', width: wp("100%"), flexDirection: 'row', alignItems: 'center'}}>
                 <View style={{ width: wp("20%"), alignItems: 'flex-start'}}>
                     <Appbar.Action style={{ marginLeft: wp("4%")}} icon="menu" onPress={()=>navigation.openDrawer()} color='#fff' />
@@ -208,6 +209,7 @@ export default function MapScreen ({ navigation }) {
                     </Card.Content>
                 </Card>
         </View>
+        </SafeAreaView>
     )
 };
 

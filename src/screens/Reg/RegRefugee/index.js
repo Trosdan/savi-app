@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, StyleSheet, ScrollView, Animated, Text, Dimensions, Keyboard, TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, Animated, Text, Dimensions, Keyboard, TouchableOpacity, SafeAreaView } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { Button, TextInput, Portal, Dialog, List } from 'react-native-paper';
@@ -62,11 +62,8 @@ export default class index extends Component {
     registrate = async () => {
         const familyid = await this.createFamily()
         this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.identificationDocumentType, familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.identificationDocument)
-        
-
-
-        navigate("RegistrationRefugeeFamily")
     }
+
     state = {
         firstName: '',
         lastName: '',
@@ -123,7 +120,7 @@ export default class index extends Component {
             outputRange: [hp('50%'), hp('70%')]
         }); 
         return (
-            <KeyboardAwareScrollView
+            <SafeAreaView
                 style={{ backgroundColor: "#FFF" }}
                 resetScrollToCoords={{ x: 0, y: 0 }}
                 scrollEnabled={false}
@@ -482,7 +479,7 @@ export default class index extends Component {
                                         marginBottom: hp("2%"),
                                         alignSelf:'flex-end'
                                         }}
-                                        onPress={() => {registrate()}}
+                                        onPress={() => {this.registrate, navigate("RegistrationRefugeeFamily")}}
                                     >
                                         <Text style={{ color: '#ffffff', fontSize: 12 }}>Continuar</Text>
                                     </Button>
@@ -490,7 +487,7 @@ export default class index extends Component {
                             </View>
                         </Animated.View>  
                 </Animated.ScrollView>
-            </KeyboardAwareScrollView>
+            </SafeAreaView>
         )
     }
 }
