@@ -12,11 +12,10 @@ import {TextInput, Button, Title} from 'react-native-paper'
 import { useState, useEffect } from "react";
 import { fetchData, storeData } from "../../storage";
 import { sendEmail } from "../../services/email";
-//creds = require("../../../credentials.json")
+const creds = require("../../../creds.json")
 export default OrgLogin = ({ navigation }) =>{
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
-  const [runned, setRunned] = useState(false);
   //const [isValid, setValid] = useState(false); //utilizar posteriormente na validação de email.
 
   const getRandomInt = (min, max) => {

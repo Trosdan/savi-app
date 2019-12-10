@@ -162,7 +162,7 @@ export default function MapScreen ({ navigation }) {
                 { !filterTabLoading ?
                     <FAB
                         style={styles.fab}
-                        icon="keyboard-arrow-right"
+                        icon="arrow-collapse-right"
                         onPress={() => read_offers({position: 0, filter: filters})}
                     />
                     :

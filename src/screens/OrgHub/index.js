@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import { Avatar, Button, Card, Title, Paragraph,  } from 'react-native-paper';
 import {gfetch} from '../../services/grafetch';
-const keys = require("./creds");
+const keys = require("../../../creds.json");
 
 export default function OffersList() {
   const creds = keys

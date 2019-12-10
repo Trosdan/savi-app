@@ -136,7 +136,7 @@ export default function MarkerSearch({ navigation }) {
                                 backgroundColor: '#ff7043',
                             }}
                             small
-                            icon="keyboard-arrow-right"
+                            icon="arro-collapse-right"
                             onPress={()=>{navigation.navigate("MarkerPage"), selectMarker(marker.name, marker.description.portuguese)}}
                         />
                     </Card>

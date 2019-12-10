@@ -6,30 +6,73 @@ import { Button, TextInput, Portal, Dialog, List } from 'react-native-paper';
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { gfetch } from '../../../services/grafetch'
-//const {headers} = require('../../../../creds.json')
+const {header} = require('../../../../creds.json')
 import {storeData, fetchData} from "../../../storage"
 
 export default class index extends Component {
-    bindMemberToFamily = async () => {
-        
+
+    stringfy = (array) =>{
+        stringedArray = ''
+        for(index in array){
+            item=array[index]
+            item = `"${item}",`
+            stringedArray = stringedArray.concat(item)
+        }
+        return stringedArray
     }
-    createFamily = async ( members = '') =>{
-        createFamilyQuery = `
-        mutation {createFamily(
-            fields:{
-            Members:[${members}]
+
+    bindMemberToFamily = async (familyID, member) => {
+        getFamilyQuery = `
+            query {
+                family(where: { id: { equalTo: "${familyID}"} }) {
+                results {
+                    id
+                    name
+                    email
+                    member
+                    primaryContact
+                }
+                }
             }
-        ){
-            id
-        }
-        }
-        
         `
-        const response = await gfetch('https://parseapi.back4app.com/graphql', headers, createFamilyQuery)
+        const familyQueryResponse = await gfetch('https://parseapi.back4app.com/graphql', header, getFamilyMembersQuery)
+        const familyMembers = familyQueryResponse.data.families.results[0]
+        const updatedListOfMembers = familyMembers.push(member)
+        updatedListOfMembers = this.stringfy(updatedListOfMembers)
+        updateFamilyQuery = `
+        mutation {
+            updateFamily(id: "${familyID}", 
+              fields: {
+              members: {names:[${updatedListOfMembers}]} 
+            }) {
+              id
+              members
+            }
+          }
+          
+          `
+          return('sucesso! :)')
+    }
+    createFamily = async ( ) =>{
+        createFamilyQuery = `
+        mutation{
+            createFamily(
+              fields :{
+              members:{names:[]}
+            }){
+              id
+              
+            }
+          }
+        `
+
+        const response = await gfetch('https://parseapi.back4app.com/graphql', header, createFamilyQuery)
+        console.log(response)
+
         const familyid =  response.data.createFamily.id
-        return familyid
         const  storeOutput = await storeData('familyID', familyid)
         console.log(storeOutput)
+        return familyid
     }
 
 
@@ -55,27 +98,47 @@ export default class index extends Component {
             }
           }
           `
-          const response = await gfetch('https://parseapi.back4app.com/graphql', headers, createRefugee)
+          const response = await gfetch('https://parseapi.back4app.com/graphql', header, createRefugee)
           return response.data.createRefugee.name
+    }
+    
+    registrate = async () => {
+        
+        const familyid = await this.createFamily()
+        this.setState({familyID:familyid})
+        const member = await this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.identificationDocumentType, familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.identificationDocument)
+        this.bindMemberToFamily(familyid, member)
+        storeData('isNotPrimaryContact', true)
 
     }
-    registrate = async () => {
-        const familyid = await this.createFamily()
-        this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.identificationDocumentType, familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.identificationDocument)
+
+    decideWhichFunctionToUseOnRegisterButton = async () =>{
+        
+        if(await fetchData('isNotPrimaryContact')){
+            this.setState({"primaryContact":false});
+            this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.identificationDocumentType, this.state.familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.identificationDocument)
+
+        }else{
+            this.setState({"primaryContact":true});            
+             this.registrate()
+
+        }
     }
 
     state = {
-        firstName: '',
-        lastName: '',
-        doc: '',
-        selectedGender: '',
-        age: '',
-        selectedYear: '',
-        selectedDay: '',
+        familyID:'',
+        firstName: 'Breno',
+        lastName: 'Bertone',
+        doc: '386731652',
+        docType: "RG",
+        selectedGender: 'Masculino',
+        age: '18',
+        selectedYear: '2001',
+        selectedDay: '26',
         fadeAnim: new Animated.Value(0),
         scrollRef: null,
         isMonthSelectorVisible: false,
-        selectedMonth: '',
+        selectedMonth: 'February',
     };
 
     _showDialog = () => this.setState({ isMonthSelectorVisible: true });
@@ -373,12 +436,14 @@ export default class index extends Component {
                                         style={style.YearInput}
                                         label='Ano'
                                         mode='outlined'
+                                        value={this.state.selectedYear}
                                     />
                                 </View>
                                     <TouchableOpacity
                                             //onPress={this._showDialog}
                                     >        
                                         <TextInput
+                                            value={this.state.selectedGender}
                                             style={style.LastnameInput}                                            label='Mês'
                                             mode='outlined'
                                             editable={false}
@@ -479,7 +544,7 @@ export default class index extends Component {
                                         marginBottom: hp("2%"),
                                         alignSelf:'flex-end'
                                         }}
-                                        onPress={() => {this.registrate, navigate("RegistrationRefugeeFamily")}}
+                                        onPress={() => this.decideWhichFunctionToUseOnRegisterButton()}
                                     >
                                         <Text style={{ color: '#ffffff', fontSize: 12 }}>Continuar</Text>
                                     </Button>

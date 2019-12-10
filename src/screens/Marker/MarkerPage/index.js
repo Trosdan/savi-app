@@ -26,7 +26,7 @@ export default function MarkerPage(props) {
         <View style={{ backgroundColor: '#f88e1e', height: hp('30%') }}>
             <View style={{ backgroundColor: '#f07e1e', height: hp('7%'), flexDirection: 'row', alignItems: 'center' }}>
                 <IconButton
-                    icon="keyboard-arrow-left"
+                    icon="arrow-collapse-left"
                     color={'#fff'}
                     size={RFPercentage(4)}
                     onPress={() => {}}
