@@ -5,5 +5,5 @@ export const gfetch = async (graphqlEndpoint, headers, query, variables = {}) =>
     headers:headers,
     body: JSON.stringify({ query, variables })
   });
-  return response;
+  return response.text();
 }
