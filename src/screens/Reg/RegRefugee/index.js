@@ -6,7 +6,7 @@ import { Button, TextInput, Portal, Dialog, List } from 'react-native-paper';
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { gfetch } from '../../../services/grafetch'
-const {header} = require('../../../../creds.json')
+const  creds = require('../../../../creds.json')
 import {storeData, fetchData} from "../../../storage"
 
 export default class index extends Component {
@@ -65,11 +65,11 @@ export default class index extends Component {
             }
           }
         `
-
-        const response = await gfetch('https://parseapi.back4app.com/graphql', header, createFamilyQuery)
-        console.log(response)
-
+        console.log("creating family...")
+        let response = await gfetch('https://parseapi.back4app.com/graphql', creds.headers, createFamilyQuery)
+        console.log(response.data.createFamily.id)
         const familyid =  response.data.createFamily.id
+        console.log("Family id: "+familyid)
         const  storeOutput = await storeData('familyID', familyid)
         console.log(storeOutput)
         return familyid
@@ -98,17 +98,22 @@ export default class index extends Component {
             }
           }
           `
+          console.log("Adding member...")
           const response = await gfetch('https://parseapi.back4app.com/graphql', header, createRefugee)
           return response.data.createRefugee.name
     }
     
-    registrate = async () => {
-        
+    registrate = async (navigation) => {
+        console.log("register")
         const familyid = await this.createFamily()
+        console.log("created family")
         this.setState({familyID:familyid})
         const member = await this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.identificationDocumentType, familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.identificationDocument)
+        console.log("Added member")
         this.bindMemberToFamily(familyid, member)
+        console.log("binded member to family")
         storeData('isNotPrimaryContact', true)
+        navigation.navigate(`RegistrationRefugeeContinue`)
 
     }
 
@@ -117,9 +122,10 @@ export default class index extends Component {
         if(await fetchData('isNotPrimaryContact')){
             this.setState({"primaryContact":false});
             this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.identificationDocumentType, this.state.familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.identificationDocument)
-
+            console.log(`additional member`)
         }else{
-            this.setState({"primaryContact":true});            
+            this.setState({"primaryContact":true});    
+            console.log('primary contact')        
              this.registrate()
 
         }

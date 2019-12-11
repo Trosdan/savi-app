@@ -6,7 +6,7 @@ import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { Button, Dialog, Portal, TextInput, TouchableOpacity } from 'react-native-paper';
 
 export default function RegRefugeeFamily ({ navigation }) {
-
+        
         return (
             <KeyboardAwareScrollView
                 style={{ backgroundColor: "#FFF" }}
@@ -27,7 +27,7 @@ export default function RegRefugeeFamily ({ navigation }) {
                     <Button
                         mode="outlined"
                         style={style.addMember}
-                        //onPress={()=>{}}
+                        onPress={()=>{navigation.navigate('RegistrationRefugee')}}
                     >
                         Adicionar membro da Família
                     </Button>
