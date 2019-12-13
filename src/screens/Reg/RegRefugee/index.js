@@ -20,22 +20,20 @@ export default class index extends Component {
         }
         return stringedArray
     }
-
-    bindMemberToFamily = async (familyID, member) => {
+    bindMemberToFamily = async (familyID, memberID) => {
         getFamilyMembersQuery = `
             query {
                 families(where: { id: { equalTo: "${familyID}"} }) {
                 results {
-                    
                     members
                 }
                 }
             }
         `
-        let familyQueryResponse = await gfetch("https://parseapi.back4app.com/graphql", creds.headers, getFamilyMembersQuery)
+        let familyQueryResponse = await gfetch("https://parseapi.back4app.com/graphql", creds.header, getFamilyMembersQuery)
         familyQueryResponse = JSON.parse(familyQueryResponse)
         let familyMembers = familyQueryResponse.data.families.results[0].members.ids
-        familyMembers.push(member)
+        familyMembers.push(memberID)
         familyMembers = this.stringfy(familyMembers)
         updateFamilyQuery = `
         mutation {
@@ -51,11 +49,11 @@ export default class index extends Component {
           }
           
           `
-          let updateFamilyResponse = await gfetch("https://parseapi.back4app.com/graphql", creds.headers, updateFamilyQuery)
-          console.log(updateFamilyResponse) 
-          updateFamilyResponse = JSON.parse(updateFamilyResponse)
-          return  updateFamilyResponse
-        //   "{"errors":[{"message":"Syntax Error: Expected :, found Name \"fields\"","locations":[{"line":4,"column":15}],"extensions":{"code":"GRAPHQL_PARSE_FAILED","exception":{"stacktrace":["GraphQLError: Syntax Error: Expected :, found Name \"fields\"","    at syntaxError (/usr/src/app/node_modules/graphql/error/syntaxError.js:15:10)","    at Parser.expectToken (/usr/src/app/node_modules/graphql/language/parser.js:1404:40)","    at Parser.parseArgument (/usr/src/app/node_modules/graphql/language/parser.js:329:10)","    at Parser.optionalMany (/usr/src/app/node_modules/graphql/language/parser.js:1497:28)","    at Parser.parseArguments (/usr/src/app/node_modules/graphql/language/parser.js:319:17)","    at Parser.parseField (/usr/src/app/node_modules/graphql/language/parser.js:306:23)","    at Parser.parseSelection (/usr/src/app/node_modules/graphql/language/parser.js:280:81)","    at Parser.many (/usr/src/app/node_modules/graphql/language/parser.js:1518:26)","    at Parser.parseSelectionSet (/usr/src/app/node_modules/graphql/language/parser.js:267:24)","    at Parser.parseOperationDefinition (/usr/src/app/node_modules/graphql/language/parser.js:195:26)"]}}}]}
+          let updatedFamilyInfo = await gfetch("https://parseapi.back4app.com/graphql", creds.header, updateFamilyQuery)
+          console.log(updatedFamilyInfo) 
+          storeData('refugeeFamily', str(updatedFamilyInfo))
+          updatedFamilyInfo = JSON.parse(updatedFamilyInfo)
+          return  updatedFamilyInfo
 
     }
     createFamily = async ( ) =>{
@@ -71,12 +69,12 @@ export default class index extends Component {
           }
         `
         console.log("creating family...")
-        let response = await gfetch("https://parseapi.back4app.com/graphql", creds.headers, createFamilyQuery)
+        let response = await gfetch("https://parseapi.back4app.com/graphql", creds.header, createFamilyQuery)
         response = JSON.parse(response)
         console.log(response.data.createFamily.id)
         const familyid =  response.data.createFamily.id
         console.log("Family id: "+familyid)
-        const  storeOutput = await storeData("familyID", familyid)
+        const  storeOutput = await storeData("familyID", str(familyid))
         console.log(storeOutput)
         return familyid
     }
@@ -106,39 +104,42 @@ export default class index extends Component {
             }
           }
           `
-          console.log("Adding member...")
-          let response = await gfetch("https://parseapi.back4app.com/graphql", creds.headers, createRefugee)
+          console.log("Adding memberID...")
+          let response = await gfetch("https://parseapi.back4app.com/graphql", creds.header, createRefugee)
           response = JSON.parse(response)
           console.log(response.data.createRefugee.id)
           return response.data.createRefugee.id
     }
     
-    registrate = async (navigation) => {
+    registrate = async () => {
         console.log("register")
         const familyid = await this.createFamily()
         console.log("created family")
         this.setState({familyID:familyid})
-        const member = await this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.docType, familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.doc)
+        const memberID = await this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.docType, familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.doc)
         
-        console.log("Added member")
-        this.bindMemberToFamily(familyid, member)
-        console.log("binded member to family")
-        storeData("isNotPrimaryContact", true)
-        navigation.navigate(`RegistrationRefugeeFamily`)
+        console.log("Added memberID")
+        this.bindMemberToFamily(familyid, memberID)
+        console.log("binded memberID to family")
+        storeData("isNotPrimaryContact", 'true')
+        
 
     }
+    
+    
 
     decideWhichFunctionToUseOnRegisterButton = async () =>{
-        
+        const {navigate} = this.props.navigation;
         if(await fetchData("isNotPrimaryContact")){
             this.setState({"primaryContact":false});
             this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.docType, this.state.familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.doc)
             console.log(`additional member`)
+            navigate(`RegistrationRefugeeFamily`)
         }else{
             this.setState({"primaryContact":true});    
             console.log("primary contact")         
-             this.registrate(this.props.navigation)
-
+            this.registrate()
+            navigate(`RegistrationRefugeeFamily`)
         }
     }
 

@@ -7,3 +7,4 @@ export const gfetch = async (graphqlEndpoint, headers, query, variables = {}) =>
   });
   return response.text();
 }
+
