@@ -1,12 +1,29 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Text, View, SafeAreaView, Image, StyleSheet, ScrollView } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { Button, Dialog, Portal, TextInput, TouchableOpacity } from 'react-native-paper';
+import {fetchData} from '../../../storage'
+
+function MemberList(props){
+    const members = props.members;
+    const listOfMembers = members.map((member) =>
+      <Text>{member}</Text>
+    );
+    return (
+      <View>{listOfMembers}</View>
+    );
+}
 
 export default function RegRefugeeFamily ({ navigation }) {
-        
+
+        const [family, setFamily ] = useState(null)
+        useEffect( async () => {
+            let familyResponse = await fetchData('refugeeFamily');
+            const familyObject = JSON.parse(familyResponse)
+            setFamily(familyObject)
+        }, [])
         return (
             <KeyboardAwareScrollView
                 style={{ backgroundColor: "#FFF" }}
@@ -22,6 +39,7 @@ export default function RegRefugeeFamily ({ navigation }) {
                         style={style.LogoSavi}
                     />
                     <Text style={style.RegFamilyTitle}>Registrar Família</Text>
+                    <MemberList members={family.data.updateFamily.members.ids[0].ids}></MemberList>
                 </View>
                 <ScrollView style={{ alignSelf: 'center', height: hp("65%")}}>
                     <Button

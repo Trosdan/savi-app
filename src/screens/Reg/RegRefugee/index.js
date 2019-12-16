@@ -8,7 +8,7 @@ import { TouchableHighlight } from "react-native-gesture-handler";
 import { gfetch } from "../../../services/grafetch"
 const  creds = require("../../../../creds.json")
 import {storeData, fetchData} from "../../../storage"
-
+//import {getFamilyMembersQuery, bindMemberToFamily, createFamily, addMember} from '../../../services/backendConnections'
 export default class index extends Component {
 
     stringfy = (array) =>{
@@ -20,6 +20,33 @@ export default class index extends Component {
         }
         return stringedArray
     }
+
+    getMembersFromFamily = (familyID) =>{
+        getMembersDetails = `query refugeeInfoByFamily {
+            refugees(where:
+              
+              {
+          Family:{equalTo:"${familyID}"}
+              }
+                            ) {
+              results {
+                name
+                age
+                gender
+                scholarity
+                identificationDocument
+                identificationDocumentType
+              }
+            }
+          }
+          `
+          let familyQueryResponse = await gfetch("https://parseapi.back4app.com/graphql", creds.header, getMembersDetails)
+          let familyObj = JSON.parse(familyQueryResponse)
+          return familyObj.data.refugees.results
+
+    }
+
+
     bindMemberToFamily = async (familyID, memberID) => {
         getFamilyMembersQuery = `
             query {
@@ -51,7 +78,7 @@ export default class index extends Component {
           `
           let updatedFamilyInfo = await gfetch("https://parseapi.back4app.com/graphql", creds.header, updateFamilyQuery)
           console.log(updatedFamilyInfo) 
-          storeData('refugeeFamily', str(updatedFamilyInfo))
+          storeData('refugeeFamily', updatedFamilyInfo.toString())
           updatedFamilyInfo = JSON.parse(updatedFamilyInfo)
           return  updatedFamilyInfo
 
@@ -74,7 +101,7 @@ export default class index extends Component {
         console.log(response.data.createFamily.id)
         const familyid =  response.data.createFamily.id
         console.log("Family id: "+familyid)
-        const  storeOutput = await storeData("familyID", str(familyid))
+        const  storeOutput = await storeData("familyID", familyid.toString())
         console.log(storeOutput)
         return familyid
     }
@@ -134,6 +161,7 @@ export default class index extends Component {
             this.setState({"primaryContact":false});
             this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.docType, this.state.familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.doc)
             console.log(`additional member`)
+            
             navigate(`RegistrationRefugeeFamily`)
         }else{
             this.setState({"primaryContact":true});    
