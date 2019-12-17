@@ -4,12 +4,17 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { Button, Dialog, Portal, TextInput, TouchableOpacity } from 'react-native-paper';
-import {fetchData} from '../../../storage'
+import {fetchData, storeData} from '../../../storage'
+import {gfetch} from '../../../services/grafetch'
+const  creds = require("../../../../creds.json")
 
 function MemberList(props){
     const members = props.members;
     const listOfMembers = members.map((member) =>
-      <Text>{member}</Text>
+    <>
+      <Text style={{fontSize:15, fontWeight: "bold"}}>{member.name}</Text>
+      <Text>{member.age} anos</Text>
+    </>
     );
     return (
       <View>{listOfMembers}</View>
@@ -18,11 +23,43 @@ function MemberList(props){
 
 export default function RegRefugeeFamily ({ navigation }) {
 
-        const [family, setFamily ] = useState(null)
-        useEffect( async () => {
+        const [members, setMembers ] = useState([])
+        const registrateDependent = () =>{
+            navigation.navigate('RegistrationRefugee')
+        }
+        const getMembersFromFamily = async () =>{
             let familyResponse = await fetchData('refugeeFamily');
+            console.log('family inside asyncstorage: '+familyResponse )
             const familyObject = JSON.parse(familyResponse)
-            setFamily(familyObject)
+            familyID = familyObject.data.updateFamily.id
+        
+            getMembersDetails = `query refugeeInfoByFamily {
+                refugees(where:
+                  
+                  {
+              Family:{equalTo:"${familyID}"}
+                  }
+                                ) {
+                  results {
+                    name
+                    age
+        
+                  }
+                }
+              }
+              `
+              let familyQueryResponse = await gfetch("https://parseapi.back4app.com/graphql", creds.header, getMembersDetails)
+              let familyObj = JSON.parse(familyQueryResponse)
+              let membersArray = familyObj.data.refugees.results
+              storeData('membersDetails', membersArray.toString() ) 
+              setMembers(membersArray)
+              return familyObj.data.refugees.results
+        
+        }
+
+        useEffect( () => {
+            getMembersFromFamily()
+
         }, [])
         return (
             <KeyboardAwareScrollView
@@ -39,13 +76,13 @@ export default function RegRefugeeFamily ({ navigation }) {
                         style={style.LogoSavi}
                     />
                     <Text style={style.RegFamilyTitle}>Registrar Família</Text>
-                    <MemberList members={family.data.updateFamily.members.ids[0].ids}></MemberList>
+                    <MemberList style={style.member} members={members}></MemberList>
                 </View>
                 <ScrollView style={{ alignSelf: 'center', height: hp("65%")}}>
                     <Button
                         mode="outlined"
                         style={style.addMember}
-                        onPress={()=>{navigation.navigate('RegistrationRefugee')}}
+                        onPress={()=>{registrateDependent()}}
                     >
                         Adicionar membro da Família
                     </Button>
@@ -93,6 +130,15 @@ const style = StyleSheet.create({
     },
     RegFamilyTitle: { 
         fontSize: RFPercentage(4),
+        //marginLeft: wp("5%"),
+        marginTop: hp("2%"),
+        fontWeight: "bold",
+        alignSelf: 'center',
+        color: '#000',
+        marginBottom: hp('1%'),
+    },
+    member: { 
+        fontSize: RFPercentage(3),
         //marginLeft: wp("5%"),
         marginTop: hp("2%"),
         fontWeight: "bold",

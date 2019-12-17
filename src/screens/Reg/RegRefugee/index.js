@@ -21,31 +21,6 @@ export default class index extends Component {
         return stringedArray
     }
 
-    getMembersFromFamily = (familyID) =>{
-        getMembersDetails = `query refugeeInfoByFamily {
-            refugees(where:
-              
-              {
-          Family:{equalTo:"${familyID}"}
-              }
-                            ) {
-              results {
-                name
-                age
-                gender
-                scholarity
-                identificationDocument
-                identificationDocumentType
-              }
-            }
-          }
-          `
-          let familyQueryResponse = await gfetch("https://parseapi.back4app.com/graphql", creds.header, getMembersDetails)
-          let familyObj = JSON.parse(familyQueryResponse)
-          return familyObj.data.refugees.results
-
-    }
-
 
     bindMemberToFamily = async (familyID, memberID) => {
         getFamilyMembersQuery = `
@@ -78,7 +53,7 @@ export default class index extends Component {
           `
           let updatedFamilyInfo = await gfetch("https://parseapi.back4app.com/graphql", creds.header, updateFamilyQuery)
           console.log(updatedFamilyInfo) 
-          storeData('refugeeFamily', updatedFamilyInfo.toString())
+          storeData('refugeeFamily', updatedFamilyInfo)
           updatedFamilyInfo = JSON.parse(updatedFamilyInfo)
           return  updatedFamilyInfo
 
@@ -91,7 +66,6 @@ export default class index extends Component {
               members:{ids:[]}
             }){
               id
-              
             }
           }
         `
@@ -101,7 +75,7 @@ export default class index extends Component {
         console.log(response.data.createFamily.id)
         const familyid =  response.data.createFamily.id
         console.log("Family id: "+familyid)
-        const  storeOutput = await storeData("familyID", familyid.toString())
+        const  storeOutput = await storeData("familyID", familyid)
         console.log(storeOutput)
         return familyid
     }
@@ -134,7 +108,6 @@ export default class index extends Component {
           console.log("Adding memberID...")
           let response = await gfetch("https://parseapi.back4app.com/graphql", creds.header, createRefugee)
           response = JSON.parse(response)
-          console.log(response.data.createRefugee.id)
           return response.data.createRefugee.id
     }
     
@@ -169,6 +142,7 @@ export default class index extends Component {
             this.registrate()
             navigate(`RegistrationRefugeeFamily`)
         }
+        
     }
 
     state = {
