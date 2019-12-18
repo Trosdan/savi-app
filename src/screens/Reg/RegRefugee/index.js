@@ -8,6 +8,7 @@ import { TouchableHighlight } from "react-native-gesture-handler";
 import { gfetch } from "../../../services/grafetch"
 const  creds = require("../../../../creds.json")
 import {storeData, fetchData} from "../../../storage"
+import {AsyncStorage} from 'react-native'
 //import {getFamilyMembersQuery, bindMemberToFamily, createFamily, addMember} from '../../../services/backendConnections'
 export default class index extends Component {
 
@@ -53,7 +54,9 @@ export default class index extends Component {
           `
           let updatedFamilyInfo = await gfetch("https://parseapi.back4app.com/graphql", creds.header, updateFamilyQuery)
           console.log(updatedFamilyInfo) 
-          storeData('refugeeFamily', updatedFamilyInfo)
+          await storeData('refugeeFamily', updatedFamilyInfo)
+          familyDetailsFromAsyncStorage = await fetchData('refugeeFamily')
+          console.log(familyDetailsFromAsyncStorage)
           updatedFamilyInfo = JSON.parse(updatedFamilyInfo)
           return  updatedFamilyInfo
 
@@ -117,29 +120,33 @@ export default class index extends Component {
         console.log("created family")
         this.setState({familyID:familyid})
         const memberID = await this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.docType, familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.doc)
-        
         console.log("Added memberID")
-        this.bindMemberToFamily(familyid, memberID)
+        await this.bindMemberToFamily(familyid, memberID)
         console.log("binded memberID to family")
-        storeData("isNotPrimaryContact", 'true')
+        await storeData("isNotPrimaryContact", true)
         
 
     }
     
-    
-
+     
     decideWhichFunctionToUseOnRegisterButton = async () =>{
+        AsyncStorage.clear() //DEV ONLY!!!
         const {navigate} = this.props.navigation;
-        if(await fetchData("isNotPrimaryContact")){
+        let ifIsPrimaryContact = await fetchData("isNotPrimaryContact")
+        console.log(ifIsPrimaryContact)
+        if(ifIsPrimaryContact){
             this.setState({"primaryContact":false});
-            this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.docType, this.state.familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.doc)
+            familyData = await fetchData('refugeeFamily')
+            familyData = JSON.parse(familyData)
+            this.setState({familyid:familyID.data.updateFamily.id})
+            await this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.docType, this.state.familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.doc)
             console.log(`additional member`)
             
             navigate(`RegistrationRefugeeFamily`)
         }else{
             this.setState({"primaryContact":true});    
             console.log("primary contact")         
-            this.registrate()
+            await this.registrate()
             navigate(`RegistrationRefugeeFamily`)
         }
         

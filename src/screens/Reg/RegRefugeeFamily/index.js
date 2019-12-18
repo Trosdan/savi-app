@@ -10,14 +10,14 @@ const  creds = require("../../../../creds.json")
 
 function MemberList(props){
     const members = props.members;
-    const listOfMembers = members.map((member) =>
-    <>
+    const listOfMembers = members.map((member, i) =>
+    <View key={i}>
       <Text style={{fontSize:15, fontWeight: "bold"}}>{member.name}</Text>
       <Text>{member.age} anos</Text>
-    </>
+    </View>
     );
     return (
-      <View>{listOfMembers}</View>
+      <View >{listOfMembers}</View>
     );
 }
 
@@ -30,7 +30,7 @@ export default function RegRefugeeFamily ({ navigation }) {
         const getMembersFromFamily = async () =>{
             let familyResponse = await fetchData('refugeeFamily');
             console.log('family inside asyncstorage: '+familyResponse )
-            const familyObject = JSON.parse(familyResponse)
+            const familyObject = JSON.parse(JSON.parse(familyResponse))
             familyID = familyObject.data.updateFamily.id
         
             getMembersDetails = `query refugeeInfoByFamily {
@@ -51,7 +51,7 @@ export default function RegRefugeeFamily ({ navigation }) {
               let familyQueryResponse = await gfetch("https://parseapi.back4app.com/graphql", creds.header, getMembersDetails)
               let familyObj = JSON.parse(familyQueryResponse)
               let membersArray = familyObj.data.refugees.results
-              storeData('membersDetails', membersArray.toString() ) 
+              storeData('membersDetails', membersArray ) 
               setMembers(membersArray)
               return familyObj.data.refugees.results
         

@@ -1,4 +1,13 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import App from './src';
+import Reactotron, {networking, openInEditor, trackGlobalErrors, asyncStorage } from 'reactotron-react-native'
+console.log = Reactotron
+
+Reactotron
+  .configure({ host: '192.168.15.157' })
+  .useReactNative() 
+  .use(asyncStorage())
+  .use(networking())
+  .use(openInEditor())
+  .use(trackGlobalErrors())
+  .connect()
 export default  App;
