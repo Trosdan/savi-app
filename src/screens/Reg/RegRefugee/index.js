@@ -130,16 +130,16 @@ export default class index extends Component {
     
      
     decideWhichFunctionToUseOnRegisterButton = async () =>{
-        AsyncStorage.clear() //DEV ONLY!!!
         const {navigate} = this.props.navigation;
-        let ifIsPrimaryContact = await fetchData("isNotPrimaryContact")
-        console.log(ifIsPrimaryContact)
-        if(ifIsPrimaryContact){
+        let ifNotIsPrimaryContact = await fetchData("isNotPrimaryContact")
+        console.log(ifNotIsPrimaryContact)
+        if(ifNotIsPrimaryContact){
             this.setState({"primaryContact":false});
             familyData = await fetchData('refugeeFamily')
-            familyData = JSON.parse(familyData)
-            this.setState({familyid:familyID.data.updateFamily.id})
-            await this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.docType, this.state.familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.doc)
+            familyDataParsed = JSON.parse(JSON.parse(familyData))
+            this.setState({familyid:familyDataParsed.data.updateFamily.id})
+            memberid = await this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.docType, this.state.familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.doc)
+            this.bindMemberToFamily(this.state.familyID, memberid)
             console.log(`additional member`)
             
             navigate(`RegistrationRefugeeFamily`)

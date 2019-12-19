@@ -1,6 +1,5 @@
 import App from './src';
 import Reactotron, {networking, openInEditor, trackGlobalErrors, asyncStorage } from 'reactotron-react-native'
-console.log = Reactotron
 
 Reactotron
   .configure({ host: '192.168.15.157' })
