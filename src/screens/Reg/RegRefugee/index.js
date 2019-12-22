@@ -11,7 +11,6 @@ import {storeData, fetchData} from "../../../storage"
 import {AsyncStorage} from 'react-native'
 //import {getFamilyMembersQuery, bindMemberToFamily, createFamily, addMember} from '../../../services/backendConnections'
 export default class index extends Component {
-
     stringfy = (array) =>{
         stringedArray = ""
         for(index in array){
@@ -35,7 +34,7 @@ export default class index extends Component {
         `
         let familyQueryResponse = await gfetch("https://parseapi.back4app.com/graphql", creds.header, getFamilyMembersQuery)
         familyQueryResponse = JSON.parse(familyQueryResponse)
-        let familyMembers = familyQueryResponse.data.families.results[0].members.ids
+        let familyMembers = familyQueryResponse.data.families.results[0].members.ids[0].ids
         familyMembers.push(memberID)
         familyMembers = this.stringfy(familyMembers)
         updateFamilyQuery = `
@@ -130,6 +129,7 @@ export default class index extends Component {
     
      
     decideWhichFunctionToUseOnRegisterButton = async () =>{
+
         const {navigate} = this.props.navigation;
         let ifNotIsPrimaryContact = await fetchData("isNotPrimaryContact")
         console.log(ifNotIsPrimaryContact)
@@ -137,16 +137,17 @@ export default class index extends Component {
             this.setState({"primaryContact":false});
             familyData = await fetchData('refugeeFamily')
             familyDataParsed = JSON.parse(JSON.parse(familyData))
-            this.setState({familyid:familyDataParsed.data.updateFamily.id})
-            memberid = await this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.docType, this.state.familyid, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.doc)
+            this.setState({familyID:familyDataParsed.data.updateFamily.id})
+            memberid = await this.addMember(this.state.name, this.state.age, this.state.job, this.state.gender, this.state.docType, this.state.familyID, this.state.primaryContact, this.state.scholarity, this.state.email, this.state.needs, this.state.doc)
             this.bindMemberToFamily(this.state.familyID, memberid)
             console.log(`additional member`)
-            
+            debugger;
             navigate(`RegistrationRefugeeFamily`)
         }else{
             this.setState({"primaryContact":true});    
             console.log("primary contact")         
             await this.registrate()
+            debugger;
             navigate(`RegistrationRefugeeFamily`)
         }
         
@@ -215,7 +216,8 @@ export default class index extends Component {
                 resetScrollToCoords={{ x: 0, y: 0 }}
                 scrollEnabled={false}
                 contentContainerStyle={{ flexGrow: 1, justifyContent: "space-between", flexDirection: "column" }}
-            >
+            >                          
+                                                       
                 <Animated.Image
                     source={require("../../../assets/images/formback.png")}
                     resizeMode="stretch"

@@ -11,9 +11,14 @@ const  creds = require("../../../../creds.json")
 function MemberList(props){
     const members = props.members;
     const listOfMembers = members.map((member, i) =>
-    <View key={i}>
+    <View style={{flex:1, flexDirection:"row"}} key={i}>
+    <View style={{flex:2}}>
       <Text style={{fontSize:15, fontWeight: "bold"}}>{member.name}</Text>
       <Text>{member.age} anos</Text>
+    </View>
+    <View style={{flex:2}}>
+        <Button>ADD</Button>
+    </View>
     </View>
     );
     return (
