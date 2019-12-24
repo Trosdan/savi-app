@@ -11,7 +11,8 @@ import { useState, useEffect } from "react";
 import { fetchData, storeData } from "../../storage";
 import { sendEmail } from "../../services/email";
 const creds = require("../../../creds.json");
-export default OrgLogin = ({ navigation }) => {
+
+export default RefugeeLogin = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState("");
     //const [isValid, setValid] = useState(false); //utilizar posteriormente na validação de email.
@@ -38,14 +39,7 @@ export default OrgLogin = ({ navigation }) => {
         setIsLoading(true);
         return fetch("https://parseapi.back4app.com/graphql", {
             credentials: "omit",
-            headers: {
-                Accept: "*/*",
-                "content-type": "application/json",
-                "X-Parse-Application-Id": creds.appid,
-                "X-Parse-Master-Key": creds.masterkey,
-                "X-Parse-Client-Key": creds.clientkey
-            },
-
+            headers: creds.header,
             body: `{"operationName":null,"variables":{},"query":"{\\n  organizations(where: {email: {equalTo: \\"${email}\\"}}) {\\n    results {\\n      email\\n    }\\n  }\\n}\\n"}`,
             method: "POST",
             mode: "cors"
@@ -108,9 +102,7 @@ export default OrgLogin = ({ navigation }) => {
     }
     return (
         <View style={styles.container}>
-            <Title style={styles.title}>
-                Digite o email da sua organização.
-            </Title>
+            <Title style={styles.title}>Digite o seu email.</Title>
             <TextInput
                 mode="outlined"
                 style={styles.email}

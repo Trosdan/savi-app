@@ -1,12 +1,12 @@
 //navigator.geolocation = require('@react-native-community/geolocation');
 
 //import Geolocation from '@react-native-community/geolocation';
-import React, { Component } from 'react';
-import MapView from 'react-native-maps';
+import React, { Component } from "react";
+import MapView from "react-native-maps";
 
-export default class MapConf extends Component{
+export default class MapConf extends Component {
     state = {
-        region: null,
+        region: null
     };
 
     // async componentDidMount(){
@@ -20,7 +20,7 @@ export default class MapConf extends Component{
     //                    longitudeDelta: 0.1
     //                }
     //            });
-    //            console.log(latitude, longitude); 
+    //            console.log(latitude, longitude);
     //         },
     //         () => {},
     //         {
@@ -32,13 +32,13 @@ export default class MapConf extends Component{
     //     //console.log('envio');
     // }
 
-    render () {
+    render() {
         const { region } = this.state;
 
         return (
-            <MapView 
-                style={{ flex: 1 }} 
-                region={region} 
+            <MapView
+                style={{ flex: 1 }}
+                region={region}
                 showsUserLocation
                 loadingEnabled
             />
