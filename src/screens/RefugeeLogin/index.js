@@ -5,7 +5,7 @@ import {
 } from "react-native-responsive-screen";
 import { RFPercentage } from "react-native-responsive-fontsize";
 
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, SafeAreaView } from "react-native";
 import { TextInput, Button, Title } from "react-native-paper";
 import { useState, useEffect } from "react";
 import { fetchData, storeData } from "../../storage";
@@ -22,12 +22,12 @@ export default RefugeeLogin = ({ navigation }) => {
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min)) + min;
     };
-
+    
     const login = async navigation => {
         verificationCode = getRandomInt(100000, 999999);
         verificationCode = verificationCode.toString();
         await storeData("code", verificationCode);
-        storeData("loginType", "org");
+        storeData("loginType", "refugee");
         await fetchData("code").then(code => {
             console.log("codigo dentro do fetch ta:", code);
         });
@@ -40,15 +40,16 @@ export default RefugeeLogin = ({ navigation }) => {
         return fetch("https://parseapi.back4app.com/graphql", {
             credentials: "omit",
             headers: creds.header,
-            body: `{"operationName":null,"variables":{},"query":"{\\n  organizations(where: {email: {equalTo: \\"${email}\\"}}) {\\n    results {\\n      email\\n    }\\n  }\\n}\\n"}`,
+            body: `{"operationName":null,"variables":{},"query":"{\\n  refugees(where: {email: {equalTo: \\"${email}\\"}}) {\\n    results {\\n      email\\n    }\\n  }\\n}\\n"}`,
             method: "POST",
             mode: "cors"
         })
             .then(response => response.json())
             .then(responseJson => {
-                console.log(responseJson.data.organizations.results[0].email);
+                
+                
                 let responseEmail =
-                    responseJson.data.organizations.results[0].email;
+                    responseJson.data.refugees.results[0].email;
                 if (responseEmail != null) {
                     sendEmail(verificationCode, responseEmail);
                     console.log("response email: ", responseEmail);
@@ -83,7 +84,7 @@ export default RefugeeLogin = ({ navigation }) => {
             alignSelf: "center",
             color: "#000",
             textAlign: "center",
-            marginTop: hp("2%")
+            marginTop: hp("10%")
         },
         container: {}
     });
@@ -101,6 +102,7 @@ export default RefugeeLogin = ({ navigation }) => {
         );
     }
     return (
+        <SafeAreaView>
         <View style={styles.container}>
             <Title style={styles.title}>Digite o seu email.</Title>
             <TextInput
@@ -114,5 +116,6 @@ export default RefugeeLogin = ({ navigation }) => {
                 Enviar
             </Button>
         </View>
+        </SafeAreaView>
     );
 };

@@ -22,18 +22,18 @@ function MemberList(props) {
     const members = props.members;
     const listOfMembers = members.map((member, i) => (
         <View style={{ flex: 1, flexDirection: "row" }} key={i}>
-            <View style={{ flex: 2 }}>
-                <Text style={{ fontSize: 15, fontWeight: "bold" }}>
+            <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 20, fontWeight: "bold" }}>
                     {member.name}
                 </Text>
                 <Text>{member.age} anos</Text>
             </View>
-            <View style={{ flex: 2 }}>
-                <Button>ADD</Button>
-            </View>
+            {/* <View style={{ flex: 2 }}> //TODO in the next version of the app: Delete refugee in registration.
+                <Button onPress={deleteRefugee()}>-</Button>
+            </View> */}
         </View>
     ));
-    return <ScrollView style={{height:40}} horizontal={true}>{listOfMembers}</ScrollView>;
+    return <ScrollView style={{height:hp("66%"), marginLeft:wp("5%")}} horizontal={false}>{listOfMembers}</ScrollView>;
 }
 
 export default function RegRefugeeFamily({ navigation }) {
@@ -182,6 +182,7 @@ const style = StyleSheet.create({
         alignSelf: "center",
         color: "#000",
         marginBottom: hp("1%")
+        
     },
     addMember: {
         width: wp("95%")

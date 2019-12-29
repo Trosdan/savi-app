@@ -30,7 +30,7 @@ const ConfWho = ({ navigation }) => (
             <List.Item
                 title="Refugiado"
                 description="Busque ajuda agora!"
-                onPress={() => navigation.navigate("RegistrationRefugee")}
+                onPress={() => navigation.navigate("RefugeeLogin")}
                 titleStyle={styles.ListTitle}
                 descriptionStyle={styles.ListDesc}
             />

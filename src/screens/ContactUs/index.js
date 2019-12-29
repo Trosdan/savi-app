@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Title, TextInput, Button, Text } from "react-native-paper";
-import { View, Input, StyleSheet, TouchableOpacity } from "react-native";
+// import { Title, TextInput, Button, Text } from "react-native-paper";
+import { View, Text, StyleSheet, TouchableOpacity, AsyncStorage } from "react-native";
 import styled from "styled-components";
 export default ContactUs = ({ navigation }) => {
     const [email, setEmail] = useState("");
@@ -8,7 +8,7 @@ export default ContactUs = ({ navigation }) => {
     const handlePress = () => {
         navigation.navigate(" ");
     };
-    const MainTitle = styled(Title)`
+    const MainTitle = styled(Text)`
         margin-left: 35px;
         margin-top: 35px;
 
@@ -29,20 +29,20 @@ export default ContactUs = ({ navigation }) => {
         margin-left: 35px;
         color: #ffffff;
     `;
-    const SubmitButton = styled(Button)`
-        margin: 35px;
-        color: white;
-    `;
-    const Input = styled(TextInput)`
-        margin: 35px;
-    `;
-    const EmailInput = styled(TextInput)`
-        margin-bottom: 35px;
-        margin-left: 35px;
-        margin-right: 35px;
+    // const SubmitButton = styled(Button)`
+    //     margin: 35px;
+    //     color: white;
+    // `;
+    // const Input = styled(TextInput)`
+    //     margin: 35px;
+    // `;
+    // const EmailInput = styled(TextInput)`
+    //     margin-bottom: 35px;
+    //     margin-left: 35px;
+    //     margin-right: 35px;
 
-        background: #ffffff;
-    `;
+    //     background: #ffffff;
+    // `;
     //     const SInput = styled(Input)`
     //     position: absolute;
     // width: 339px;
@@ -80,6 +80,7 @@ export default ContactUs = ({ navigation }) => {
               <SubmitButton  mode="contained" onPress={()=>handlePress()}>
     Enviar
   </SubmitButton> */}
+  <TouchableOpacity style={styles.submit} onMagicTap={() => AsyncStorage.clear()}></TouchableOpacity>
         </View>
     );
 };
@@ -90,6 +91,6 @@ const styles = StyleSheet.create({
     },
     submit: {
         width: 60,
-        height: 60
+        height: 60,
     }
 });

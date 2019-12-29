@@ -178,6 +178,16 @@ export default class index extends Component {
     };
 
     decideWhichFunctionToUseOnRegisterButton = async () => {
+        const birthDate = new Date(
+            this.state.selectedYear,
+            this.state.selectedMonth,
+            this.state.selectedDay
+        );
+        const now = new Date();
+        const diffTime = Math.abs(now - birthDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffYears = diffDays / 365;
+        this.setState({ age: diffYears });
         const { navigate } = this.props.navigation;
         let ifNotIsPrimaryContact = await fetchData("isNotPrimaryContact");
         console.log(ifNotIsPrimaryContact);
@@ -212,14 +222,14 @@ export default class index extends Component {
 
     state = {
         familyID: "",
-        name: "Breno",
-        lastName: "Bertone",
-        doc: "386731652",
-        docType: "RG",
-        gender: "Masculino",
-        age: "18",
-        selectedYear: "2001",
-        selectedDay: "26",
+        name: "",
+        lastName: "",
+        doc: "",
+        docType: "",
+        gender: "",
+        age: "",
+        selectedYear: "",
+        selectedDay: "",
         fadeAnim: new Animated.Value(0),
         scrollRef: null,
         isMonthSelectorVisible: false,
@@ -364,7 +374,7 @@ export default class index extends Component {
                             />
                             <TextInput
                                 style={style.LastnameInput}
-                                label="Sobrenome"
+                                label="Sobrenome - opcional"
                                 mode="outlined"
                                 onChangeText={lastName =>
                                     this.setState({ lastName: lastName })
@@ -525,8 +535,7 @@ export default class index extends Component {
                                                     title="Janeiro"
                                                     onPress={() =>
                                                         this.setState({
-                                                            selectedMonth:
-                                                                "Janeiro"
+                                                            selectedMonth: 0
                                                         })
                                                     }
                                                     style={
@@ -546,8 +555,7 @@ export default class index extends Component {
                                                     title="Fevereiro"
                                                     onPress={() =>
                                                         this.setState({
-                                                            selectedMonth:
-                                                                "Fevereiro"
+                                                            selectedMonth: 1
                                                         })
                                                     }
                                                     style={
@@ -567,8 +575,7 @@ export default class index extends Component {
                                                     title="Março"
                                                     onPress={() =>
                                                         this.setState({
-                                                            selectedMonth:
-                                                                "Março"
+                                                            selectedMonth: 2
                                                         })
                                                     }
                                                     style={
@@ -587,8 +594,7 @@ export default class index extends Component {
                                                     title="Abril"
                                                     onPress={() =>
                                                         this.setState({
-                                                            selectedMonth:
-                                                                "Abril"
+                                                            selectedMonth: 3
                                                         })
                                                     }
                                                     style={
@@ -607,8 +613,7 @@ export default class index extends Component {
                                                     title="Maio"
                                                     onPress={() =>
                                                         this.setState({
-                                                            selectedMonth:
-                                                                "Maio"
+                                                            selectedMonth: 4
                                                         })
                                                     }
                                                     style={
@@ -627,8 +632,7 @@ export default class index extends Component {
                                                     title="Junho"
                                                     onPress={() =>
                                                         this.setState({
-                                                            selectedMonth:
-                                                                "Junho"
+                                                            selectedMonth: 5
                                                         })
                                                     }
                                                     style={
@@ -647,8 +651,7 @@ export default class index extends Component {
                                                     title="Julho"
                                                     onPress={() =>
                                                         this.setState({
-                                                            selectedMonth:
-                                                                "Julho"
+                                                            selectedMonth: 6
                                                         })
                                                     }
                                                     style={
@@ -667,8 +670,7 @@ export default class index extends Component {
                                                     title="Agosto"
                                                     onPress={() =>
                                                         this.setState({
-                                                            selectedMonth:
-                                                                "Agosto"
+                                                            selectedMonth: 7
                                                         })
                                                     }
                                                     style={
@@ -688,8 +690,7 @@ export default class index extends Component {
                                                     title="Setembro"
                                                     onPress={() =>
                                                         this.setState({
-                                                            selectedMonth:
-                                                                "Setembro"
+                                                            selectedMonth: 8
                                                         })
                                                     }
                                                     style={
@@ -709,8 +710,7 @@ export default class index extends Component {
                                                     title="Outubro"
                                                     onPress={() =>
                                                         this.setState({
-                                                            selectedMonth:
-                                                                "Outubro"
+                                                            selectedMonth: 9
                                                         })
                                                     }
                                                     style={
@@ -730,8 +730,7 @@ export default class index extends Component {
                                                     title="Novembro"
                                                     onPress={() =>
                                                         this.setState({
-                                                            selectedMonth:
-                                                                "Novembro"
+                                                            selectedMonth: 10
                                                         })
                                                     }
                                                     style={
@@ -751,8 +750,7 @@ export default class index extends Component {
                                                     title="Dezembro"
                                                     onPress={() =>
                                                         this.setState({
-                                                            selectedMonth:
-                                                                "Dezembro"
+                                                            selectedMonth: 11
                                                         })
                                                     }
                                                     style={

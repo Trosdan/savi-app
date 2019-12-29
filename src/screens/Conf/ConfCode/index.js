@@ -8,27 +8,29 @@ import {
 } from "react-native-responsive-screen";
 import { SafeAreaView } from "react-native";
 import { fetchData, storeData } from "../../../storage";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { Button } from "react-native-paper";
 
 ConfCode = ({ navigation }) => {
-    const [inputCode, setInputCode] = useState(0);
+    const [inputCode, setInputCode] = useState('');
     const [failedWarn, setFailedWarn] = useState(false);
-
+    const handleButtonPress = () => {
+        storeData('logged', true)
+        navigation.navigate("RegRefugee")
+    }
     const checkCode = () => {
         console.log("checkcode");
-
+        
         fetchData("code").then(code => {
             fetchData("loginType").then(loginType => {
-                console.log("codigo dentro do fetch ta:", code);
-                console.log(`foi inserido: ${inputCode}`);
 
+                console.log("codigo dentro do fetch ta:", code.toString());
+                console.log(`foi inserido: ${inputCode.toString()}`);
                 if (code === inputCode && loginType === "org") {
                     console.log(`Navegando para orghub...`);
                     navigation.navigate("OrgHub");
-                } else if ((code = !inputCode)) {
+                } else if ((code == !inputCode)) {
                     setFailedWarn(true);
-                } else if (code === inputCode && loginType === "refugee") {
+                } else if (code == inputCode && loginType === "refugee") {
                     console.log(`Navegando para mapscreen...`);
 
                     navigation.navigate("MapScreen");
@@ -50,12 +52,12 @@ ConfCode = ({ navigation }) => {
                 onChangeText={code => setInputCode(code)}
             />
             {/* <Text style={{color:'red'}}>{failedWarn ? 'Código incorreto :/' : ""}</Text> */}
-            <Button style={styles.continueButton} onPress={checkCode()}>
+            <Button style={styles.continueButton} onPress={()=>checkCode()}>
                 Confirmar
             </Button>
             <ButtonConfNotSend
                 style={styles.confNotSendButton}
-                onPress={() => navigation.navigate("ConfirmationNumber")}
+                onPress={() => handleButtonPress()}
             />
         </SafeAreaView>
     );
