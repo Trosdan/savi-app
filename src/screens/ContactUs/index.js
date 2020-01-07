@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 // import { Title, TextInput, Button, Text } from "react-native-paper";
-import { View, Text, StyleSheet, TouchableOpacity, AsyncStorage } from "react-native";
+import { SafeAreaView, Text, StyleSheet, TouchableOpacity, AsyncStorage } from "react-native";
 import styled from "styled-components";
 export default ContactUs = ({ navigation }) => {
     const [email, setEmail] = useState("");
@@ -9,7 +9,7 @@ export default ContactUs = ({ navigation }) => {
         navigation.navigate(" ");
     };
     const MainTitle = styled(Text)`
-        margin-left: 35px;
+        margin-left: 25px;
         margin-top: 35px;
 
         font-family: Roboto;
@@ -24,9 +24,9 @@ export default ContactUs = ({ navigation }) => {
         font-family: Roboto;
         font-style: normal;
         font-weight: bold;
-        font-size: 48px;
+        font-size: 40px;
         line-height: 75px;
-        margin-left: 35px;
+        margin-left: 25px;
         color: #ffffff;
     `;
     // const SubmitButton = styled(Button)`
@@ -38,7 +38,7 @@ export default ContactUs = ({ navigation }) => {
     // `;
     // const EmailInput = styled(TextInput)`
     //     margin-bottom: 35px;
-    //     margin-left: 35px;
+    //     margin-left: 25px;
     //     margin-right: 35px;
 
     //     background: #ffffff;
@@ -63,7 +63,7 @@ export default ContactUs = ({ navigation }) => {
     // background: #FFFFFF;
     // border-radius: 5px;`
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <MainTitle>ENTRE EM CONTATO COM:</MainTitle>
             <EmailText>alphalumen.org.br</EmailText>
             {/* <Input label='Email'
@@ -81,7 +81,7 @@ export default ContactUs = ({ navigation }) => {
     Enviar
   </SubmitButton> */}
   <TouchableOpacity style={styles.submit} onMagicTap={() => AsyncStorage.clear()}></TouchableOpacity>
-        </View>
+        </SafeAreaView>
     );
 };
 const styles = StyleSheet.create({

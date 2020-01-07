@@ -5,7 +5,13 @@ import {
 } from "react-native-responsive-screen";
 import { RFPercentage } from "react-native-responsive-fontsize";
 
-import { View, Text, StyleSheet, ActivityIndicator, SafeAreaView } from "react-native";
+import {
+    View,
+    Text,
+    StyleSheet,
+    ActivityIndicator,
+    SafeAreaView
+} from "react-native";
 import { TextInput, Button, Title } from "react-native-paper";
 import { useState, useEffect } from "react";
 import { fetchData, storeData } from "../../storage";
@@ -22,7 +28,7 @@ export default RefugeeLogin = ({ navigation }) => {
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min)) + min;
     };
-    
+
     const login = async navigation => {
         verificationCode = getRandomInt(100000, 999999);
         verificationCode = verificationCode.toString();
@@ -46,15 +52,20 @@ export default RefugeeLogin = ({ navigation }) => {
         })
             .then(response => response.json())
             .then(responseJson => {
-                
-                
-                let responseEmail =
-                    responseJson.data.refugees.results[0].email;
-                if (responseEmail != null) {
-                    sendEmail(verificationCode, responseEmail);
-                    console.log("response email: ", responseEmail);
-                    setIsLoading(false);
-                    navigation.navigate("ConfirmationCode");
+                console.log('response: '+responseJson.data.refugees.results[0])
+                if (responseJson.data.refugees.results[0] == undefined) {
+                    console.log("Email não existe no banco de dados. Redirecionando para tela de registro.")
+                    storeData('RefugeeEmail', email)
+                    navigation.navigate("RegistrationRefugee");
+                } else {
+                    let responseEmail =
+                        responseJson.data.refugees.results[0].email;
+                    if (responseEmail != null) {
+                        sendEmail(verificationCode, responseEmail);
+                        console.log("response email: ", responseEmail);
+                        setIsLoading(false);
+                        navigation.navigate("ConfirmationCode");
+                    }
                 }
                 //
                 setIsLoading(false);
@@ -103,19 +114,19 @@ export default RefugeeLogin = ({ navigation }) => {
     }
     return (
         <SafeAreaView>
-        <View style={styles.container}>
-            <Title style={styles.title}>Digite o seu email.</Title>
-            <TextInput
-                mode="outlined"
-                style={styles.email}
-                label="Email"
-                onChangeText={name => setEmail(name)}
-            />
+            <View style={styles.container}>
+                <Title style={styles.title}>Digite o seu email.</Title>
+                <TextInput
+                    mode="outlined"
+                    style={styles.email}
+                    label="Email"
+                    onChangeText={name => setEmail(name)}
+                />
 
-            <Button style={styles.button} onPress={() => login(navigation)}>
-                Enviar
-            </Button>
-        </View>
+                <Button style={styles.button} onPress={() => login(navigation)}>
+                    Enviar
+                </Button>
+            </View>
         </SafeAreaView>
     );
 };

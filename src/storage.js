@@ -15,15 +15,19 @@ export const storeData = async (key, value) => {
 export const fetchData = async key => {
     try {
         const value = await AsyncStorage.getItem(key);
-        if (value !== null) {
-            console.log(`fetching ${key}:${value}`);
-            if(value[value.length-1] == '"' && value[0  ] == '"' ){
-                return value.slice(1,-1)
-            }
-            return value;
-        }
+        console.log(`fetching ${key}:${value}`);
+        return value
     } catch (error) {
         console.log(`error fetching data ${key} -> ${error}`);
     }
 };
 export const clear = () => AsyncStorage.clear();
+
+export const unstring = (value) => {
+    if (value !== null) {
+        if(value[value.length-1] == '"' && value[0  ] == '"' ){
+            return value.slice(1,-1)
+        }
+        return value;
+    }
+}

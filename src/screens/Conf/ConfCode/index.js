@@ -7,7 +7,7 @@ import {
     heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import { SafeAreaView } from "react-native";
-import { fetchData, storeData } from "../../../storage";
+import { fetchData, storeData, unstring } from "../../../storage";
 import { Button } from "react-native-paper";
 
 ConfCode = ({ navigation }) => {
@@ -22,7 +22,8 @@ ConfCode = ({ navigation }) => {
         
         fetchData("code").then(code => {
             fetchData("loginType").then(loginType => {
-
+                loginType = unstring(loginType)
+                code = unstring(code)
                 console.log("codigo dentro do fetch ta:", code.toString());
                 console.log(`foi inserido: ${inputCode.toString()}`);
                 if (code === inputCode && loginType === "org") {

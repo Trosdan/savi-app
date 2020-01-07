@@ -12,15 +12,12 @@ import {
 } from "react-native-responsive-screen";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
+import { axheaders } from "../../creds.json";
 
 export default function components() {
     const url = "https://parseapi.back4app.com/functions/get_offer_points";
     const config = {
-        headers: {
-            "X-Parse-Application-Id":
-                "47RAnYvxm7rWLUTUZYHt9SItJjd9FnmWj5ZK5g92",
-            "X-Parse-REST-API-Key": "ZMbHFNcQ1Rvh7bIpoctydiF9yRtZDrnJ81pzhtdF"
-        }
+        headers: axheaders
     };
 
     const latitude = useSelector(state => state.user.location.latitude);
@@ -50,7 +47,7 @@ export default function components() {
         let location = await Location.getCurrentPositionAsync({
             coords: { latitude, longitude }
         });
-        changeActive(latitude, longitude);
+        changeActive(location.coords.latitude, location.coords.longitude);
         console.log("essa é a localizacao" + latitude);
     };
 

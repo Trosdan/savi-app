@@ -26,7 +26,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import axios from "axios";
-
+import { axheaders } from "../../../creds.json";
 //import { } from 'react-navigation';
 
 // import { Container } from './styles';
@@ -60,11 +60,7 @@ export default function MapScreen({ navigation }) {
 
     const url = "https://parseapi.back4app.com/functions/get_offer_points";
     const config = {
-        headers: {
-            "X-Parse-Application-Id":
-                "47RAnYvxm7rWLUTUZYHt9SItJjd9FnmWj5ZK5g92",
-            "X-Parse-REST-API-Key": "ZMbHFNcQ1Rvh7bIpoctydiF9yRtZDrnJ81pzhtdF"
-        }
+        headers: axheaders
     };
 
     function filterTabShowAnimFunc() {

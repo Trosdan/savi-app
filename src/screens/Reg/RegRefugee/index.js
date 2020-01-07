@@ -21,10 +21,20 @@ import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { TouchableHighlight } from "react-native-gesture-handler";
 import { gfetch } from "../../../services/grafetch";
 const creds = require("../../../../creds.json");
-import { storeData, fetchData } from "../../../storage";
+import { storeData, fetchData, unstring } from "../../../storage";
 import { AsyncStorage } from "react-native";
 //import {getFamilyMembersQuery, bindMemberToFamily, createFamily, addMember} from '../../../services/backendConnections'
 export default class index extends Component {
+    componentDidMount(){
+        this.setEmail()
+    }
+
+    setEmail = async () => {
+        let RefugeeEmail = await fetchData("RefugeeEmail")
+        RefugeeEmail = unstring(RefugeeEmail)
+        this.setState({email:RefugeeEmail})
+    }
+
     stringfy = array => {
         stringedArray = "";
         for (index in array) {
@@ -154,6 +164,7 @@ export default class index extends Component {
     };
 
     registrate = async () => {
+
         console.log("register");
         const familyid = await this.createFamily();
         console.log("created family");
@@ -233,7 +244,7 @@ export default class index extends Component {
         fadeAnim: new Animated.Value(0),
         scrollRef: null,
         isMonthSelectorVisible: false,
-        selectedMonth: "February"
+        selectedMonth: 2
     };
 
     _showDialog = () => this.setState({ isMonthSelectorVisible: true });
@@ -363,6 +374,15 @@ export default class index extends Component {
                                 justifyContent: "flex-end"
                             }}
                         >
+                        <TextInput
+                        style={style.TextInput}
+                        label="Email"
+                        mode="outlined"
+                        onChangeText={inputValue =>
+                            this.setState({ email: inputValue })
+                        }
+                        value={this.state.email}
+                    />
                             <TextInput
                                 style={style.NameInput}
                                 label="Nome"
@@ -381,6 +401,7 @@ export default class index extends Component {
                                 }
                                 value={this.state.lastName}
                             />
+
                             <View
                                 style={{
                                     flexDirection: "row",
@@ -469,7 +490,7 @@ export default class index extends Component {
                         >
                             <TextInput
                                 style={style.NameInput}
-                                label="Documento de Identidade"
+                                label="Documento de Identidade - opcional"
                                 mode="outlined"
                                 onChangeText={doc =>
                                     this.setState({ doc: doc })
@@ -478,7 +499,7 @@ export default class index extends Component {
                             />
                             <TextInput
                                 style={style.TextInput}
-                                label="Tipo de Documento de Identidade"
+                                label="Tipo de Documento de Identidade - opcional"
                                 mode="outlined"
                                 onChangeText={docType =>
                                     this.setState({ docType: docType })
@@ -513,7 +534,7 @@ export default class index extends Component {
                                         editable={false}
                                         disabled={true}
                                         //onFocus={ Keyboard.dismiss(), this._showDialog}
-                                        value={selectedMonth}
+                                        value={`${selectedMonth}`}
                                         theme={{
                                             colors: {
                                                 disabled: "#707070",
@@ -539,8 +560,7 @@ export default class index extends Component {
                                                         })
                                                     }
                                                     style={
-                                                        selectedMonth ==
-                                                        "Janeiro"
+                                                        selectedMonth == 0
                                                             ? {
                                                                   backgroundColor:
                                                                       "#ccc"
@@ -559,8 +579,7 @@ export default class index extends Component {
                                                         })
                                                     }
                                                     style={
-                                                        selectedMonth ==
-                                                        "Fevereiro"
+                                                        selectedMonth == 1
                                                             ? {
                                                                   backgroundColor:
                                                                       "#ccc"
@@ -579,7 +598,7 @@ export default class index extends Component {
                                                         })
                                                     }
                                                     style={
-                                                        selectedMonth == "Março"
+                                                        selectedMonth == 2
                                                             ? {
                                                                   backgroundColor:
                                                                       "#ccc"
@@ -598,7 +617,7 @@ export default class index extends Component {
                                                         })
                                                     }
                                                     style={
-                                                        selectedMonth == "Abril"
+                                                        selectedMonth == 3
                                                             ? {
                                                                   backgroundColor:
                                                                       "#ccc"
@@ -617,7 +636,7 @@ export default class index extends Component {
                                                         })
                                                     }
                                                     style={
-                                                        selectedMonth == "Maio"
+                                                        selectedMonth == 4
                                                             ? {
                                                                   backgroundColor:
                                                                       "#ccc"
@@ -636,7 +655,7 @@ export default class index extends Component {
                                                         })
                                                     }
                                                     style={
-                                                        selectedMonth == "Junho"
+                                                        selectedMonth == 5
                                                             ? {
                                                                   backgroundColor:
                                                                       "#ccc"
@@ -655,7 +674,7 @@ export default class index extends Component {
                                                         })
                                                     }
                                                     style={
-                                                        selectedMonth == "Julho"
+                                                        selectedMonth == 6
                                                             ? {
                                                                   backgroundColor:
                                                                       "#ccc"
@@ -674,8 +693,7 @@ export default class index extends Component {
                                                         })
                                                     }
                                                     style={
-                                                        selectedMonth ==
-                                                        "Agosto"
+                                                        selectedMonth == 7
                                                             ? {
                                                                   backgroundColor:
                                                                       "#ccc"
@@ -694,8 +712,7 @@ export default class index extends Component {
                                                         })
                                                     }
                                                     style={
-                                                        selectedMonth ==
-                                                        "Setembro"
+                                                        selectedMonth == 8
                                                             ? {
                                                                   backgroundColor:
                                                                       "#ccc"
@@ -714,8 +731,7 @@ export default class index extends Component {
                                                         })
                                                     }
                                                     style={
-                                                        selectedMonth ==
-                                                        "Outubro"
+                                                        selectedMonth == 9
                                                             ? {
                                                                   backgroundColor:
                                                                       "#ccc"
@@ -734,8 +750,7 @@ export default class index extends Component {
                                                         })
                                                     }
                                                     style={
-                                                        selectedMonth ==
-                                                        "Novembro"
+                                                        selectedMonth == 10
                                                             ? {
                                                                   backgroundColor:
                                                                       "#ccc"
@@ -754,8 +769,7 @@ export default class index extends Component {
                                                         })
                                                     }
                                                     style={
-                                                        selectedMonth ==
-                                                        "Dezembro"
+                                                        selectedMonth == 11
                                                             ? {
                                                                   backgroundColor:
                                                                       "#ccc"
@@ -776,10 +790,16 @@ export default class index extends Component {
                                     </Dialog>
                                 </Portal>
                                 <TextInput
+                                    keyboardType="numeric"
+                                    maxLength={4}
                                     style={style.YearInput}
                                     label="Ano"
                                     mode="outlined"
-                                    value={this.state.selectedYear}
+                                    value={`${this.state.selectedYear}`}
+                                    onChangeText={year => {
+                                        
+                                        this.setState({selectedYear:year})
+                                    }}
                                 />
                             </View>
                             <TouchableOpacity
