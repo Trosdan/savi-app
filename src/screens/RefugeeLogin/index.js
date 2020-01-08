@@ -33,47 +33,46 @@ export default RefugeeLogin = ({ navigation }) => {
         verificationCode = getRandomInt(100000, 999999);
         verificationCode = verificationCode.toString();
         await storeData("code", verificationCode);
-        storeData("loginType", "refugee");
-        await fetchData("code").then(code => {
-            console.log("codigo dentro do fetch ta:", code);
-        });
+        await storeData("loginType", "refugee");
+        // const code = await fetchData("code"); //debugging only! do NOT use in production.
+        // console.log("codigo dentro do fetch ta:", code);
         console.log("codigo de verificação:", verificationCode);
-        if (email === "") {
-            return null;
-        }
 
+        if (email === "") return null;
         setIsLoading(true);
-        return fetch("https://parseapi.back4app.com/graphql", {
+        const response = await fetch("https://parseapi.back4app.com/graphql", {
             credentials: "omit",
             headers: creds.header,
             body: `{"operationName":null,"variables":{},"query":"{\\n  refugees(where: {email: {equalTo: \\"${email}\\"}}) {\\n    results {\\n      email\\n    }\\n  }\\n}\\n"}`,
             method: "POST",
             mode: "cors"
-        })
-            .then(response => response.json())
-            .then(responseJson => {
-                console.log('response: '+responseJson.data.refugees.results[0])
-                if (responseJson.data.refugees.results[0] == undefined) {
-                    console.log("Email não existe no banco de dados. Redirecionando para tela de registro.")
-                    storeData('RefugeeEmail', email)
-                    navigation.navigate("RegistrationRefugee");
-                } else {
-                    let responseEmail =
-                        responseJson.data.refugees.results[0].email;
-                    if (responseEmail != null) {
-                        sendEmail(verificationCode, responseEmail);
-                        console.log("response email: ", responseEmail);
-                        setIsLoading(false);
-                        navigation.navigate("ConfirmationCode");
-                    }
-                }
-                //
+        });
+        responseJson = await response.json();
+        debugger;
+        console.log("response: " + responseJson.data.refugees.results[0]);
+        if (responseJson.data.refugees.results[0] == undefined) {
+            console.log(
+                "Email não existe no banco de dados. Redirecionando para tela de registro."
+            );
+            storeData("RefugeeEmail", email);
+            navigation.navigate("RegistrationRefugee");
+        } else {
+            let responseEmail = responseJson.data.refugees.results[0].email;
+            if (responseEmail != null) {
+                const emailResponse = await sendEmail(
+                    verificationCode,
+                    responseEmail
+                );
+                const emailReponseJson = await emailResponse.json();
+                console.log(`Email response: ${emailReponseJson}`);
+                debugger;
+                console.log("response email: ", responseEmail);
                 setIsLoading(false);
-            })
-            .catch(error => {
-                console.error(error);
-                setIsLoading(false);
-            });
+                navigation.navigate("ConfirmationCode");
+            }
+        }
+        //
+        setIsLoading(false);
     };
 
     const styles = StyleSheet.create({

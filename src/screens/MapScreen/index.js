@@ -244,7 +244,7 @@ export default function MapScreen({ navigation }) {
                     ) : (
                         <FAB
                             style={styles.fab}
-                            icon="search"
+                            icon="search-web"
                             onPress={() => {
                                 changeTabActive(), filterTabShowAnimFunc();
                             }}

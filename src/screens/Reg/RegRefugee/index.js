@@ -227,6 +227,7 @@ export default class index extends Component {
             this.setState({ primaryContact: true });
             console.log("primary contact");
             await this.registrate();
+            if(!this.state.email) navigate('ConfirmationCode')
             navigate(`RegistrationRefugeeFamily`);
         }
     };
