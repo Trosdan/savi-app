@@ -1,6 +1,6 @@
 import SafeAreaView from "react-native-safe-area-view";
 import { DrawerNavigatorItems } from "react-navigation-drawer";
-import { ScrollView, StyleSheet, View, Text } from "react-native";
+import { ScrollView, StyleSheet, View, Text, AsyncStorage } from "react-native";
 import React from "react";
 import {
     widthPercentageToDP as wp,
@@ -180,6 +180,16 @@ export default function CustomDrawer({ navigation }) {
                     >
                         Contato
                     </Text>
+                    <Text
+                    onPress={() => {
+                        AsyncStorage.clear()
+                        navigation.navigate("ConfirmationWho")
+                    }}
+                    style={styles.contactList}
+                    titleStyle={styles.myFamilyListTitle}
+                >
+                    Sair
+                </Text>
                 </View>
             </View>
         </View>

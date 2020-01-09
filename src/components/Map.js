@@ -48,7 +48,7 @@ export default function components() {
             coords: { latitude, longitude }
         });
         changeActive(location.coords.latitude, location.coords.longitude);
-        console.log("essa é a localizacao" + latitude);
+        console.log("essa é a localizacao" + location.coords.latitude, location.coords.longitude);
     };
 
     useEffect(() => {

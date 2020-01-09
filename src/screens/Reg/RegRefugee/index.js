@@ -900,7 +900,7 @@ export default class index extends Component {
                             }}
                         >
                             <Text style={style.RegFamilySubtitle}>
-                                Só mais algumas coisinhas
+                                Alguma necessidade que queira nos informar?
                             </Text>
                         </View>
                         <View
@@ -915,12 +915,12 @@ export default class index extends Component {
                                 style={style.NameInput}
                                 label="Data de Nascimento"
                                 mode="outlined"
+                                value={this.state.needs}
+                                onChangeText={need => {
+                                    this.setState({needs:need})
+                                }}
                             />
-                            <TextInput
-                                style={style.LastnameInput}
-                                label="Genero"
-                                mode="outlined"
-                            />
+
                             <View
                                 style={{
                                     flexDirection: "row",

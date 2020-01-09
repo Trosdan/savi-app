@@ -48,7 +48,7 @@ export default RefugeeLogin = ({ navigation }) => {
             mode: "cors"
         });
         responseJson = await response.json();
-        debugger;
+        
         console.log("response: " + responseJson.data.refugees.results[0]);
         if (responseJson.data.refugees.results[0] == undefined) {
             console.log(
@@ -65,7 +65,7 @@ export default RefugeeLogin = ({ navigation }) => {
                 );
                 const emailReponseJson = await emailResponse.json();
                 console.log(`Email response: ${emailReponseJson}`);
-                debugger;
+                
                 console.log("response email: ", responseEmail);
                 setIsLoading(false);
                 navigation.navigate("ConfirmationCode");
