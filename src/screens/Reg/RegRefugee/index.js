@@ -25,15 +25,15 @@ import { storeData, fetchData, unstring } from "../../../storage";
 import { AsyncStorage } from "react-native";
 //import {getFamilyMembersQuery, bindMemberToFamily, createFamily, addMember} from '../../../services/backendConnections'
 export default class index extends Component {
-    componentDidMount(){
-        this.setEmail()
+    componentDidMount() {
+        this.setEmail();
     }
 
     setEmail = async () => {
-        let RefugeeEmail = await fetchData("RefugeeEmail")
-        RefugeeEmail = unstring(RefugeeEmail)
-        this.setState({email:RefugeeEmail})
-    }
+        let RefugeeEmail = await fetchData("RefugeeEmail");
+        RefugeeEmail = unstring(RefugeeEmail);
+        this.setState({ email: RefugeeEmail });
+    };
 
     stringfy = array => {
         stringedArray = "";
@@ -61,8 +61,13 @@ export default class index extends Component {
             getFamilyMembersQuery
         );
         familyQueryResponse = JSON.parse(familyQueryResponse);
-        let familyMembers =
-            familyQueryResponse.data.families.results[0].members.ids;
+        if (familyQueryResponse.data.families.results[0] == undefined) {
+            familyMembers = [];
+        } else {
+            familyMembers =
+                familyQueryResponse.data.families.results[0].members.ids;
+        }
+
         familyMembers.push(memberID);
         familyMembers = this.stringfy(familyMembers);
         updateFamilyQuery = `
@@ -160,11 +165,11 @@ export default class index extends Component {
             createRefugee
         );
         response = JSON.parse(response);
+        debugger;
         return response.data.createRefugee.id;
     };
 
     registrate = async () => {
-
         console.log("register");
         const familyid = await this.createFamily();
         console.log("created family");
@@ -227,7 +232,7 @@ export default class index extends Component {
             this.setState({ primaryContact: true });
             console.log("primary contact");
             await this.registrate();
-            if(!this.state.email) navigate('ConfirmationCode')
+            if (!this.state.email) navigate("ConfirmationCode");
             navigate(`RegistrationRefugeeFamily`);
         }
     };
@@ -375,15 +380,15 @@ export default class index extends Component {
                                 justifyContent: "flex-end"
                             }}
                         >
-                        <TextInput
-                        style={style.TextInput}
-                        label="Email"
-                        mode="outlined"
-                        onChangeText={inputValue =>
-                            this.setState({ email: inputValue })
-                        }
-                        value={this.state.email}
-                    />
+                            <TextInput
+                                style={style.TextInput}
+                                label="Email"
+                                mode="outlined"
+                                onChangeText={inputValue =>
+                                    this.setState({ email: inputValue })
+                                }
+                                value={this.state.email}
+                            />
                             <TextInput
                                 style={style.NameInput}
                                 label="Nome"
@@ -798,8 +803,7 @@ export default class index extends Component {
                                     mode="outlined"
                                     value={`${this.state.selectedYear}`}
                                     onChangeText={year => {
-                                        
-                                        this.setState({selectedYear:year})
+                                        this.setState({ selectedYear: year });
                                     }}
                                 />
                             </View>
@@ -913,11 +917,11 @@ export default class index extends Component {
                         >
                             <TextInput
                                 style={style.NameInput}
-                                label="Data de Nascimento"
+                                label="Necessidade"
                                 mode="outlined"
                                 value={this.state.needs}
                                 onChangeText={need => {
-                                    this.setState({needs:need})
+                                    this.setState({ needs: need });
                                 }}
                             />
 

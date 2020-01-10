@@ -11,33 +11,33 @@ import { fetchData, storeData, unstring } from "../../../storage";
 import { Button } from "react-native-paper";
 
 ConfCode = ({ navigation }) => {
-    const [inputCode, setInputCode] = useState('');
+    const [inputCode, setInputCode] = useState("");
     const [failedWarn, setFailedWarn] = useState(false);
     const handleButtonPress = () => {
-        storeData('logged', true)
-        navigation.navigate("RegRefugee")
-    }
-    const checkCode = () => {
+        navigation.navigate("RegRefugee");
+    };
+    const checkCode = async () => {
         console.log("checkcode");
-        
-        fetchData("code").then(code => {
-            fetchData("loginType").then(loginType => {
-                loginType = unstring(loginType)
-                code = unstring(code)
-                console.log("codigo dentro do fetch ta:", code.toString());
-                console.log(`foi inserido: ${inputCode.toString()}`);
-                if (code === inputCode && loginType === "org") {
-                    console.log(`Navegando para orghub...`);
-                    navigation.navigate("OrgHub");
-                } else if ((code == !inputCode)) {
-                    setFailedWarn(true);
-                } else if (code == inputCode && loginType === "refugee") {
-                    console.log(`Navegando para mapscreen...`);
 
-                    navigation.navigate("MapScreen");
-                }
-            });
-        });
+        code = await fetchData("code");
+        loginType = await fetchData("loginType");
+        loginType = unstring(loginType);
+        code = unstring(code);
+
+        console.log("codigo dentro do fetch ta:", code.toString());
+        console.log(`foi inserido: ${inputCode.toString()}`);
+
+        if (code === inputCode && loginType === "org") {
+            console.log(`Navegando para orghub...`);
+            navigation.navigate("OrgHub");
+        } else if (code == !inputCode) {
+            setFailedWarn(true);
+        } else if (code == inputCode && loginType === "refugee") {
+            console.log("loggando usuário...");
+            storeData("logged", true);
+            console.log(`Navegando para mapscreen...`);
+            navigation.navigate("MapScreen");
+        }
     };
     return (
         <SafeAreaView style={styles.container} behavior="position" enabled>
@@ -53,7 +53,7 @@ ConfCode = ({ navigation }) => {
                 onChangeText={code => setInputCode(code)}
             />
             {/* <Text style={{color:'red'}}>{failedWarn ? 'Código incorreto :/' : ""}</Text> */}
-            <Button style={styles.continueButton} onPress={()=>checkCode()}>
+            <Button style={styles.continueButton} onPress={() => checkCode()}>
                 Confirmar
             </Button>
             <ButtonConfNotSend

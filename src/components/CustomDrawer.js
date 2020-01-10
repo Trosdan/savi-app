@@ -10,6 +10,7 @@ import { Surface, Divider, List, Button } from "react-native-paper";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { NavigationActions } from "react-navigation";
 import { useSelector, useDispatch } from "react-redux";
+import { storeData } from "../storage";
 
 navigateToScreen = route => () => {
     const navigateAction = NavigationActions.navigate({
@@ -83,8 +84,12 @@ export default function CustomDrawer({ navigation }) {
                         titleStyle={styles.myAccountListTitle}
                     />
                     <List.Item
+                        // onPress={() => {
+                        //     changeActive("Minha Familia");
+                        // }}
                         onPress={() => {
-                            changeActive("Minha Familia");
+                            storeData("lastScreen", "CustomDrawer");
+                            navigation.navigate("RegistrationRefugeeFamily");
                         }}
                         title="Minha Familia"
                         style={
@@ -181,15 +186,15 @@ export default function CustomDrawer({ navigation }) {
                         Contato
                     </Text>
                     <Text
-                    onPress={() => {
-                        AsyncStorage.clear()
-                        navigation.navigate("ConfirmationWho")
-                    }}
-                    style={styles.contactList}
-                    titleStyle={styles.myFamilyListTitle}
-                >
-                    Sair
-                </Text>
+                        onPress={() => {
+                            AsyncStorage.clear();
+                            navigation.navigate("ConfirmationWho");
+                        }}
+                        style={styles.contactList}
+                        titleStyle={styles.myFamilyListTitle}
+                    >
+                        Sair
+                    </Text>
                 </View>
             </View>
         </View>

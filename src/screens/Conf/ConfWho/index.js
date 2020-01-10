@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { List } from "react-native-paper";
 import {
     widthPercentageToDP as wp,
@@ -6,19 +6,31 @@ import {
 } from "react-native-responsive-screen";
 import { View, Image, StyleSheet, Text, SafeAreaView } from "react-native";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { fetchData } from "../../../storage";
+import { fetchData, unstring } from "../../../storage";
 // import { Container } from './styles';
 
 const ConfWho = ({ navigation }) => {
+    const verifyLogin = async () => {
+        let isLogged = await fetchData("logged");
+        let loginType = await fetchData("loginType");
+        loginType = unstring(loginType);
+        if (isLogged == "true" && loginType == "refugee") {
+            console.log("navegando para mapscreen...");
+            navigation.navigate("MapScreen");
+        }
+    };
+    verifyLogin();
+
     const handleLoginEvent = async () => {
-        const isLogged = await fetchData("loginType");
+        const isLogged = await fetchData("logged");
 
         if (isLogged) {
             navigation.navigate("MapScreen");
             console.log("Navegando para MapScreen");
+        } else if (isLogged == null) {
+            console.log("Navegando para RegRefugee");
+            navigation.navigate("RefugeeLogin");
         }
-        console.log("Navegando para RegRefugee");
-        navigation.navigate("RefugeeLogin");
     };
     return (
         <SafeAreaView
@@ -33,7 +45,7 @@ const ConfWho = ({ navigation }) => {
                 resizeMode="contain"
                 style={styles.LogoSavi}
             />
-            <Text style={styles.PageTitle}>Quem és?</Text>
+            <Text style={styles.PageTitle}>Quien eres?</Text>
             <View
                 style={{
                     backgroundColor: "#f0f0f0",
@@ -44,31 +56,31 @@ const ConfWho = ({ navigation }) => {
             <List.Section style={styles.List}>
                 <List.Item
                     title="Refugiado"
-                    description="Busque ajuda agora!"
+                    description="Obtener ayuda ahora!"
                     onPress={() => handleLoginEvent()}
                     titleStyle={styles.ListTitle}
                     descriptionStyle={styles.ListDesc}
                 />
                 <View style={{ backgroundColor: "#f0f0f0", height: ".25%" }} />
                 <List.Item
-                    title="Organizações"
-                    description="Ajude milhões!"
+                    title="Organización"
+                    description="Ayuda millones!"
                     onPress={() => navigation.navigate("ContactUs")}
                     titleStyle={styles.ListTitle}
                     descriptionStyle={styles.ListDesc}
                 />
                 <View style={{ backgroundColor: "#f0f0f0", height: ".25%" }} />
                 <List.Item
-                    title="Doadores"
-                    description="Contribua com a causa!"
+                    title="Donantes"
+                    description="Contribuya a la causa!"
                     onPress={() => navigation.navigate("ContactUs")}
                     titleStyle={styles.ListTitle}
                     descriptionStyle={styles.ListDesc}
                 />
                 <View style={{ backgroundColor: "#f0f0f0", height: ".25%" }} />
                 <List.Item
-                    title="Voluntários"
-                    description="Colabore conosco!"
+                    title="Voluntarios"
+                    description="Colabore con nosotros!"
                     onPress={() => navigation.navigate("ContactUs")}
                     titleStyle={styles.ListTitle}
                     descriptionStyle={styles.ListDesc}

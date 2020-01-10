@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Appbar, TextInput, FAB } from "react-native-paper";
 import { View, StyleSheet, TouchableOpacity, Image } from "react-native";
 import {
@@ -7,10 +7,15 @@ import {
 } from "react-native-responsive-screen";
 import { useSelector } from "react-redux";
 // import { Container } from './styles';
+import { fetchData, storeData } from "../../../storage";
 
 export default function UserProfile({ navigation }) {
     const username = useSelector(state => state.user.name);
-
+    useEffect(async () => {
+        const memberDetails = await fetchData('memberDetails')
+        const { name, age } = JSON.parse(memberDetails)
+        
+    }, []);
     return (
         <View style={styles.container}>
             <Appbar

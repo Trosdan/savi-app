@@ -5,7 +5,8 @@ import {
     SafeAreaView,
     Image,
     StyleSheet,
-    ScrollView
+    ScrollView,
+    BackHandler
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
@@ -18,7 +19,7 @@ import { fetchData, storeData } from "../../../storage";
 import { gfetch } from "../../../services/grafetch";
 const creds = require("../../../../creds.json");
 
-function MemberList(props) { 
+export function MemberList(props) {
     const members = props.members;
     const listOfMembers = members.map((member, i) => (
         <View style={{ flex: 1, flexDirection: "row" }} key={i}>
@@ -33,7 +34,14 @@ function MemberList(props) {
             </View> */}
         </View>
     ));
-    return <ScrollView style={{height:hp("66%"), marginLeft:wp("5%")}} horizontal={false}>{listOfMembers}</ScrollView>;
+    return (
+        <ScrollView
+            style={{ height: hp("66%"), marginLeft: wp("5%") }}
+            horizontal={false}
+        >
+            {listOfMembers}
+        </ScrollView>
+    );
 }
 
 export default function RegRefugeeFamily({ navigation }) {
@@ -41,6 +49,15 @@ export default function RegRefugeeFamily({ navigation }) {
     const registrateDependent = () => {
         navigation.navigate("RegistrationRefugee");
     };
+    const handleBackButton = async () => {
+        const lastScreen = await fetch("lastScreen");
+        navigation.navigate(lastScreen);
+    };
+    useEffect(() => {
+        getMembersFromFamily();
+        BackHandler.addEventListener("hardwareBackPress", handleBackButton);
+    }, []);
+
     const getMembersFromFamily = async () => {
         let familyResponse = await fetchData("refugeeFamily");
         console.log("family inside asyncstorage: " + familyResponse);
@@ -57,7 +74,11 @@ export default function RegRefugeeFamily({ navigation }) {
                   results {
                     name
                     age
-        
+                    email
+                    scholarity
+                    needs
+                    identificationDocument
+                    identificationDocumentType
                   }
                 }
               }
@@ -69,14 +90,12 @@ export default function RegRefugeeFamily({ navigation }) {
         );
         let familyObj = JSON.parse(familyQueryResponse);
         let membersArray = familyObj.data.refugees.results;
+        console.log(`Members array: ${membersArray}`);
         storeData("membersDetails", membersArray);
         setMembers(membersArray);
         return familyObj.data.refugees.results;
     };
 
-    useEffect(() => {
-        getMembersFromFamily();
-    }, []);
     return (
         <KeyboardAwareScrollView
             style={{ backgroundColor: "#FFF" }}
@@ -102,10 +121,9 @@ export default function RegRefugeeFamily({ navigation }) {
                     style={style.LogoSavi}
                 />
                 <Text style={style.RegFamilyTitle}>Registrar Família</Text>
-               
             </View>
             <ScrollView style={{ alignSelf: "center", height: hp("65%") }}>
-                 <MemberList style={style.member} members={members}></MemberList>
+                <MemberList style={style.member} members={members}></MemberList>
                 <Button
                     mode="outlined"
                     style={style.addMember}
@@ -134,7 +152,15 @@ export default function RegRefugeeFamily({ navigation }) {
                     }}
                     //onPress={() => {}}
                 >
-                    <Text style={{ color: "#707070", fontSize: 12 }}>
+                    <Text
+                        onPress={async () => {
+                            const lastScreen = await fetchData("lastScreen");
+                            if (typeof lastScreen == "string") {
+                                navigation.navigate(lastScreen);
+                            }
+                        }}
+                        style={{ color: "#707070", fontSize: 12 }}
+                    >
                         Voltar
                     </Text>
                 </Button>
@@ -182,7 +208,6 @@ const style = StyleSheet.create({
         alignSelf: "center",
         color: "#000",
         marginBottom: hp("1%")
-        
     },
     addMember: {
         width: wp("95%")

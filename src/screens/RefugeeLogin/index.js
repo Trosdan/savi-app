@@ -48,9 +48,10 @@ export default RefugeeLogin = ({ navigation }) => {
             mode: "cors"
         });
         responseJson = await response.json();
-        
+
         console.log("response: " + responseJson.data.refugees.results[0]);
         if (responseJson.data.refugees.results[0] == undefined) {
+            //verificando se o email existe no banco de dados
             console.log(
                 "Email não existe no banco de dados. Redirecionando para tela de registro."
             );
@@ -63,10 +64,13 @@ export default RefugeeLogin = ({ navigation }) => {
                     verificationCode,
                     responseEmail
                 );
-                const emailReponseJson = await emailResponse.json();
-                console.log(`Email response: ${emailReponseJson}`);
-                
-                console.log("response email: ", responseEmail);
+                if (emailResponse != undefined) {
+                    const emailReponseJson = await emailResponse.json();
+                    console.log(`Email response: ${emailReponseJson}`);
+
+                    console.log("response email: ", responseEmail);
+                }
+
                 setIsLoading(false);
                 navigation.navigate("ConfirmationCode");
             }
@@ -114,7 +118,9 @@ export default RefugeeLogin = ({ navigation }) => {
     return (
         <SafeAreaView>
             <View style={styles.container}>
-                <Title style={styles.title}>Digite o seu email.</Title>
+                <Title style={styles.title}>
+                    Ingrese su correo eletrónico aquí
+                </Title>
                 <TextInput
                     mode="outlined"
                     style={styles.email}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, Image, ScrollView } from "react-native";
 import {
     Appbar,
@@ -24,9 +24,13 @@ export default function MarkerSearch({ navigation }) {
     const latitude = useSelector(state => state.user.location.latitude);
     const longitude = useSelector(state => state.user.location.longitude);
     const dispatch = useDispatch();
-
+    const [keyword, setKeyword] = useState("");
     const markers = useSelector(state => state.markers);
 
+    const search = async keyword => {
+        const results = await fetch()
+        
+    };
     async function read_offers(data) {
         if (data === 0) {
             return await axios.post(url, {}, config).then(res => {

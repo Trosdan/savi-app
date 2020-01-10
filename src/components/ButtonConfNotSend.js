@@ -9,7 +9,7 @@ export default class ButtonConfNotSend extends Component {
                 onPress={this.props.onPress}
             >
                 <Text style={styles.caption}>
-                    Não recebi o código de confirmação
+                    No recibí el código de verificación
                 </Text>
             </TouchableOpacity>
         );

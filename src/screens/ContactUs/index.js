@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 // import { Title, TextInput, Button, Text } from "react-native-paper";
-import { SafeAreaView, Text, StyleSheet, TouchableOpacity, AsyncStorage } from "react-native";
+import {
+    SafeAreaView,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    AsyncStorage
+} from "react-native";
 import styled from "styled-components";
 export default ContactUs = ({ navigation }) => {
     const [email, setEmail] = useState("");
@@ -10,12 +16,13 @@ export default ContactUs = ({ navigation }) => {
     };
     const MainTitle = styled(Text)`
         margin-left: 25px;
+        margin-right: 5px;
         margin-top: 35px;
 
         font-family: Roboto;
         font-style: normal;
         font-weight: bold;
-        font-size: 64px;
+        font-size: 60px;
         line-height: 75px;
 
         color: #ffffff;
@@ -24,7 +31,7 @@ export default ContactUs = ({ navigation }) => {
         font-family: Roboto;
         font-style: normal;
         font-weight: bold;
-        font-size: 40px;
+        font-size: 36px;
         line-height: 75px;
         margin-left: 25px;
         color: #ffffff;
@@ -64,8 +71,8 @@ export default ContactUs = ({ navigation }) => {
     // border-radius: 5px;`
     return (
         <SafeAreaView style={styles.container}>
-            <MainTitle>ENTRE EM CONTATO COM:</MainTitle>
-            <EmailText>alphalumen.org.br</EmailText>
+            <MainTitle>ENTRE EN CONTACTO CON:</MainTitle>
+            <EmailText>colombia@savi.app</EmailText>
             {/* <Input label='Email'
             value={email}
             mode='flat'
@@ -80,7 +87,6 @@ export default ContactUs = ({ navigation }) => {
               <SubmitButton  mode="contained" onPress={()=>handlePress()}>
     Enviar
   </SubmitButton> */}
-  <TouchableOpacity style={styles.submit} onMagicTap={() => AsyncStorage.clear()}></TouchableOpacity>
         </SafeAreaView>
     );
 };
@@ -91,6 +97,6 @@ const styles = StyleSheet.create({
     },
     submit: {
         width: 60,
-        height: 60,
+        height: 60
     }
 });
