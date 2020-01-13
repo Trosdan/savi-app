@@ -16,6 +16,7 @@ import { TextInput, Button, Title } from "react-native-paper";
 import { useState, useEffect } from "react";
 import { fetchData, storeData } from "../../storage";
 import { sendEmail } from "../../services/email";
+import { gfetch } from "../../services/grafetch";
 const creds = require("../../../creds.json");
 
 export default RefugeeLogin = ({ navigation }) => {
@@ -28,8 +29,49 @@ export default RefugeeLogin = ({ navigation }) => {
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min)) + min;
     };
-
+    const storeFamilyDetails = async email => {
+        console.log("storing family details...");
+        getFamilyIDQuery = `
+        query{
+        refugees(limit:1, where:{email:{equalTo:"${email}"}}){
+            results{
+                Family {
+                    id
+                }
+            }
+        }
+        }`;
+        let queryResponse = await gfetch(
+            "https://parseapi.back4app.com/graphql",
+            creds.header,
+            getFamilyIDQuery
+        );
+        debugger;
+        const familyID = JSON.parse(queryResponse).data.refugees.results[0]
+            .Family.id;
+        const getFamilyDetailsQuery = `
+        query{
+        families(where:{id:{equalTo:"${familyID}"}}){
+            results{
+            id 
+            members
+            }
+        }
+        }`;
+        queryResponse = await gfetch(
+            "https://parseapi.back4app.com/graphql",
+            creds.header,
+            getFamilyDetailsQuery
+        );
+        storeData(
+            "refugeeFamily",
+            JSON.parse(queryResponse).data.families.results
+        );
+    };
     const login = async navigation => {
+        await storeData("RefugeeEmail", email);
+        storeFamilyDetails(email);
+
         verificationCode = getRandomInt(100000, 999999);
         verificationCode = verificationCode.toString();
         await storeData("code", verificationCode);
@@ -55,7 +97,6 @@ export default RefugeeLogin = ({ navigation }) => {
             console.log(
                 "Email não existe no banco de dados. Redirecionando para tela de registro."
             );
-            storeData("RefugeeEmail", email);
             navigation.navigate("RegistrationRefugee");
         } else {
             let responseEmail = responseJson.data.refugees.results[0].email;

@@ -15,8 +15,6 @@ const ConfWho = ({ navigation }) => {
         let loginType = await fetchData("loginType");
         loginType = unstring(loginType);
         if (isLogged == "true" && loginType == "refugee") {
-            debugger;
-
             console.log("navegando para mapscreen...");
             navigation.navigate("MapScreen");
         }
@@ -31,7 +29,7 @@ const ConfWho = ({ navigation }) => {
             navigation.navigate("MapScreen");
             console.log("Navegando para MapScreen");
         } else if (isLogged == null) {
-            console.log("Navegando para RegRefugee");
+            console.log("Navegando para RefugeeLogin");
             navigation.navigate("RefugeeLogin");
         }
     };

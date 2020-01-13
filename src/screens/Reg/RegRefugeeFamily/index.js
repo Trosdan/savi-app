@@ -15,7 +15,7 @@ import {
 } from "react-native-responsive-screen";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { Button, List } from "react-native-paper";
-import { fetchData, storeData } from "../../../storage";
+import { fetchData, storeData, seeAllValues } from "../../../storage";
 import { gfetch } from "../../../services/grafetch";
 const creds = require("../../../../creds.json");
 
@@ -54,6 +54,7 @@ export default function RegRefugeeFamily({ navigation }) {
         // navigation.navigate(lastScreen);
     };
     useEffect(() => {
+        seeAllValues();
         console.log("RegRefugeeFamily");
         getMembersFromFamily();
         BackHandler.addEventListener("hardwareBackPress", handleBackButton);
@@ -63,7 +64,7 @@ export default function RegRefugeeFamily({ navigation }) {
         let familyResponse = await fetchData("refugeeFamily");
         console.log("family inside asyncstorage: " + familyResponse);
         const familyObject = JSON.parse(JSON.parse(familyResponse));
-        debugger;
+
         familyID = familyObject.data.updateFamily.id;
 
         getMembersDetails = `query refugeeInfoByFamily {

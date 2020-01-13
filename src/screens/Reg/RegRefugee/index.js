@@ -165,7 +165,7 @@ export default class index extends Component {
             createRefugee
         );
         response = JSON.parse(response);
-        debugger;
+
         return response.data.createRefugee.id;
     };
 
