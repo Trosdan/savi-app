@@ -21,8 +21,9 @@ const ConfWho = ({ navigation }) => {
             navigation.navigate("MapScreen");
         }
     };
-    verifyLogin();
-
+    useEffect(() => {
+        verifyLogin();
+    }, []);
     const handleLoginEvent = async () => {
         const isLogged = await fetchData("logged");
 
