@@ -89,6 +89,7 @@ export default function CustomDrawer({ navigation }) {
                         // }}
                         onPress={() => {
                             storeData("lastScreen", "CustomDrawer");
+                            debugger;
                             navigation.navigate("RegistrationRefugeeFamily");
                         }}
                         title="Minha Familia"

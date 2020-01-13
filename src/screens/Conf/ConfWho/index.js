@@ -15,6 +15,8 @@ const ConfWho = ({ navigation }) => {
         let loginType = await fetchData("loginType");
         loginType = unstring(loginType);
         if (isLogged == "true" && loginType == "refugee") {
+            debugger;
+
             console.log("navegando para mapscreen...");
             navigation.navigate("MapScreen");
         }
