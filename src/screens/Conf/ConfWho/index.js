@@ -24,7 +24,7 @@ const ConfWho = ({ navigation }) => {
     useEffect(() => {
         verifyLogin();
     }, []);
-    const handleLoginEvent = async () => {
+    const handleLoginPressEvent = async () => {
         const isLogged = await fetchData("logged");
 
         if (isLogged) {
@@ -60,7 +60,7 @@ const ConfWho = ({ navigation }) => {
                 <List.Item
                     title="Refugiado"
                     description="Obtener ayuda ahora!"
-                    onPress={() => handleLoginEvent()}
+                    onPress={() => handleLoginPressEvent()}
                     titleStyle={styles.ListTitle}
                     descriptionStyle={styles.ListDesc}
                 />
