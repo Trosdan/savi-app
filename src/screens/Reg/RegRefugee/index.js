@@ -1,78 +1,303 @@
-import React, { Component } from 'react';
-import { View, Image, StyleSheet, ScrollView, Animated, Text, Dimensions, Keyboard, TouchableOpacity } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import { Button, TextInput, Portal, Dialog, List } from 'react-native-paper';
+import React, { Component } from "react";
+import {
+    View,
+    Image,
+    StyleSheet,
+    ScrollView,
+    Animated,
+    Text,
+    Dimensions,
+    Keyboard,
+    TouchableOpacity,
+    SafeAreaView
+} from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import {
+    widthPercentageToDP as wp,
+    heightPercentageToDP as hp
+} from "react-native-responsive-screen";
+import { Button, TextInput, Portal, Dialog, List } from "react-native-paper";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { TouchableHighlight } from 'react-native-gesture-handler';
-// import { Container } from './styles';
-
+import { TouchableHighlight } from "react-native-gesture-handler";
+import { gfetch } from "../../../services/grafetch";
+const creds = require("../../../../creds.json");
+import { storeData, fetchData, unstring } from "../../../storage";
+import { AsyncStorage } from "react-native";
+//import {getFamilyMembersQuery, bindMemberToFamily, createFamily, addMember} from '../../../services/backendConnections'
 export default class index extends Component {
-    registrate = () => {
-        fetch(`https://parseapi.back4app.com/graphql",{"credentials":"omit","headers":{"accept":"*/*","accept-language":"pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7","content-type":"application/json","sec-fetch-mode":"cors","sec-fetch-site":"same-site","x-parse-application-id":"47RAnYvxm7rWLUTUZYHt9SItJjd9FnmWj5ZK5g92","x-parse-client-key":"WLyCpihyllj8cxhhuVZk9b15JkbMeSt5q2IURgAW","x-parse-master-key":"32qb1Of9n8jESGsr3TESg9RUAxJTrZbpGVVKIk3v"},"referrer":"https://parse-dashboard.back4app.com/apps/2e02d985-4038-4b1e-91e7-09d9e451c149/api_console/graphql","referrerPolicy":"no-referrer-when-downgrade","body":"{\"operationName\":null,\"variables\":{},\"query\":\"mutation {\\n  createRefugee(fields: {name: \\\"${this.state.firstName}\\\", age: \\\"${this.state.age}\\\", job: \\\"${this.state.job}\\\", gender: \\\"${this.state.selectedGender}\\\", identificationDocumentType: \\\"${this.state.docType}\\\", familyID: 1, primaryContact: true, scholarity: \\\"${this.state.scholarity}\\\", email: \\\"${this.state.email}\\\", needs: \\\"${this.state.needs}\\\", identificationDocument: \\\"${this.state.doc}\\\"}) {\\n    name\\n  }\\n}\\n\"}","method":"POST","mode":"cors"});
-        navigate("RegistrationRefugeeFamily`)
+    componentDidMount() {
+        this.setEmail();
     }
+
+    setEmail = async () => {
+        let RefugeeEmail = await fetchData("RefugeeEmail");
+        RefugeeEmail = unstring(RefugeeEmail);
+        this.setState({ email: RefugeeEmail });
+    };
+
+    stringfy = array => {
+        stringedArray = "";
+        for (index in array) {
+            item = array[index];
+            item = `"${item}",`;
+            stringedArray = stringedArray.concat(item);
+        }
+        return stringedArray;
+    };
+
+    bindMemberToFamily = async (familyID, memberID) => {
+        getFamilyMembersQuery = `
+            query {
+                families(where: { id: { equalTo: "${familyID}"} }) {
+                results {
+                    members
+                }
+                }
+            }
+        `;
+        let familyQueryResponse = await gfetch(
+            "https://parseapi.back4app.com/graphql",
+            creds.header,
+            getFamilyMembersQuery
+        );
+        familyQueryResponse = JSON.parse(familyQueryResponse);
+        if (familyQueryResponse.data.families.results[0] == undefined) {
+            familyMembers = [];
+        } else {
+            familyMembers =
+                familyQueryResponse.data.families.results[0].members.ids;
+        }
+
+        familyMembers.push(memberID);
+        familyMembers = this.stringfy(familyMembers);
+        updateFamilyQuery = `
+        mutation {
+            updateFamily(id: "${familyID}", 
+              fields: {
+              members: {
+                  ids:[ ${familyMembers}]
+                } 
+            }) {
+              id
+              members
+            }
+          }
+          
+          `;
+        let updatedFamilyInfo = await gfetch(
+            "https://parseapi.back4app.com/graphql",
+            creds.header,
+            updateFamilyQuery
+        );
+        console.log(updatedFamilyInfo);
+        await storeData("refugeeFamily", updatedFamilyInfo);
+        familyDetailsFromAsyncStorage = await fetchData("refugeeFamily");
+        console.log(familyDetailsFromAsyncStorage);
+        updatedFamilyInfo = JSON.parse(updatedFamilyInfo);
+        return updatedFamilyInfo;
+    };
+    createFamily = async () => {
+        createFamilyQuery = `
+        mutation{
+            createFamily(
+              fields :{
+              members:{ids:[]}
+            }){
+              id
+            }
+          }
+        `;
+        console.log("creating family...");
+        let response = await gfetch(
+            "https://parseapi.back4app.com/graphql",
+            creds.header,
+            createFamilyQuery
+        );
+        response = JSON.parse(response);
+        console.log(response.data.createFamily.id);
+        const familyid = response.data.createFamily.id;
+        console.log("Family id: " + familyid);
+        const storeOutput = await storeData("familyID", familyid);
+        console.log(storeOutput);
+        return familyid;
+    };
+
+    addMember = async (
+        name = "",
+        age = "",
+        job = "",
+        gender = "",
+        docType = "",
+        familyID = "",
+        primaryContact = "",
+        scholarity = "",
+        email = "",
+        needs = "",
+        identificationDocument = ""
+    ) => {
+        const createRefugee = `
+        mutation {
+            createRefugee(
+              fields: {
+                name: "${name}"
+                age: "${age}"
+                job: "${job}"
+                gender: "${gender}"
+                identificationDocumentType: "${docType}" 
+                Family: {
+                    link: "${familyID}"
+                            }
+                primaryContact: ${primaryContact}
+                scholarity: "${scholarity}" 
+                email: "${email}"
+                needs: "${needs}" 
+                identificationDocument: "${identificationDocument}" 
+              }
+            ) {
+              id
+            }
+          }
+          `;
+        console.log("Adding memberID...");
+        let response = await gfetch(
+            "https://parseapi.back4app.com/graphql",
+            creds.header,
+            createRefugee
+        );
+        response = JSON.parse(response);
+
+        return response.data.createRefugee.id;
+    };
+
+    registrate = async () => {
+        console.log("register");
+        const familyid = await this.createFamily();
+        console.log("created family");
+        this.setState({ familyID: familyid });
+        const memberID = await this.addMember(
+            this.state.name,
+            this.state.age,
+            this.state.job,
+            this.state.gender,
+            this.state.docType,
+            familyid,
+            this.state.primaryContact,
+            this.state.scholarity,
+            this.state.email,
+            this.state.needs,
+            this.state.doc
+        );
+        console.log("Added memberID");
+        await this.bindMemberToFamily(familyid, memberID);
+        console.log("binded memberID to family");
+        await storeData("isNotPrimaryContact", true);
+    };
+
+    decideWhichFunctionToUseOnRegisterButton = async () => {
+        const birthDate = new Date(
+            this.state.selectedYear,
+            this.state.selectedMonth,
+            this.state.selectedDay
+        );
+        const now = new Date();
+        const diffTime = Math.abs(now - birthDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffYears = diffDays / 365;
+        this.setState({ age: diffYears });
+        const { navigate } = this.props.navigation;
+        let ifNotIsPrimaryContact = await fetchData("isNotPrimaryContact");
+        console.log(ifNotIsPrimaryContact);
+        if (ifNotIsPrimaryContact) {
+            this.setState({ primaryContact: false });
+            familyData = await fetchData("refugeeFamily");
+            familyDataParsed = JSON.parse(JSON.parse(familyData));
+            this.setState({ familyID: familyDataParsed.data.updateFamily.id });
+            memberid = await this.addMember(
+                this.state.name,
+                this.state.age,
+                this.state.job,
+                this.state.gender,
+                this.state.docType,
+                this.state.familyID,
+                this.state.primaryContact,
+                this.state.scholarity,
+                this.state.email,
+                this.state.needs,
+                this.state.doc
+            );
+            this.bindMemberToFamily(this.state.familyID, memberid);
+            console.log(`additional member`);
+            navigate(`RegistrationRefugeeFamily`);
+        } else {
+            this.setState({ primaryContact: true });
+            console.log("primary contact");
+            await this.registrate();
+            if (!this.state.email) navigate("ConfirmationCode");
+            navigate(`RegistrationRefugeeFamily`);
+        }
+    };
+
     state = {
-        firstName: '',
-        lastName: '',
-        doc: '',
-        selectedGender: '',
-        age: '',
-        selectedYear: '',
-        selectedDay: '',
+        familyID: "",
+        name: "",
+        lastName: "",
+        doc: "",
+        docType: "",
+        gender: "",
+        age: "",
+        selectedYear: "",
+        selectedDay: "",
         fadeAnim: new Animated.Value(0),
         scrollRef: null,
         isMonthSelectorVisible: false,
-        selectedMonth: '',
+        selectedMonth: 2
     };
 
     _showDialog = () => this.setState({ isMonthSelectorVisible: true });
 
     _hideDialog = () => this.setState({ isMonthSelectorVisible: false });
 
-    _selectRadioButton = (value) => this.setState({ checked: value });
+    _selectRadioButton = value => this.setState({ checked: value });
 
     render() {
-        const {navigate} = this.props.navigation;
+        const { navigate } = this.props.navigation;
         const SCREEN_WIDTH = Dimensions.get("window").width;
         this.state.scrollRef = React.createRef();
 
         const { fadeAnim, isMonthSelectorVisible, selectedMonth } = this.state;
-        function hideAnimFunc () {
-            Animated.spring(
-                fadeAnim,
-                {
-                    toValue: 100,
-                },
-            ).start();
+        function hideAnimFunc() {
+            Animated.spring(fadeAnim, {
+                toValue: 100
+            }).start();
             console.log(hideAnimPerc);
-        };
-        function showAnimFunc () {
-            Animated.spring(
-                fadeAnim,
-                {
-                    toValue: 0,
-                },
-            ).start();
+        }
+        function showAnimFunc() {
+            Animated.spring(fadeAnim, {
+                toValue: 0
+            }).start();
         }
         const hideAnimPerc = fadeAnim.interpolate({
             inputRange: [0, 100],
-            outputRange: [hp('-10%'), hp('-30%')]
-        }); 
+            outputRange: [hp("-10%"), hp("-30%")]
+        });
         const hideAnimPercView = fadeAnim.interpolate({
             inputRange: [0, 100],
-            outputRange: [hp('45%'), hp('25%')]
-        }); 
+            outputRange: [hp("45%"), hp("25%")]
+        });
         const extendFormView = fadeAnim.interpolate({
             inputRange: [0, 100],
-            outputRange: [hp('50%'), hp('70%')]
-        }); 
+            outputRange: [hp("50%"), hp("70%")]
+        });
         return (
-            <KeyboardAwareScrollView
+            <SafeAreaView
                 style={{ backgroundColor: "#FFF" }}
                 resetScrollToCoords={{ x: 0, y: 0 }}
                 scrollEnabled={false}
-                contentContainerStyle={{ flexGrow: 1, justifyContent: 'space-between', flexDirection: 'column' }}
+                contentContainerStyle={{
+                    flexGrow: 1,
+                    justifyContent: "space-between",
+                    flexDirection: "column"
+                }}
             >
                 <Animated.Image
                     source={require("../../../assets/images/formback.png")}
@@ -82,11 +307,17 @@ export default class index extends Component {
                         width: "100%",
                         height: hp("55%"),
                         position: "absolute",
-                        top:  hideAnimPerc
-                        //transform: [{translateY: fadeAnim._value}]          
+                        top: hideAnimPerc
+                        //transform: [{translateY: fadeAnim._value}]
                     }}
                 />
-                <Animated.View style={{ justifyContent: 'flex-start', alignSelf: 'center', height: hideAnimPercView}}>
+                <Animated.View
+                    style={{
+                        justifyContent: "flex-start",
+                        alignSelf: "center",
+                        height: hideAnimPercView
+                    }}
+                >
                     <Image
                         resizeMethod="auto"
                         source={require("../../../assets/images/savibranco.png")}
@@ -94,349 +325,665 @@ export default class index extends Component {
                         style={style.LogoSavi}
                     />
                     <Text style={style.RegFamilyTitle}>Registrar Família</Text>
-                    <Text style={style.RegFamilyText} >Todos os membros da familia devem estar no mesmo lugar, se estão em localizações diferentes devem se registrar em celulares diferentes</Text>
+                    <Text style={style.RegFamilyText}>
+                        Todos os membros da familia devem estar no mesmo lugar,
+                        se estão em localizações diferentes devem se registrar
+                        em celulares diferentes
+                    </Text>
                 </Animated.View>
-                <Animated.ScrollView 
-                    style={{height: extendFormView}}
+                <Animated.ScrollView
+                    style={{ height: extendFormView }}
                     horizontal
                     pagingEnabled
                     scrollEnabled={false}
                     showsHorizontalScrollIndicator={false}
-                    ref={(c) => {this.scroll = c}}
-                    onScroll={Animated.event( [{ nativeEvent: { contentOffset: { x: this.animation, }, }, },], { useNativeDriver: true } )}
+                    ref={c => {
+                        this.scroll = c;
+                    }}
+                    onScroll={Animated.event(
+                        [
+                            {
+                                nativeEvent: {
+                                    contentOffset: { x: this.animation }
+                                }
+                            }
+                        ],
+                        { useNativeDriver: true }
+                    )}
+                >
+                    <View
+                        style={{
+                            width: SCREEN_WIDTH,
+                            backgroundColor: "#fff",
+                            height: hp("50%")
+                            //justifyContent: "space-between"
+                        }}
+                        index={0}
                     >
-                        <View 
-                            style={{ 
-                                width: SCREEN_WIDTH, 
-                                backgroundColor: '#fff', 
-                                height: hp("50%"), 
-                                //justifyContent: 'space-between' 
-                                }} 
-                            index={0}
-                        >
-                            <View style={{
-                                width: SCREEN_WIDTH, 
-                                backgroundColor: '#fff', 
+                        <View
+                            style={{
+                                width: SCREEN_WIDTH,
+                                backgroundColor: "#fff",
                                 height: hp("10%"),
-                                justifyContent: 'flex-start' 
-                            }}>
-                                <Text style={style.RegFamilySubtitle}>Registrar contato principal da Familia</Text>
-                            </View>  
-                            <View style={{
-                                width: SCREEN_WIDTH, 
-                                backgroundColor: '#fff', 
+                                justifyContent: "flex-start"
+                            }}
+                        >
+                            <Text style={style.RegFamilySubtitle}>
+                                Registrar contato principal da Familia
+                            </Text>
+                        </View>
+                        <View
+                            style={{
+                                width: SCREEN_WIDTH,
+                                backgroundColor: "#fff",
                                 height: hp("40%"),
-                                justifyContent: 'flex-end' 
-                            }}>
-                                <TextInput
-                                    style={style.NameInput}
-                                    label='Nome'
-                                    mode='outlined'
-                                    onChangeText={firstName => this.setState({firstName:firstName})}
-                                    value={this.state.firstName}
-                                />
-                                <TextInput
-                                    style={style.LastnameInput}
-                                    label='Sobrenome'
-                                    mode='outlined'
-                                    onChangeText={lastName => this.setState({lastName:lastName})}
-                                    value={this.state.lastName}
-                                />
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
-                                    <Button
-                                        mode="text"  
-                                        icon="chevron-left"
-                                        style={{
-                                        //height: hp('6%'),
+                                justifyContent: "flex-end"
+                            }}
+                        >
+                            <TextInput
+                                style={style.TextInput}
+                                label="Email"
+                                mode="outlined"
+                                onChangeText={inputValue =>
+                                    this.setState({ email: inputValue })
+                                }
+                                value={this.state.email}
+                            />
+                            <TextInput
+                                style={style.NameInput}
+                                label="Nome"
+                                mode="outlined"
+                                onChangeText={name =>
+                                    this.setState({ name: name })
+                                }
+                                value={this.state.name}
+                            />
+                            <TextInput
+                                style={style.LastnameInput}
+                                label="Sobrenome - opcional"
+                                mode="outlined"
+                                onChangeText={lastName =>
+                                    this.setState({ lastName: lastName })
+                                }
+                                value={this.state.lastName}
+                            />
+
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between"
+                                }}
+                            >
+                                <Button
+                                    mode="text"
+                                    icon="chevron-left"
+                                    style={{
+                                        //height: hp("6%"),
                                         width: wp("28%"),
                                         marginLeft: wp("5%"),
                                         marginBottom: hp("2%"),
-                                        alignSelf:'flex-end',                                    
-                                        }}
-                                        onPress={() => this.scroll.getNode().scrollTo({x: 0})}
-                                    >
-                                        <Text style={{ color: '#707070', fontSize: 12 }}>Voltar</Text>
-                                    </Button>
-                                    <Button
-                                        mode="contained"  
+                                        alignSelf: "flex-end"
+                                    }}
+                                    onPress={() =>
+                                        this.scroll.getNode().scrollTo({ x: 0 })
+                                    }
+                                >
+                                    <Text
                                         style={{
-                                        //height: hp('6%'),
+                                            color: "#707070",
+                                            fontSize: 12
+                                        }}
+                                    >
+                                        Voltar
+                                    </Text>
+                                </Button>
+                                <Button
+                                    mode="contained"
+                                    style={{
+                                        //height: hp("6%"),
                                         width: wp("28%"),
                                         marginRight: wp("5%"),
                                         marginBottom: hp("2%"),
-                                        alignSelf:'flex-end'
+                                        alignSelf: "flex-end"
+                                    }}
+                                    onPress={() => {
+                                        this.scroll
+                                            .getNode()
+                                            .scrollTo({ x: SCREEN_WIDTH }),
+                                            hideAnimFunc();
+                                    }}
+                                >
+                                    <Text
+                                        style={{
+                                            color: "#ffffff",
+                                            fontSize: 12
                                         }}
-                                        onPress={() => {this.scroll.getNode().scrollTo({x: SCREEN_WIDTH}), hideAnimFunc()}}
                                     >
-                                        <Text style={{ color: '#ffffff', fontSize: 12 }}>Continuar</Text>
-                                    </Button>
-                                </View>
+                                        Continuar
+                                    </Text>
+                                </Button>
                             </View>
                         </View>
-                        <Animated.View 
-                            style={{ 
-                                width: SCREEN_WIDTH, 
-                                backgroundColor: '#fff', 
-                                height: extendFormView, 
-                                justifyContent: 'flex-end' 
-                                }} 
-                            index={1}
-                        >
-                            <View style={{
-                                width: SCREEN_WIDTH, 
-                                backgroundColor: '#fff', 
+                    </View>
+                    <Animated.View
+                        style={{
+                            width: SCREEN_WIDTH,
+                            backgroundColor: "#fff",
+                            height: extendFormView,
+                            justifyContent: "flex-end"
+                        }}
+                        index={1}
+                    >
+                        <View
+                            style={{
+                                width: SCREEN_WIDTH,
+                                backgroundColor: "#fff",
                                 height: hp("10%"),
-                                justifyContent: 'flex-start' 
-                            }}>
-                                <Text style={style.RegFamilySubtitle}>Precisamos de mais informações</Text>
-                            </View>
-                            <View style={{
-                                width: SCREEN_WIDTH, 
-                                backgroundColor: '#fff', 
+                                justifyContent: "flex-start"
+                            }}
+                        >
+                            <Text style={style.RegFamilySubtitle}>
+                                Precisamos de mais informações
+                            </Text>
+                        </View>
+                        <View
+                            style={{
+                                width: SCREEN_WIDTH,
+                                backgroundColor: "#fff",
                                 height: hp("60%"),
-                                justifyContent: 'flex-end' 
-                            }}>
-                                <TextInput
-                                    style={style.NameInput}
-                                    label='Documento de Identidade'
-                                    mode='outlined'
-                                    onChangeText={doc => this.setState({doc:doc})}
-                                    value={this.state.doc}
-                                />
-                                <TextInput
-                                    style={style.TextInput}
-                                    label='Tipo de Documento de Identidade'
-                                    mode='outlined'
-                                    onChangeText={docType => this.setState({docType:docType})}
-                                    value={this.state.docType}
-                                />
-                                <View style={{
-                                    flexDirection: 'row',
-                                    justifyContent: 'space-between',
+                                justifyContent: "flex-end"
+                            }}
+                        >
+                            <TextInput
+                                style={style.NameInput}
+                                label="Documento de Identidade - opcional"
+                                mode="outlined"
+                                onChangeText={doc =>
+                                    this.setState({ doc: doc })
+                                }
+                                value={this.state.doc}
+                            />
+                            <TextInput
+                                style={style.TextInput}
+                                label="Tipo de Documento de Identidade - opcional"
+                                mode="outlined"
+                                onChangeText={docType =>
+                                    this.setState({ docType: docType })
+                                }
+                                value={this.state.docType}
+                            />
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
                                     marginLeft: wp("5%"),
                                     marginRight: wp("5%"),
                                     marginBottom: hp("2%")
-                                }}>
-                                    <TextInput
-                                        style={style.DayInput}
-                                        label='Dia'
-                                        mode='outlined'
-                                        onChangeText={selectedDay => this.setState({selectedDay:selectedDay})}
-                                        value={this.state.selectedDay}
-                                    />
-                                    <TouchableOpacity
-                                        onPress={this._showDialog}
-                                    >
-                                        <TextInput
-                                            style={style.MonthInput}
-                                            label='Mês'
-                                            mode='outlined'
-                                            editable={false}
-                                            disabled={true}
-                                            //onFocus={ Keyboard.dismiss(), this._showDialog}
-                                            value={selectedMonth}
-                                            theme={{ colors: {
-                                                disabled: '#707070',
-                                                placeholder: '#000'
-                                            }}}
-                                        />
-                                    </TouchableOpacity>
-                                    <Portal>
-                                        <Dialog
-                                            visible={isMonthSelectorVisible}
-                                            onDismiss={this._hideDialog}
-                                            style={{height: hp("50%")}}
-                                        >    
-                                            <Dialog.Title>Mês</Dialog.Title>
-                                                <Dialog.ScrollArea>
-                                                    <ScrollView >
-                                                        <List.Item
-                                                            title="Janeiro"
-                                                            onPress={() => this.setState({ selectedMonth: 'Janeiro'})}
-                                                            style={selectedMonth=='Janeiro'?{backgroundColor: '#ccc'}:{backgroundColor: '#FFF'}}
-                                                        />
-                                                        <List.Item
-                                                            title="Fevereiro"
-                                                            onPress={() => this.setState({ selectedMonth: 'Fevereiro'})}
-                                                            style={selectedMonth=='Fevereiro'?{backgroundColor: '#ccc'}:{backgroundColor: '#FFF'}}
-                                                        />
-                                                        <List.Item
-                                                            title="Março"
-                                                            onPress={() => this.setState({ selectedMonth: 'Março'})}
-                                                            style={selectedMonth=='Março'?{backgroundColor: '#ccc'}:{backgroundColor: '#FFF'}}
-                                                        />
-                                                        <List.Item
-                                                            title="Abril"
-                                                            onPress={() => this.setState({ selectedMonth: 'Abril'})}
-                                                            style={selectedMonth=='Abril'?{backgroundColor: '#ccc'}:{backgroundColor: '#FFF'}}
-                                                        />
-                                                        <List.Item
-                                                            title="Maio"
-                                                            onPress={() => this.setState({ selectedMonth: 'Maio'})}
-                                                            style={selectedMonth=='Maio'?{backgroundColor: '#ccc'}:{backgroundColor: '#FFF'}}
-                                                        />
-                                                        <List.Item
-                                                            title="Junho"
-                                                            onPress={() => this.setState({ selectedMonth: 'Junho'})}
-                                                            style={selectedMonth=='Junho'?{backgroundColor: '#ccc'}:{backgroundColor: '#FFF'}}
-                                                        />
-                                                        <List.Item
-                                                            title="Julho"
-                                                            onPress={() => this.setState({ selectedMonth: 'Julho'})}
-                                                            style={selectedMonth=='Julho'?{backgroundColor: '#ccc'}:{backgroundColor: '#FFF'}}
-                                                        />
-                                                        <List.Item
-                                                            title="Agosto"
-                                                            onPress={() => this.setState({ selectedMonth: 'Agosto'})}
-                                                            style={selectedMonth=='Agosto'?{backgroundColor: '#ccc'}:{backgroundColor: '#FFF'}}
-                                                        />
-                                                        <List.Item
-                                                            title="Setembro"
-                                                            onPress={() => this.setState({ selectedMonth: 'Setembro'})}
-                                                            style={selectedMonth=='Setembro'?{backgroundColor: '#ccc'}:{backgroundColor: '#FFF'}}
-                                                        />
-                                                        <List.Item
-                                                            title="Outubro"
-                                                            onPress={() => this.setState({ selectedMonth: 'Outubro'})}
-                                                            style={selectedMonth=='Outubro'?{backgroundColor: '#ccc'}:{backgroundColor: '#FFF'}}
-                                                        />
-                                                        <List.Item
-                                                            title="Novembro"
-                                                            onPress={() => this.setState({ selectedMonth: 'Novembro'})}
-                                                            style={selectedMonth=='Novembro'?{backgroundColor: '#ccc'}:{backgroundColor: '#FFF'}}
-                                                        />
-                                                        <List.Item
-                                                            title="Dezembro"
-                                                            onPress={() => this.setState({ selectedMonth: 'Dezembro'})}
-                                                            style={selectedMonth=='Dezembro'?{backgroundColor: '#ccc'}:{backgroundColor: '#FFF'}}
-                                                        />
-                                                    </ScrollView>
-                                                </Dialog.ScrollArea>
-                                            <Dialog.Actions>
-                                                <Button onPress={this._hideDialog}>Ok</Button>
-                                            </Dialog.Actions>
-                                        </Dialog>
-                                    </Portal>
-                                    <TextInput
-                                        style={style.YearInput}
-                                        label='Ano'
-                                        mode='outlined'
-                                    />
-                                </View>
-                                    <TouchableOpacity
-                                            //onPress={this._showDialog}
-                                    >        
-                                        <TextInput
-                                            style={style.LastnameInput}                                            label='Mês'
-                                            mode='outlined'
-                                            editable={false}
-                                            disabled={true}
-                                            label='Gênero'
-                                            //onFocus={ Keyboard.dismiss(), this._showDialog}
-                                            theme={{ colors: {
-                                                disabled: '#707070',
-                                                placeholder: '#000'
-                                            }}}
-                                        />
-                                    </TouchableOpacity>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
-                                    <Button
-                                        mode="text"  
-                                        icon="chevron-left"
-                                        style={{
-                                        //height: hp('6%'),
-                                        width: wp("28%"),
-                                        marginLeft: wp("5%"),
-                                        marginBottom: hp("2%"),
-                                        alignSelf:'flex-end',                                    
-                                        }}
-                                        onPress={() => {this.scroll.getNode().scrollTo({x: 0}), showAnimFunc()}}
-                                    >
-                                        <Text style={{ color: '#707070', fontSize: 12 }}>Voltar</Text>
-                                    </Button>
-                                    <Button
-                                        mode="contained"  
-                                        style={{
-                                        //height: hp('6%'),
-                                        width: wp("28%"),
-                                        marginRight: wp("5%"),
-                                        marginBottom: hp("2%"),
-                                        alignSelf:'flex-end'
-                                        }}
-                                        onPress={() => this.scroll.getNode().scrollTo({x: SCREEN_WIDTH*2})}
-                                    >
-                                        <Text style={{ color: '#ffffff', fontSize: 12 }}>Continuar</Text>
-                                    </Button>
-                                </View>
-                            </View>
-                        </Animated.View>
-                        <Animated.View 
-                            style={{ 
-                                width: SCREEN_WIDTH, 
-                                backgroundColor: '#fff', 
-                                height: extendFormView, 
-                                justifyContent: 'flex-end' 
-                                }} 
-                            index={2}
-                        >
-                            <View style={{
-                                width: SCREEN_WIDTH, 
-                                backgroundColor: '#fff', 
-                                height: hp("10%"),
-                                justifyContent: 'flex-start' 
-                            }}>
-                                <Text style={style.RegFamilySubtitle}>Só mais algumas coisinhas</Text>
-                            </View>
-                            <View style={{
-                                width: SCREEN_WIDTH, 
-                                backgroundColor: '#fff', 
-                                height: hp("60%"),
-                                justifyContent: 'flex-end' 
-                            }}>
+                                }}
+                            >
                                 <TextInput
-                                    style={style.NameInput}
-                                    label='Data de Nascimento'
-                                    mode='outlined'
+                                    style={style.DayInput}
+                                    label="Dia"
+                                    mode="outlined"
+                                    onChangeText={selectedDay =>
+                                        this.setState({
+                                            selectedDay: selectedDay
+                                        })
+                                    }
+                                    value={this.state.selectedDay}
                                 />
+                                <TouchableOpacity onPress={this._showDialog}>
+                                    <TextInput
+                                        style={style.MonthInput}
+                                        label="Mês"
+                                        mode="outlined"
+                                        editable={false}
+                                        disabled={true}
+                                        //onFocus={ Keyboard.dismiss(), this._showDialog}
+                                        value={`${selectedMonth}`}
+                                        theme={{
+                                            colors: {
+                                                disabled: "#707070",
+                                                placeholder: "#000"
+                                            }
+                                        }}
+                                    />
+                                </TouchableOpacity>
+                                <Portal>
+                                    <Dialog
+                                        visible={isMonthSelectorVisible}
+                                        onDismiss={this._hideDialog}
+                                        style={{ height: hp("50%") }}
+                                    >
+                                        <Dialog.Title>Mês</Dialog.Title>
+                                        <Dialog.ScrollArea>
+                                            <ScrollView>
+                                                <List.Item
+                                                    title="Janeiro"
+                                                    onPress={() =>
+                                                        this.setState({
+                                                            selectedMonth: 0
+                                                        })
+                                                    }
+                                                    style={
+                                                        selectedMonth == 0
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      "#ccc"
+                                                              }
+                                                            : {
+                                                                  backgroundColor:
+                                                                      "#FFF"
+                                                              }
+                                                    }
+                                                />
+                                                <List.Item
+                                                    title="Fevereiro"
+                                                    onPress={() =>
+                                                        this.setState({
+                                                            selectedMonth: 1
+                                                        })
+                                                    }
+                                                    style={
+                                                        selectedMonth == 1
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      "#ccc"
+                                                              }
+                                                            : {
+                                                                  backgroundColor:
+                                                                      "#FFF"
+                                                              }
+                                                    }
+                                                />
+                                                <List.Item
+                                                    title="Março"
+                                                    onPress={() =>
+                                                        this.setState({
+                                                            selectedMonth: 2
+                                                        })
+                                                    }
+                                                    style={
+                                                        selectedMonth == 2
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      "#ccc"
+                                                              }
+                                                            : {
+                                                                  backgroundColor:
+                                                                      "#FFF"
+                                                              }
+                                                    }
+                                                />
+                                                <List.Item
+                                                    title="Abril"
+                                                    onPress={() =>
+                                                        this.setState({
+                                                            selectedMonth: 3
+                                                        })
+                                                    }
+                                                    style={
+                                                        selectedMonth == 3
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      "#ccc"
+                                                              }
+                                                            : {
+                                                                  backgroundColor:
+                                                                      "#FFF"
+                                                              }
+                                                    }
+                                                />
+                                                <List.Item
+                                                    title="Maio"
+                                                    onPress={() =>
+                                                        this.setState({
+                                                            selectedMonth: 4
+                                                        })
+                                                    }
+                                                    style={
+                                                        selectedMonth == 4
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      "#ccc"
+                                                              }
+                                                            : {
+                                                                  backgroundColor:
+                                                                      "#FFF"
+                                                              }
+                                                    }
+                                                />
+                                                <List.Item
+                                                    title="Junho"
+                                                    onPress={() =>
+                                                        this.setState({
+                                                            selectedMonth: 5
+                                                        })
+                                                    }
+                                                    style={
+                                                        selectedMonth == 5
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      "#ccc"
+                                                              }
+                                                            : {
+                                                                  backgroundColor:
+                                                                      "#FFF"
+                                                              }
+                                                    }
+                                                />
+                                                <List.Item
+                                                    title="Julho"
+                                                    onPress={() =>
+                                                        this.setState({
+                                                            selectedMonth: 6
+                                                        })
+                                                    }
+                                                    style={
+                                                        selectedMonth == 6
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      "#ccc"
+                                                              }
+                                                            : {
+                                                                  backgroundColor:
+                                                                      "#FFF"
+                                                              }
+                                                    }
+                                                />
+                                                <List.Item
+                                                    title="Agosto"
+                                                    onPress={() =>
+                                                        this.setState({
+                                                            selectedMonth: 7
+                                                        })
+                                                    }
+                                                    style={
+                                                        selectedMonth == 7
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      "#ccc"
+                                                              }
+                                                            : {
+                                                                  backgroundColor:
+                                                                      "#FFF"
+                                                              }
+                                                    }
+                                                />
+                                                <List.Item
+                                                    title="Setembro"
+                                                    onPress={() =>
+                                                        this.setState({
+                                                            selectedMonth: 8
+                                                        })
+                                                    }
+                                                    style={
+                                                        selectedMonth == 8
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      "#ccc"
+                                                              }
+                                                            : {
+                                                                  backgroundColor:
+                                                                      "#FFF"
+                                                              }
+                                                    }
+                                                />
+                                                <List.Item
+                                                    title="Outubro"
+                                                    onPress={() =>
+                                                        this.setState({
+                                                            selectedMonth: 9
+                                                        })
+                                                    }
+                                                    style={
+                                                        selectedMonth == 9
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      "#ccc"
+                                                              }
+                                                            : {
+                                                                  backgroundColor:
+                                                                      "#FFF"
+                                                              }
+                                                    }
+                                                />
+                                                <List.Item
+                                                    title="Novembro"
+                                                    onPress={() =>
+                                                        this.setState({
+                                                            selectedMonth: 10
+                                                        })
+                                                    }
+                                                    style={
+                                                        selectedMonth == 10
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      "#ccc"
+                                                              }
+                                                            : {
+                                                                  backgroundColor:
+                                                                      "#FFF"
+                                                              }
+                                                    }
+                                                />
+                                                <List.Item
+                                                    title="Dezembro"
+                                                    onPress={() =>
+                                                        this.setState({
+                                                            selectedMonth: 11
+                                                        })
+                                                    }
+                                                    style={
+                                                        selectedMonth == 11
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      "#ccc"
+                                                              }
+                                                            : {
+                                                                  backgroundColor:
+                                                                      "#FFF"
+                                                              }
+                                                    }
+                                                />
+                                            </ScrollView>
+                                        </Dialog.ScrollArea>
+                                        <Dialog.Actions>
+                                            <Button onPress={this._hideDialog}>
+                                                Ok
+                                            </Button>
+                                        </Dialog.Actions>
+                                    </Dialog>
+                                </Portal>
                                 <TextInput
+                                    keyboardType="numeric"
+                                    maxLength={4}
+                                    style={style.YearInput}
+                                    label="Ano"
+                                    mode="outlined"
+                                    value={`${this.state.selectedYear}`}
+                                    onChangeText={year => {
+                                        this.setState({ selectedYear: year });
+                                    }}
+                                />
+                            </View>
+                            <TouchableOpacity
+                            //onPress={this._showDialog}
+                            >
+                                <TextInput
+                                    value={this.state.gender}
                                     style={style.LastnameInput}
-                                    label='Genero'
-                                    mode='outlined'
+                                    label="Mês"
+                                    mode="outlined"
+                                    editable={false}
+                                    disabled={true}
+                                    label="Gênero"
+                                    //onFocus={ Keyboard.dismiss(), this._showDialog}
+                                    theme={{
+                                        colors: {
+                                            disabled: "#707070",
+                                            placeholder: "#000"
+                                        }
+                                    }}
                                 />
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
-                                    <Button
-                                        mode="text"  
-                                        icon="chevron-left"
-                                        style={{
-                                        //height: hp('6%'),
+                            </TouchableOpacity>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between"
+                                }}
+                            >
+                                <Button
+                                    mode="text"
+                                    icon="chevron-left"
+                                    style={{
+                                        //height: hp("6%"),
                                         width: wp("28%"),
                                         marginLeft: wp("5%"),
                                         marginBottom: hp("2%"),
-                                        alignSelf:'flex-end',                                    
-                                        }}
-                                        onPress={() => this.scroll.getNode().scrollTo({x: SCREEN_WIDTH})}
-                                    >
-                                        <Text style={{ color: '#707070', fontSize: 12 }}>Voltar</Text>
-                                    </Button>
-                                    <Button
-                                        mode="contained"  
+                                        alignSelf: "flex-end"
+                                    }}
+                                    onPress={() => {
+                                        this.scroll
+                                            .getNode()
+                                            .scrollTo({ x: 0 }),
+                                            showAnimFunc();
+                                    }}
+                                >
+                                    <Text
                                         style={{
-                                        //height: hp('6%'),
+                                            color: "#707070",
+                                            fontSize: 12
+                                        }}
+                                    >
+                                        Voltar
+                                    </Text>
+                                </Button>
+                                <Button
+                                    mode="contained"
+                                    style={{
+                                        //height: hp("6%"),
                                         width: wp("28%"),
                                         marginRight: wp("5%"),
                                         marginBottom: hp("2%"),
-                                        alignSelf:'flex-end'
+                                        alignSelf: "flex-end"
+                                    }}
+                                    onPress={() =>
+                                        this.scroll
+                                            .getNode()
+                                            .scrollTo({ x: SCREEN_WIDTH * 2 })
+                                    }
+                                >
+                                    <Text
+                                        style={{
+                                            color: "#ffffff",
+                                            fontSize: 12
                                         }}
-                                        onPress={() => {registrate()}}
                                     >
-                                        <Text style={{ color: '#ffffff', fontSize: 12 }}>Continuar</Text>
-                                    </Button>
-                                </View>
+                                        Continuar
+                                    </Text>
+                                </Button>
                             </View>
-                        </Animated.View>  
+                        </View>
+                    </Animated.View>
+                    <Animated.View
+                        style={{
+                            width: SCREEN_WIDTH,
+                            backgroundColor: "#fff",
+                            height: extendFormView,
+                            justifyContent: "flex-end"
+                        }}
+                        index={2}
+                    >
+                        <View
+                            style={{
+                                width: SCREEN_WIDTH,
+                                backgroundColor: "#fff",
+                                height: hp("10%"),
+                                justifyContent: "flex-start"
+                            }}
+                        >
+                            <Text style={style.RegFamilySubtitle}>
+                                Alguma necessidade que queira nos informar?
+                            </Text>
+                        </View>
+                        <View
+                            style={{
+                                width: SCREEN_WIDTH,
+                                backgroundColor: "#fff",
+                                height: hp("60%"),
+                                justifyContent: "flex-end"
+                            }}
+                        >
+                            <TextInput
+                                style={style.NameInput}
+                                label="Necessidade"
+                                mode="outlined"
+                                value={this.state.needs}
+                                onChangeText={need => {
+                                    this.setState({ needs: need });
+                                }}
+                            />
+
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between"
+                                }}
+                            >
+                                <Button
+                                    mode="text"
+                                    icon="chevron-left"
+                                    style={{
+                                        //height: hp("6%"),
+                                        width: wp("28%"),
+                                        marginLeft: wp("5%"),
+                                        marginBottom: hp("2%"),
+                                        alignSelf: "flex-end"
+                                    }}
+                                    onPress={() =>
+                                        this.scroll
+                                            .getNode()
+                                            .scrollTo({ x: SCREEN_WIDTH })
+                                    }
+                                >
+                                    <Text
+                                        style={{
+                                            color: "#707070",
+                                            fontSize: 12
+                                        }}
+                                    >
+                                        Voltar
+                                    </Text>
+                                </Button>
+                                <Button
+                                    mode="contained"
+                                    style={{
+                                        //height: hp("6%"),
+                                        width: wp("28%"),
+                                        marginRight: wp("5%"),
+                                        marginBottom: hp("2%"),
+                                        alignSelf: "flex-end"
+                                    }}
+                                    onPress={() =>
+                                        this.decideWhichFunctionToUseOnRegisterButton()
+                                    }
+                                >
+                                    <Text
+                                        style={{
+                                            color: "#ffffff",
+                                            fontSize: 12
+                                        }}
+                                    >
+                                        Continuar
+                                    </Text>
+                                </Button>
+                            </View>
+                        </View>
+                    </Animated.View>
                 </Animated.ScrollView>
-            </KeyboardAwareScrollView>
-        )
+            </SafeAreaView>
+        );
     }
 }
 
@@ -445,61 +992,61 @@ const style = StyleSheet.create({
         width: wp("70%"),
         height: hp("10%"),
         marginTop: hp("5%"),
-        alignSelf: 'center'
+        alignSelf: "center"
     },
     NameInput: {
         marginLeft: wp("5%"),
         marginRight: wp("5%"),
         marginBottom: hp("2%"),
-        marginTop: hp("4%"),
-      },
-      LastnameInput: { 
+        marginTop: hp("4%")
+    },
+    LastnameInput: {
         marginLeft: wp("5%"),
         marginRight: wp("5%"),
         marginBottom: hp("7%")
-      },
-      TextInput: {
+    },
+    TextInput: {
         marginLeft: wp("5%"),
         marginRight: wp("5%"),
-        marginBottom: hp("2%"),
-      },
-      RegFamilySubtitle: { 
+        marginBottom: hp("2%")
+    },
+    RegFamilySubtitle: {
         fontSize: RFPercentage(3),
         marginLeft: wp("7%"),
-        marginRight: wp("7%"),    
-        alignSelf: 'center',
-        color: '#000',
-        textAlign: 'center',
+        marginRight: wp("7%"),
+        alignSelf: "center",
+        color: "#000",
+        textAlign: "center",
         marginTop: hp("2%")
-      },
-      DayInput: {
+    },
+    DayInput: {
         width: wp("28%"),
         marginRight: wp("3%")
-      },
-      MonthInput: {
+    },
+    MonthInput: {
         width: wp("28%"),
-        marginRight: wp("3%"),
-      },
-      YearInput: {
-        width: wp("28%"),
-      },
-      RegFamilyTitle: { 
+        marginRight: wp("3%")
+    },
+    YearInput: {
+        width: wp("28%")
+    },
+    RegFamilyTitle: {
         fontSize: RFPercentage(4),
         //marginLeft: wp("5%"),
         marginTop: hp("2%"),
         fontWeight: "bold",
-        alignSelf: 'center',
-        color: '#FFF',
-        marginBottom: hp('1%'),
+        alignSelf: "center",
+        color: "#FFF",
+        marginBottom: hp("1%")
     },
     RegFamilyText: {
-        fontSize: RFPercentage(2.2), 
+        fontSize: RFPercentage(2.2),
         alignSelf: "center",
         marginLeft: wp("10%"),
         marginRight: wp("10%"),
         marginTop: hp("5%"),
-        color: '#FFF',
-        textAlign: 'center',
-        marginBottom: hp('3%')
-    },
-});fetch("https://parseapi.back4app.com/graphql", {"credentials":"omit","headers":{"accept":"*/*","accept-language":"pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7","content-type":"application/json","sec-fetch-mode":"cors","sec-fetch-site":"same-site","x-parse-application-id":"47RAnYvxm7rWLUTUZYHt9SItJjd9FnmWj5ZK5g92","x-parse-client-key":"WLyCpihyllj8cxhhuVZk9b15JkbMeSt5q2IURgAW","x-parse-master-key":"32qb1Of9n8jESGsr3TESg9RUAxJTrZbpGVVKIk3v"},"referrer":"https://parse-dashboard.back4app.com/apps/2e02d985-4038-4b1e-91e7-09d9e451c149/api_console/graphql","referrerPolicy":"no-referrer-when-downgrade","body":"{\"operationName\":null,\"variables\":{},\"query\":\"mutation {\\n  createRefugee(fields: {name: \\\"Teste\\\", age: \\\"21\\\", job: \\\"motorista de uber\\\", gender: \\\"masculino\\\", identificationDocumentType: \\\"teste\\\", familyID: 1, primaryContact: true, scholarity: \\\"ensino teste completo\\\", email: \\\"teste@teste.com\\\", needs: \\\"comida e teste\\\", identificationDocument: \\\"436696134776\\\"}) {\\n    name\\n  }\\n}\\n\"}","method":"POST","mode":"cors"});
+        color: "#FFF",
+        textAlign: "center",
+        marginBottom: hp("3%")
+    }
+});

@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { Text, View } from 'react-native';
-import { Avatar, Button, Card, Title, Paragraph } from 'react-native-paper';
+import React, { Component } from "react";
+import { Text, View } from "react-native";
+import { Avatar, Button, Card, Title, Paragraph } from "react-native-paper";
 
 export default class CardLocConf extends Component {
     render() {
@@ -8,18 +8,22 @@ export default class CardLocConf extends Component {
             <View>
                 <Text> textInComponent </Text>
                 <Card>
-                    <Card.Title title="Card Title" subtitle="Card Subtitle" left={(props) => <Avatar.Icon {...props} icon="folder" />} />
+                    <Card.Title
+                        title="Card Title"
+                        subtitle="Card Subtitle"
+                        left={props => <Avatar.Icon {...props} icon="folder" />}
+                    />
                     <Card.Content>
-                    <Title>Card title</Title>
-                    <Paragraph>Card content</Paragraph>
+                        <Title>Card title</Title>
+                        <Paragraph>Card content</Paragraph>
                     </Card.Content>
-                    <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
+                    <Card.Cover source={{ uri: "https://picsum.photos/700" }} />
                     <Card.Actions>
-                    <Button>Cancel</Button>
-                    <Button>Ok</Button>
+                        <Button>Cancel</Button>
+                        <Button>Ok</Button>
                     </Card.Actions>
                 </Card>
             </View>
-        )
+        );
     }
 }
