@@ -46,7 +46,7 @@ export default RefugeeLogin = ({ navigation }) => {
             creds.header,
             getFamilyIDQuery
         );
-        debugger;
+        
         const familyID = JSON.parse(queryResponse).data.refugees.results[0]
             .Family.id;
         const getFamilyDetailsQuery = `

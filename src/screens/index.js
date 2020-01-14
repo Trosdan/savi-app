@@ -1,3 +1,4 @@
+import AuthLoading from "./AuthLoading";
 import ConfNumber from "./Conf/ConfNumber";
 import ConfCode from "./Conf/ConfCode";
 import ConfMap from "./Conf/ConfMap";
@@ -112,6 +113,13 @@ const Drawer = createDrawerNavigator(
 );
 
 const Stack = createStackNavigator({
+    // AuthLoading: {
+    //     screen: AuthLoading,
+    //     navigationOptions: {
+    //         title: "AuthLoading",
+    //         header: null
+    //     }
+    // },
     ConfirmationWho: {
         screen: ConfWho,
         navigationOptions: {

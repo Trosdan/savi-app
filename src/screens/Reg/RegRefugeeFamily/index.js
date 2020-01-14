@@ -47,11 +47,12 @@ export function MemberList(props) {
 export default function RegRefugeeFamily({ navigation }) {
     const [members, setMembers] = useState([]);
     const registrateDependent = () => {
-        // navigation.navigate("RegistrationRefugee");
+        navigation.navigate("RegistrationRefugee");
     };
     const handleBackButton = async () => {
+        console.log("handling back button");
         const lastScreen = await fetch("lastScreen");
-        // navigation.navigate(lastScreen);
+        navigation.navigate(lastScreen);
     };
     useEffect(() => {
         seeAllValues();
@@ -63,9 +64,9 @@ export default function RegRefugeeFamily({ navigation }) {
     const getMembersFromFamily = async () => {
         let familyResponse = await fetchData("refugeeFamily");
         console.log("family inside asyncstorage: " + familyResponse);
-        const familyObject = JSON.parse(JSON.parse(familyResponse));
+        const familyObject = JSON.parse(familyResponse);
 
-        familyID = familyObject.data.updateFamily.id;
+        familyID = familyObject[0].id;
 
         getMembersDetails = `query refugeeInfoByFamily {
                 refugees(where:
@@ -86,6 +87,7 @@ export default function RegRefugeeFamily({ navigation }) {
                 }
               }
               `;
+        
         let familyQueryResponse = await gfetch(
             "https://parseapi.back4app.com/graphql",
             creds.header,
@@ -153,13 +155,13 @@ export default function RegRefugeeFamily({ navigation }) {
                         marginBottom: hp("2%"),
                         alignSelf: "flex-end"
                     }}
-                    //onPress={() => {}}
+                    onPress={() => {}}
                 >
                     <Text
                         onPress={async () => {
                             const lastScreen = await fetchData("lastScreen");
                             if (typeof lastScreen == "string") {
-                                // navigation.navigate(lastScreen);
+                                navigation.navigate(lastScreen);
                             }
                         }}
                         style={{ color: "#707070", fontSize: 12 }}
@@ -176,7 +178,7 @@ export default function RegRefugeeFamily({ navigation }) {
                         marginBottom: hp("2%"),
                         alignSelf: "flex-end"
                     }}
-                    // onPress={() => navigation.navigate("MapScreen")}
+                    onPress={() => navigation.navigate("MapScreen")}
                 >
                     <Text style={{ color: "#ffffff", fontSize: 12 }}>
                         Finalizar
