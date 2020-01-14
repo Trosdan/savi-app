@@ -1,14 +1,14 @@
 import React, { useEffect, Fragment, useState } from "react";
 import Map from "../../components/Map";
+import { useSafeArea } from "react-native-safe-area-context";
+
 import {
     View,
     Image,
-    TouchableOpacity,
     StyleSheet,
     Text,
     ScrollView,
     Animated,
-    SafeAreaView
 } from "react-native";
 import {
     Appbar,
@@ -144,51 +144,50 @@ export default function MapScreen({ navigation }) {
         dispatch({ type: "FILTER_LOADING" });
     }
 
+    const insets = useSafeArea();
+
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <View style={{ backgroundColor: "#000" }}>
-                <View
-                    style={{
-                        backgroundColor: "#ff7043",
-                        height: hp("8%"),
-                        justifyContent: "center",
-                        width: wp("100%"),
-                        flexDirection: "row",
-                        alignItems: "center"
-                    }}
-                >
-                    <View
-                        style={{ width: wp("20%"), alignItems: "flex-start" }}
-                    >
-                        <Appbar.Action
-                            style={{ marginLeft: wp("4%") }}
-                            icon="menu"
-                            onPress={() => navigation.openDrawer()}
-                            color="#fff"
-                        />
-                    </View>
-                    <View style={{ width: wp("60%"), alignItems: "center" }}>
-                        <Image
-                            source={require("../../assets/images/savibrancotitle.png")}
-                            resizeMode="contain"
-                            resizeMethod="auto"
-                            style={{ height: hp("5%"), width: hp("10%") }}
-                        />
-                    </View>
-                    <View style={{ width: wp("20%"), alignItems: "flex-end" }}>
-                        <Image
-                            source={require("../../assets/images/savibrancoicone.png")}
-                            resizeMode="contain"
-                            resizeMethod="auto"
-                            style={{
-                                height: hp("4%"),
-                                width: hp("4%"),
-                                marginRight: wp("4%")
-                            }}
-                        />
-                    </View>
+        <View style={{ backgroundColor: "#000", paddingTop: insets.top }}>
+            <View
+                style={{
+                    backgroundColor: "#ff7043",
+                    height: hp("8%"),
+                    justifyContent: "center",
+                    width: wp("100%"),
+                    flexDirection: "row",
+                    alignItems: "center"
+                }}
+            >
+                <View style={{ width: wp("20%"), alignItems: "flex-start" }}>
+                    <Appbar.Action
+                        style={{ marginLeft: wp("4%") }}
+                        icon="menu"
+                        onPress={() => navigation.openDrawer()}
+                        color="#fff"
+                    />
                 </View>
-                {/* 
+                <View style={{ width: wp("60%"), alignItems: "center" }}>
+                    <Image
+                        source={require("../../assets/images/savibrancotitle.png")}
+                        resizeMode="contain"
+                        resizeMethod="auto"
+                        style={{ height: hp("5%"), width: hp("10%") }}
+                    />
+                </View>
+                <View style={{ width: wp("20%"), alignItems: "flex-end" }}>
+                    <Image
+                        source={require("../../assets/images/savibrancoicone.png")}
+                        resizeMode="contain"
+                        resizeMethod="auto"
+                        style={{
+                            height: hp("4%"),
+                            width: hp("4%"),
+                            marginRight: wp("4%")
+                        }}
+                    />
+                </View>
+            </View>
+            {/* 
                 <TouchableOpacity onPress={() => navigation.openDrawer()}>
                     <Image
                         source={require("../../assets/images/savibrancoicone.png")}
@@ -198,286 +197,285 @@ export default function MapScreen({ navigation }) {
                     />
                 </TouchableOpacity>
             */}
-                <Animated.View style={{ height: MapAnimPerc }}>
-                    <Map onShowAnim={() => markerCardShowAnimFunc()} />
-                    {filterTabActive ? (
-                        <>
-                            {!filterTabLoading ? (
-                                <FAB
-                                    style={styles.fab}
-                                    icon="arrow-collapse-right"
-                                    onPress={() =>
-                                        read_offers({
-                                            position: 0,
-                                            filter: filters
-                                        })
-                                    }
-                                />
-                            ) : (
-                                <View
+            <Animated.View style={{ height: MapAnimPerc }}>
+                <Map onShowAnim={() => markerCardShowAnimFunc()} />
+                {filterTabActive ? (
+                    <>
+                        {!filterTabLoading ? (
+                            <FAB
+                                style={styles.fab}
+                                icon="arrow-collapse-right"
+                                onPress={() =>
+                                    read_offers({
+                                        position: 0,
+                                        filter: filters
+                                    })
+                                }
+                            />
+                        ) : (
+                            <View
+                                style={{
+                                    justifyContent: "center",
+                                    alignSelf: "center",
+                                    position: "absolute",
+                                    bottom: 0,
+                                    marginBottom: hp("2%")
+                                }}
+                            >
+                                <ActivityIndicator
                                     style={{
-                                        justifyContent: "center",
-                                        alignSelf: "center",
+                                        elevation: 10,
                                         position: "absolute",
-                                        bottom: 0,
-                                        marginBottom: hp("2%")
+                                        alignSelf: "center"
                                     }}
-                                >
-                                    <ActivityIndicator
-                                        style={{
-                                            elevation: 10,
-                                            position: "absolute",
-                                            alignSelf: "center"
-                                        }}
-                                        animating={true}
-                                        color="#fff"
-                                    />
-                                    <FAB
-                                        style={{
-                                            backgroundColor: "#ff7043",
-                                            color: "#fff"
-                                        }}
-                                    />
-                                </View>
-                            )}
-                        </>
-                    ) : (
-                        <FAB
-                            style={styles.fab}
-                            icon="search-web"
-                            onPress={() => {
-                                changeTabActive(), filterTabShowAnimFunc();
-                            }}
-                        ></FAB>
-                    )}
-                </Animated.View>
-                <Animated.View
-                    style={{
-                        height: filterTabAnimPerc,
-                        justifyContent: "flex-start",
-                        alignItems: "center",
-                        backgroundColor: "#242f3e"
-                    }}
-                >
-                    <View
-                        style={{
-                            flexDirection: "column",
-                            width: wp("90%"),
-                            height: hp("30%"),
-                            justifyContent: "space-between"
+                                    animating={true}
+                                    color="#fff"
+                                />
+                                <FAB
+                                    style={{
+                                        backgroundColor: "#ff7043",
+                                        color: "#fff"
+                                    }}
+                                />
+                            </View>
+                        )}
+                    </>
+                ) : (
+                    <FAB
+                        style={styles.fab}
+                        icon="search-web"
+                        onPress={() => {
+                            changeTabActive(), filterTabShowAnimFunc();
                         }}
-                    >
-                        <ScrollView>
-                            <Button
-                                onPress={() => {
-                                    changeActive("food");
-                                }}
-                                style={
-                                    food == false
-                                        ? styles.filterButton
-                                        : styles.filterButtonActive
-                                }
-                                mode="outlined"
-                            >
-                                <Text
-                                    style={
-                                        food == true
-                                            ? styles.filterButtonTextActive
-                                            : styles.filterButtonText
-                                    }
-                                >
-                                    ALIMENTAÇÃO
-                                </Text>
-                            </Button>
-                            <Button
-                                onPress={() => {
-                                    changeActive("documentation");
-                                }}
-                                style={
-                                    documentation == false
-                                        ? styles.filterButton
-                                        : styles.filterButtonActive
-                                }
-                                mode="outlined"
-                            >
-                                <Text
-                                    style={
-                                        documentation == true
-                                            ? styles.filterButtonTextActive
-                                            : styles.filterButtonText
-                                    }
-                                >
-                                    DOCUMENTAÇÃO
-                                </Text>
-                            </Button>
-                            <Button
-                                onPress={() => {
-                                    changeActive("education");
-                                }}
-                                style={
-                                    education == false
-                                        ? styles.filterButton
-                                        : styles.filterButtonActive
-                                }
-                                mode="outlined"
-                            >
-                                <Text
-                                    style={
-                                        education == true
-                                            ? styles.filterButtonTextActive
-                                            : styles.filterButtonText
-                                    }
-                                >
-                                    EDUCAÇÃO
-                                </Text>
-                            </Button>
-                            <Button
-                                onPress={() => {
-                                    changeActive("shelter");
-                                }}
-                                style={
-                                    shelter == false
-                                        ? styles.filterButton
-                                        : styles.filterButtonActive
-                                }
-                                mode="outlined"
-                            >
-                                <Text
-                                    style={
-                                        shelter == true
-                                            ? styles.filterButtonTextActive
-                                            : styles.filterButtonText
-                                    }
-                                >
-                                    ABRIGO
-                                </Text>
-                            </Button>
-                            <Button
-                                onPress={() => {
-                                    changeActive("health");
-                                }}
-                                style={
-                                    health == false
-                                        ? styles.filterButton
-                                        : styles.filterButtonActive
-                                }
-                                mode="outlined"
-                            >
-                                <Text
-                                    style={
-                                        health == true
-                                            ? styles.filterButtonTextActive
-                                            : styles.filterButtonText
-                                    }
-                                >
-                                    SAUDE
-                                </Text>
-                            </Button>
-                            <Button
-                                onPress={() => {
-                                    changeActive("clothes");
-                                }}
-                                style={
-                                    clothes == false
-                                        ? styles.filterButton
-                                        : styles.filterButtonActive
-                                }
-                                mode="outlined"
-                            >
-                                <Text
-                                    style={
-                                        clothes == true
-                                            ? styles.filterButtonTextActive
-                                            : styles.filterButtonText
-                                    }
-                                >
-                                    ROUPA
-                                </Text>
-                            </Button>
-                            <Button
-                                onPress={() => {
-                                    changeActive("job");
-                                }}
-                                style={
-                                    job == false
-                                        ? styles.filterButton
-                                        : styles.filterButtonActive
-                                }
-                                mode="outlined"
-                            >
-                                <Text
-                                    style={
-                                        job == true
-                                            ? styles.filterButtonTextActive
-                                            : styles.filterButtonText
-                                    }
-                                >
-                                    EMPREGO
-                                </Text>
-                            </Button>
-                            <Button
-                                onPress={() => {
-                                    changeActive("acessibility");
-                                }}
-                                style={
-                                    acessibility == false
-                                        ? styles.filterButton
-                                        : styles.filterButtonActive
-                                }
-                                mode="outlined"
-                            >
-                                <Text
-                                    style={
-                                        acessibility == true
-                                            ? styles.filterButtonTextActive
-                                            : styles.filterButtonText
-                                    }
-                                >
-                                    ACESSIBILIDADE
-                                </Text>
-                            </Button>
-                            <Button
-                                onPress={() => {
-                                    changeActive("nursery");
-                                }}
-                                style={
-                                    nursery == false
-                                        ? styles.filterButton
-                                        : styles.filterButtonActive
-                                }
-                                mode="outlined"
-                            >
-                                <Text
-                                    style={
-                                        nursery == true
-                                            ? styles.filterButtonTextActive
-                                            : styles.filterButtonText
-                                    }
-                                >
-                                    CRECHE
-                                </Text>
-                            </Button>
-                        </ScrollView>
-                    </View>
-                </Animated.View>
-                <Card
+                    ></FAB>
+                )}
+            </Animated.View>
+            <Animated.View
+                style={{
+                    height: filterTabAnimPerc,
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    backgroundColor: "#242f3e"
+                }}
+            >
+                <View
                     style={{
-                        color: "#fff",
-                        position: "absolute",
-                        height: markerCardTabAnimPerc,
-                        width: wp("96%"),
-                        alignSelf: "center",
-                        bottom: wp("2%"),
-                        zIndex: 100
+                        flexDirection: "column",
+                        width: wp("90%"),
+                        height: hp("30%"),
+                        justifyContent: "space-between"
                     }}
                 >
-                    <Card.Content>
-                        {/* <Text style={{fontSize: RFPercentage(3), fontWeight: '600'}}>{markerName}</Text>
+                    <ScrollView>
+                        <Button
+                            onPress={() => {
+                                changeActive("food");
+                            }}
+                            style={
+                                food == false
+                                    ? styles.filterButton
+                                    : styles.filterButtonActive
+                            }
+                            mode="outlined"
+                        >
+                            <Text
+                                style={
+                                    food == true
+                                        ? styles.filterButtonTextActive
+                                        : styles.filterButtonText
+                                }
+                            >
+                                ALIMENTAÇÃO
+                            </Text>
+                        </Button>
+                        <Button
+                            onPress={() => {
+                                changeActive("documentation");
+                            }}
+                            style={
+                                documentation == false
+                                    ? styles.filterButton
+                                    : styles.filterButtonActive
+                            }
+                            mode="outlined"
+                        >
+                            <Text
+                                style={
+                                    documentation == true
+                                        ? styles.filterButtonTextActive
+                                        : styles.filterButtonText
+                                }
+                            >
+                                DOCUMENTAÇÃO
+                            </Text>
+                        </Button>
+                        <Button
+                            onPress={() => {
+                                changeActive("education");
+                            }}
+                            style={
+                                education == false
+                                    ? styles.filterButton
+                                    : styles.filterButtonActive
+                            }
+                            mode="outlined"
+                        >
+                            <Text
+                                style={
+                                    education == true
+                                        ? styles.filterButtonTextActive
+                                        : styles.filterButtonText
+                                }
+                            >
+                                EDUCAÇÃO
+                            </Text>
+                        </Button>
+                        <Button
+                            onPress={() => {
+                                changeActive("shelter");
+                            }}
+                            style={
+                                shelter == false
+                                    ? styles.filterButton
+                                    : styles.filterButtonActive
+                            }
+                            mode="outlined"
+                        >
+                            <Text
+                                style={
+                                    shelter == true
+                                        ? styles.filterButtonTextActive
+                                        : styles.filterButtonText
+                                }
+                            >
+                                ABRIGO
+                            </Text>
+                        </Button>
+                        <Button
+                            onPress={() => {
+                                changeActive("health");
+                            }}
+                            style={
+                                health == false
+                                    ? styles.filterButton
+                                    : styles.filterButtonActive
+                            }
+                            mode="outlined"
+                        >
+                            <Text
+                                style={
+                                    health == true
+                                        ? styles.filterButtonTextActive
+                                        : styles.filterButtonText
+                                }
+                            >
+                                SAUDE
+                            </Text>
+                        </Button>
+                        <Button
+                            onPress={() => {
+                                changeActive("clothes");
+                            }}
+                            style={
+                                clothes == false
+                                    ? styles.filterButton
+                                    : styles.filterButtonActive
+                            }
+                            mode="outlined"
+                        >
+                            <Text
+                                style={
+                                    clothes == true
+                                        ? styles.filterButtonTextActive
+                                        : styles.filterButtonText
+                                }
+                            >
+                                ROUPA
+                            </Text>
+                        </Button>
+                        <Button
+                            onPress={() => {
+                                changeActive("job");
+                            }}
+                            style={
+                                job == false
+                                    ? styles.filterButton
+                                    : styles.filterButtonActive
+                            }
+                            mode="outlined"
+                        >
+                            <Text
+                                style={
+                                    job == true
+                                        ? styles.filterButtonTextActive
+                                        : styles.filterButtonText
+                                }
+                            >
+                                EMPREGO
+                            </Text>
+                        </Button>
+                        <Button
+                            onPress={() => {
+                                changeActive("acessibility");
+                            }}
+                            style={
+                                acessibility == false
+                                    ? styles.filterButton
+                                    : styles.filterButtonActive
+                            }
+                            mode="outlined"
+                        >
+                            <Text
+                                style={
+                                    acessibility == true
+                                        ? styles.filterButtonTextActive
+                                        : styles.filterButtonText
+                                }
+                            >
+                                ACESSIBILIDADE
+                            </Text>
+                        </Button>
+                        <Button
+                            onPress={() => {
+                                changeActive("nursery");
+                            }}
+                            style={
+                                nursery == false
+                                    ? styles.filterButton
+                                    : styles.filterButtonActive
+                            }
+                            mode="outlined"
+                        >
+                            <Text
+                                style={
+                                    nursery == true
+                                        ? styles.filterButtonTextActive
+                                        : styles.filterButtonText
+                                }
+                            >
+                                CRECHE
+                            </Text>
+                        </Button>
+                    </ScrollView>
+                </View>
+            </Animated.View>
+            <Card
+                style={{
+                    color: "#fff",
+                    position: "absolute",
+                    height: markerCardTabAnimPerc,
+                    width: wp("96%"),
+                    alignSelf: "center",
+                    bottom: wp("2%"),
+                    zIndex: 100
+                }}
+            >
+                <Card.Content>
+                    {/* <Text style={{fontSize: RFPercentage(3), fontWeight: '600'}}>{markerName}</Text>
                         <Text>{markerDesc}</Text> */}
-                    </Card.Content>
-                </Card>
-            </View>
-        </SafeAreaView>
+                </Card.Content>
+            </Card>
+        </View>
     );
 }
 
