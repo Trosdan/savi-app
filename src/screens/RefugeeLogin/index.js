@@ -46,9 +46,10 @@ export default RefugeeLogin = ({ navigation }) => {
             creds.header,
             getFamilyIDQuery
         );
-        
+        debugger;
         const familyID = JSON.parse(queryResponse).data.refugees.results[0]
             .Family.id;
+        
         const getFamilyDetailsQuery = `
         query{
         families(where:{id:{equalTo:"${familyID}"}}){
@@ -63,6 +64,7 @@ export default RefugeeLogin = ({ navigation }) => {
             creds.header,
             getFamilyDetailsQuery
         );
+        debugger;
         storeData(
             "refugeeFamily",
             JSON.parse(queryResponse).data.families.results

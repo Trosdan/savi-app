@@ -60,6 +60,7 @@ export default class index extends Component {
             creds.header,
             getFamilyMembersQuery
         );
+        debugger;
         familyQueryResponse = JSON.parse(familyQueryResponse);
         if (familyQueryResponse.data.families.results[0] == undefined) {
             familyMembers = [];
@@ -93,6 +94,7 @@ export default class index extends Component {
         await storeData("refugeeFamily", updatedFamilyInfo);
         familyDetailsFromAsyncStorage = await fetchData("refugeeFamily");
         console.log(familyDetailsFromAsyncStorage);
+        debugger;
         updatedFamilyInfo = JSON.parse(updatedFamilyInfo);
         return updatedFamilyInfo;
     };
@@ -113,6 +115,7 @@ export default class index extends Component {
             creds.header,
             createFamilyQuery
         );
+        debugger;
         response = JSON.parse(response);
         console.log(response.data.createFamily.id);
         const familyid = response.data.createFamily.id;
@@ -164,6 +167,7 @@ export default class index extends Component {
             creds.header,
             createRefugee
         );
+        debugger;
         response = JSON.parse(response);
 
         return response.data.createRefugee.id;
@@ -210,6 +214,7 @@ export default class index extends Component {
         if (ifNotIsPrimaryContact) {
             this.setState({ primaryContact: false });
             familyData = await fetchData("refugeeFamily");
+            debugger;
             familyDataParsed = JSON.parse(JSON.parse(familyData));
             this.setState({ familyID: familyDataParsed.data.updateFamily.id });
             memberid = await this.addMember(

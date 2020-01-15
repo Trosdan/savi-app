@@ -51,19 +51,23 @@ export default function RegRefugeeFamily({ navigation }) {
     };
     const handleBackButton = async () => {
         console.log("handling back button");
-        const lastScreen = await fetch("lastScreen");
+        const lastScreen = await fetchData("lastScreen");
         navigation.navigate(lastScreen);
     };
     useEffect(() => {
         seeAllValues();
-        console.log("RegRefugeeFamily");
+        console.log("RegRefugeeFamily: useEffect");
         getMembersFromFamily();
+    }, []);
+
+    useEffect(() => {
         BackHandler.addEventListener("hardwareBackPress", handleBackButton);
     }, []);
 
     const getMembersFromFamily = async () => {
         let familyResponse = await fetchData("refugeeFamily");
         console.log("family inside asyncstorage: " + familyResponse);
+        debugger;
         const familyObject = JSON.parse(familyResponse);
 
         familyID = familyObject[0].id;
@@ -87,15 +91,17 @@ export default function RegRefugeeFamily({ navigation }) {
                 }
               }
               `;
-        
+
         let familyQueryResponse = await gfetch(
             "https://parseapi.back4app.com/graphql",
             creds.header,
             getMembersDetails
         );
+        debugger;
         let familyObj = JSON.parse(familyQueryResponse);
         let membersArray = familyObj.data.refugees.results;
         console.log(`Members array: ${membersArray}`);
+        debugger;
         storeData("membersDetails", membersArray);
         setMembers(membersArray);
         return familyObj.data.refugees.results;
