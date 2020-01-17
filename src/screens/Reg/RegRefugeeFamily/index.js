@@ -15,7 +15,7 @@ import {
 } from "react-native-responsive-screen";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { Button, List } from "react-native-paper";
-import { fetchData, storeData, seeAllValues } from "../../../storage";
+import { fetchData, storeData, seeAllValues, unstring } from "../../../storage";
 import { gfetch } from "../../../services/grafetch";
 const creds = require("../../../../creds.json");
 
@@ -51,7 +51,8 @@ export default function RegRefugeeFamily({ navigation }) {
     };
     const handleBackButton = async () => {
         console.log("handling back button");
-        const lastScreen = await fetchData("lastScreen");
+        let lastScreen = await fetchData("lastScreen");
+        lastScreen = unstring(lastScreen);
         navigation.navigate(lastScreen);
     };
     useEffect(() => {
@@ -67,7 +68,6 @@ export default function RegRefugeeFamily({ navigation }) {
     const getMembersFromFamily = async () => {
         let familyResponse = await fetchData("refugeeFamily");
         console.log("family inside asyncstorage: " + familyResponse);
-        debugger;
         const familyObject = JSON.parse(familyResponse);
 
         familyID = familyObject[0].id;
@@ -97,11 +97,9 @@ export default function RegRefugeeFamily({ navigation }) {
             creds.header,
             getMembersDetails
         );
-        debugger;
         let familyObj = JSON.parse(familyQueryResponse);
         let membersArray = familyObj.data.refugees.results;
         console.log(`Members array: ${membersArray}`);
-        debugger;
         storeData("membersDetails", membersArray);
         setMembers(membersArray);
         return familyObj.data.refugees.results;
