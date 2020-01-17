@@ -7,32 +7,43 @@ import {
     Animated,
     Text,
     Dimensions,
-    Keyboard,
+    // Keyboard,
     TouchableOpacity,
     SafeAreaView
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+// import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"; //Implement later...
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import { Button, TextInput, Portal, Dialog, List } from "react-native-paper";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { TouchableHighlight } from "react-native-gesture-handler";
+import { RFPercentage } from "react-native-responsive-fontsize";
 import { gfetch } from "../../../services/grafetch";
 const creds = require("../../../../creds.json");
 import { storeData, fetchData, unstring } from "../../../storage";
-import { AsyncStorage } from "react-native";
-//import {getFamilyMembersQuery, bindMemberToFamily, createFamily, addMember} from '../../../services/backendConnections'
+//import {getFamilyMembersQuery, bindMemberToFamily, createFamily, addMember} from '../../../services/backendConnections' =>Possible refactoring
 export default class index extends Component {
     componentDidMount() {
-        this.setEmail();
+        if (this.checkIfIsPrimaryContact() == true) {
+            this.setEmail();
+        }
     }
-
+    checkIfIsPrimaryContact = async () => {
+        let isSecondaryContact = await fetchData("isSecondaryContact");
+        if (!isSecondaryContact) {
+            console.log("é contato primário");
+            this.setState({ primaryContact: true });
+            return true;
+        } else {
+            console.log("é contato secundario");
+            return false;
+        }
+    };
     setEmail = async () => {
         let RefugeeEmail = await fetchData("RefugeeEmail");
         RefugeeEmail = unstring(RefugeeEmail);
         this.setState({ email: RefugeeEmail });
+        console.log(`setting default email value: ${RefugeeEmail}`);
     };
 
     stringfy = array => {
@@ -98,6 +109,7 @@ export default class index extends Component {
         updatedFamilyInfo = JSON.parse(updatedFamilyInfo);
         return updatedFamilyInfo;
     };
+
     createFamily = async () => {
         createFamilyQuery = `
         mutation{
@@ -194,7 +206,7 @@ export default class index extends Component {
         console.log("Added memberID");
         await this.bindMemberToFamily(familyid, memberID);
         console.log("binded memberID to family");
-        await storeData("isNotPrimaryContact", true);
+        await storeData("isSecondaryContact", true);
     };
 
     decideWhichFunctionToUseOnRegisterButton = async () => {
@@ -209,7 +221,7 @@ export default class index extends Component {
         const diffYears = diffDays / 365;
         this.setState({ age: diffYears });
         const { navigate } = this.props.navigation;
-        let ifNotIsPrimaryContact = await fetchData("isNotPrimaryContact");
+        let ifNotIsPrimaryContact = await fetchData("isSecondaryContact");
         console.log(ifNotIsPrimaryContact);
         if (ifNotIsPrimaryContact) {
             this.setState({ primaryContact: false });
@@ -243,6 +255,8 @@ export default class index extends Component {
     };
 
     state = {
+        primaryContact: null,
+        email: "",
         familyID: "",
         name: "",
         lastName: "",
@@ -268,7 +282,10 @@ export default class index extends Component {
         const { navigate } = this.props.navigation;
         const SCREEN_WIDTH = Dimensions.get("window").width;
         this.state.scrollRef = React.createRef();
-
+        let text;
+        !this.state.isPrimaryContact
+            ? (text = "Registrar contato secundário da família")
+            : (text = "Registrar contato principal da família");
         const { fadeAnim, isMonthSelectorVisible, selectedMonth } = this.state;
         function hideAnimFunc() {
             Animated.spring(fadeAnim, {
@@ -373,9 +390,7 @@ export default class index extends Component {
                                 justifyContent: "flex-start"
                             }}
                         >
-                            <Text style={style.RegFamilySubtitle}>
-                                Registrar contato principal da Familia
-                            </Text>
+                            <Text style={style.RegFamilySubtitle}>{text}</Text>
                         </View>
                         <View
                             style={{
@@ -386,7 +401,7 @@ export default class index extends Component {
                             }}
                         >
                             <TextInput
-                                style={style.TextInput}
+                                style={style.EmailInput}
                                 label="Email"
                                 mode="outlined"
                                 onChangeText={inputValue =>
@@ -993,6 +1008,12 @@ export default class index extends Component {
 }
 
 const style = StyleSheet.create({
+    EmailInput: {
+        marginLeft: wp("5%"),
+        marginRight: wp("5%"),
+        marginTop: hp("4%"),
+        marginBottom: hp("-2%")
+    },
     LogoSavi: {
         width: wp("70%"),
         height: hp("10%"),
@@ -1008,7 +1029,7 @@ const style = StyleSheet.create({
     LastnameInput: {
         marginLeft: wp("5%"),
         marginRight: wp("5%"),
-        marginBottom: hp("7%")
+        marginBottom: hp("2%")
     },
     TextInput: {
         marginLeft: wp("5%"),
