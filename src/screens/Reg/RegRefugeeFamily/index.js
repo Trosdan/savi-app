@@ -15,34 +15,9 @@ import {
 } from "react-native-responsive-screen";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { Button, List } from "react-native-paper";
-import { fetchData, storeData, seeAllValues } from "../../../storage";
-import { gfetch } from "../../../services/grafetch";
-const creds = require("../../../../creds.json");
-
-export function MemberList(props) {
-    const members = props.members;
-    const listOfMembers = members.map((member, i) => (
-        <View style={{ flex: 1, flexDirection: "row" }} key={i}>
-            <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                    {member.name}
-                </Text>
-                <Text>{member.age} anos</Text>
-            </View>
-            {/* <View style={{ flex: 2 }}> //TODO in the next version of the app: Delete refugee in registration.
-                <Button onPress={deleteRefugee()}>-</Button>
-            </View> */}
-        </View>
-    ));
-    return (
-        <ScrollView
-            style={{ height: hp("66%"), marginLeft: wp("5%") }}
-            horizontal={false}
-        >
-            {listOfMembers}
-        </ScrollView>
-    );
-}
+import { fetchData, seeAllValues, unstring } from "../../../storage";
+import MemberList from "../../../components/MembersList";
+import { getMembersFromFamily } from "../../../services/backendIntegrations";
 
 export default function RegRefugeeFamily({ navigation }) {
     const [members, setMembers] = useState([]);
@@ -51,55 +26,22 @@ export default function RegRefugeeFamily({ navigation }) {
     };
     const handleBackButton = async () => {
         console.log("handling back button");
-        const lastScreen = await fetch("lastScreen");
+        let lastScreen = await fetchData("lastScreen");
+        lastScreen = unstring(lastScreen);
         navigation.navigate(lastScreen);
     };
     useEffect(() => {
         seeAllValues();
-        console.log("RegRefugeeFamily");
-        getMembersFromFamily();
-        BackHandler.addEventListener("hardwareBackPress", handleBackButton);
+        console.log("RegRefugeeFamily: useEffect");
+
+        const members = getMembersFromFamily();
+        console.log(`members :${members}`);
+        setMembers(members);
     }, []);
 
-    const getMembersFromFamily = async () => {
-        let familyResponse = await fetchData("refugeeFamily");
-        console.log("family inside asyncstorage: " + familyResponse);
-        const familyObject = JSON.parse(familyResponse);
-
-        familyID = familyObject[0].id;
-
-        getMembersDetails = `query refugeeInfoByFamily {
-                refugees(where:
-                  
-                  {
-              Family:{equalTo:"${familyID}"}
-                  }
-                                ) {
-                  results {
-                    name
-                    email
-                    age
-                    scholarity
-                    needs
-                    identificationDocument
-                    identificationDocumentType
-                  }
-                }
-              }
-              `;
-        
-        let familyQueryResponse = await gfetch(
-            "https://parseapi.back4app.com/graphql",
-            creds.header,
-            getMembersDetails
-        );
-        let familyObj = JSON.parse(familyQueryResponse);
-        let membersArray = familyObj.data.refugees.results;
-        console.log(`Members array: ${membersArray}`);
-        storeData("membersDetails", membersArray);
-        setMembers(membersArray);
-        return familyObj.data.refugees.results;
-    };
+    useEffect(() => {
+        BackHandler.addEventListener("hardwareBackPress", handleBackButton);
+    }, []);
 
     return (
         <KeyboardAwareScrollView
