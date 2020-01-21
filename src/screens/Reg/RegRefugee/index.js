@@ -1,3 +1,4 @@
+import {  } from './../../../services/backendIntegrations';
 import React, { Component } from "react";
 import {
     View,
@@ -22,6 +23,7 @@ import { gfetch } from "../../../services/grafetch";
 const creds = require("../../../../creds.json");
 import { storeData, fetchData, unstring } from "../../../storage";
 //import {getFamilyMembersQuery, bindMemberToFamily, createFamily, addMember} from '../../../services/backendConnections' =>Possible refactoring
+
 export default class index extends Component {
     componentDidMount() {
         if (this.checkIfisSecondaryContact() == true) {

@@ -11,7 +11,7 @@ import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { NavigationActions } from "react-navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { storeData, fetchData } from "../storage";
-
+import { getMembersFromFamily } from "../services/backendIntegrations";
 navigateToScreen = route => () => {
     const navigateAction = NavigationActions.navigate({
         routeName: route
@@ -22,14 +22,9 @@ navigateToScreen = route => () => {
 export default function CustomDrawer({ navigation }) {
     const [userData, setUserData] = useState({});
     useEffect(() => {
-        getMembersFromStorage();
-    }, []);
-    const getMembersFromStorage = async () => {
-        let membersDetails = await fetchData("membersDetails");
-        membersDetails = JSON.parse(membersDetails);
-        debugger;
+        const membersDetails = getMembersFromFamily();
         setUserData(membersDetails[0]);
-    };
+    }, []);
     const drawerActive = useSelector(state => state.drawerActive);
     const dispatch = useDispatch();
     console.log(`user data: ${userData}`);

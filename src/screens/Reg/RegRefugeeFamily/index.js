@@ -33,7 +33,9 @@ export default function RegRefugeeFamily({ navigation }) {
     useEffect(() => {
         seeAllValues();
         console.log("RegRefugeeFamily: useEffect");
+
         const members = getMembersFromFamily();
+        console.log(`members :${members}`);
         setMembers(members);
     }, []);
 
