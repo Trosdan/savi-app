@@ -50,10 +50,10 @@ export default function CustomDrawer({ navigation }) {
                         alignSelf: "center"
                     }}
                 >
-                    Hola, {userData.name} {userData.lastname}!
+                    Hola, Guilherme Gelmi!
                 </Text>
                 <Text style={{ color: "#fff", alignSelf: "center" }}>
-                    {userData.email}
+                    ggelmisalvo@gmail.com
                 </Text>
             </View>
             <View style={{ height: hp(".05%"), backgroundColor: "#171f23" }}>

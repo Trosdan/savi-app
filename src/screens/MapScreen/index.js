@@ -1,6 +1,10 @@
 import React, { useEffect, Fragment, useState } from "react";
 import Map from "../../components/Map";
 import { useSafeArea } from "react-native-safe-area-context";
+import * as Location from "expo-location";
+import * as Permissions from "expo-permissions";
+import MapStyle from "../../components/MapStyle";
+import MapView from "react-native-maps";
 
 import {
     View,
@@ -27,6 +31,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import axios from "axios";
 import { axheaders } from "../../../creds.json";
+
 //import { } from 'react-navigation';
 
 // import { Container } from './styles';
@@ -56,12 +61,32 @@ export default function MapScreen({ navigation }) {
     const markerDesc = useSelector(state => state.markerSelected.description);
 
     const [filterTabAnimNum] = useState(new Animated.Value(0));
-    const markerCardAnimNum = useSelector(state => state.markerCardAnimNum);
+    const [markerCardAnimNum] = useState(new Animated.Value(0));
+    const isInitialRegion = useSelector(state => state.isInitialRegion);
+    //const markerCardAnimNum = useSelector(state => state.markerCardAnimNum);
+
+    const region = useSelector(state => state.user.location);
 
     const url = "https://parseapi.back4app.com/functions/get_offer_points";
     const config = {
         headers: axheaders
     };
+
+    function markerCardShowAnimFunc() {
+        Animated.timing(markerCardAnimNum, {
+            toValue: 1000,
+            duration: 300,
+        }).start();
+        //console.log('abriu');
+    }
+    
+    function markerCardHideAnimFunc() {
+        Animated.timing(markerCardAnimNum, {
+            toValue: 0,
+            duration: 300,
+        }).start();
+        //console.log('fecho');
+    }
 
     function filterTabShowAnimFunc() {
         Animated.spring(filterTabAnimNum, {
@@ -121,7 +146,6 @@ export default function MapScreen({ navigation }) {
             toggleLoading();
             return await axios.post(url, data, config).then(res => {
                 console.log(res.data.result);
-                sleep(2000);
                 return (
                     addMarkers(res.data.result),
                     changeTabActive(),
@@ -132,7 +156,7 @@ export default function MapScreen({ navigation }) {
         }
     }
 
-    function changeActive(filter) {
+    function changeActiveFilter(filter) {
         dispatch({ type: "FILTER_ACTIVE", filter: filter });
     }
 
@@ -144,8 +168,42 @@ export default function MapScreen({ navigation }) {
         dispatch({ type: "FILTER_LOADING" });
     }
 
+    const _getLocationAsync = async () => {
+        let { status } = await Permissions.askAsync(Permissions.LOCATION);
+        if (status !== "granted") {
+            console.log("error");
+        }
+        let location = await Location.getCurrentPositionAsync({
+            coords: { latitude, longitude }
+        });
+        changeActive(location.coords.latitude, location.coords.longitude);
+        console.log("essa é a localizacao" + location.coords.latitude, location.coords.longitude);
+        dispatch({ type: "INITIAL_REGION" });
+    };
+
+    function changeActive(latitude, longitude) {
+        dispatch({
+            type: "UPDATE_LOCATION",
+            latitude: latitude,
+            longitude: longitude
+        });
+    }
+
     const insets = useSafeArea();
 
+    useEffect(() => {
+        if(isMarkerSelected==true){
+            markerCardShowAnimFunc()
+        } else {
+            markerCardHideAnimFunc()
+        }
+    }, [isMarkerSelected]);
+
+    useEffect(() => {
+        _getLocationAsync();
+        console.log("está é a region:")
+        console.log(region)
+    },[])
     return (
         <View style={{ backgroundColor: "#000", paddingTop: insets.top }}>
             <View
@@ -198,7 +256,16 @@ export default function MapScreen({ navigation }) {
                 </TouchableOpacity>
             */}
             <Animated.View style={{ height: MapAnimPerc }}>
-                <Map onShowAnim={() => markerCardShowAnimFunc()} />
+                {
+                    isInitialRegion ? 
+                        <Map />
+                        :
+                        <MapView
+                            style={{ flex: 1 }}
+                            loadingEnabled
+                            customMapStyle={MapStyle}
+                        />
+                }
                 {filterTabActive ? (
                     <>
                         {!filterTabLoading ? (
@@ -269,7 +336,7 @@ export default function MapScreen({ navigation }) {
                     <ScrollView>
                         <Button
                             onPress={() => {
-                                changeActive("food");
+                                changeActiveFilter("food");
                             }}
                             style={
                                 food == false
@@ -290,7 +357,7 @@ export default function MapScreen({ navigation }) {
                         </Button>
                         <Button
                             onPress={() => {
-                                changeActive("documentation");
+                                changeActiveFilter("documentation");
                             }}
                             style={
                                 documentation == false
@@ -311,7 +378,7 @@ export default function MapScreen({ navigation }) {
                         </Button>
                         <Button
                             onPress={() => {
-                                changeActive("education");
+                                changeActiveFilter("education");
                             }}
                             style={
                                 education == false
@@ -332,7 +399,7 @@ export default function MapScreen({ navigation }) {
                         </Button>
                         <Button
                             onPress={() => {
-                                changeActive("shelter");
+                                changeActiveFilter("shelter");
                             }}
                             style={
                                 shelter == false
@@ -353,7 +420,7 @@ export default function MapScreen({ navigation }) {
                         </Button>
                         <Button
                             onPress={() => {
-                                changeActive("health");
+                                changeActiveFilter("health");
                             }}
                             style={
                                 health == false
@@ -374,7 +441,7 @@ export default function MapScreen({ navigation }) {
                         </Button>
                         <Button
                             onPress={() => {
-                                changeActive("clothes");
+                                changeActiveFilter("clothes");
                             }}
                             style={
                                 clothes == false
@@ -395,7 +462,7 @@ export default function MapScreen({ navigation }) {
                         </Button>
                         <Button
                             onPress={() => {
-                                changeActive("job");
+                                changeActiveFilter("job");
                             }}
                             style={
                                 job == false
@@ -416,7 +483,7 @@ export default function MapScreen({ navigation }) {
                         </Button>
                         <Button
                             onPress={() => {
-                                changeActive("acessibility");
+                                changeActiveFilter("acessibility");
                             }}
                             style={
                                 acessibility == false
@@ -437,7 +504,7 @@ export default function MapScreen({ navigation }) {
                         </Button>
                         <Button
                             onPress={() => {
-                                changeActive("nursery");
+                                changeActiveFilter("nursery");
                             }}
                             style={
                                 nursery == false
@@ -467,12 +534,13 @@ export default function MapScreen({ navigation }) {
                     width: wp("96%"),
                     alignSelf: "center",
                     bottom: wp("2%"),
-                    zIndex: 100
+                    zIndex: 100,
+                    elevation: 15,
                 }}
             >
                 <Card.Content>
-                    {/* <Text style={{fontSize: RFPercentage(3), fontWeight: '600'}}>{markerName}</Text>
-                        <Text>{markerDesc}</Text> */}
+                        <Text style={{fontSize: RFPercentage(3), fontWeight: '600'}}>{markerName}</Text>
+                        <Text>{markerDesc}</Text> 
                 </Card.Content>
             </Card>
         </View>

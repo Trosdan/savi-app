@@ -40,7 +40,8 @@ const INITIAL_STATE = {
         name: "",
         description: ""
     },
-    markerCardAnimNum: new Animated.Value(0)
+    markerCardAnimNum: new Animated.Value(0),
+    isInitialRegion: false
 };
 
 function markerCardShowAnimFunc(markerCardAnimNum) {
@@ -52,7 +53,7 @@ function markerCardShowAnimFunc(markerCardAnimNum) {
 
 function markerCardHideAnimFunc(markerCardAnimNum) {
     Animated.spring(markerCardAnimNum, {
-        toValue: 1
+        toValue: 0
     }).start();
     //console.log('fecho');
 }
@@ -92,7 +93,7 @@ function reducer(state = INITIAL_STATE, action) {
             return { ...state, filterTabAnim: action.filterTabAnimNum };
         case "SELECT_MARKER":
             console.log("selecionou");
-            markerCardShowAnimFunc(state.markerCardAnimNum);
+            //markerCardShowAnimFunc(state.markerCardAnimNum);
             return {
                 ...state,
                 markerSelected: {
@@ -103,12 +104,18 @@ function reducer(state = INITIAL_STATE, action) {
                 isMarkerSelected: true
             };
         case "DESELECT_MARKER":
-            markerCardHideAnimFunc(state.markerCardAnimNum);
+            //markerCardHideAnimFunc(state.markerCardAnimNum);
             console.log("deselecionou");
             return {
                 ...state,
                 isMarkerSelected: false
             };
+        case "INITIAL_REGION":
+            console.log("Initial Region");
+            return {
+                ...state,
+                isInitialRegion: true
+            }
         default:
             return state;
     }

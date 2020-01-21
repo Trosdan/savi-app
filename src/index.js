@@ -4,8 +4,9 @@ import Routes from "./screens";
 import { SafeAreaView } from "react-native";
 import { Provider as ReduxProvider } from "react-redux";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-
 import store from "./store";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 
 const theme = {
     ...DefaultTheme,
@@ -24,7 +25,12 @@ const theme = {
 const App = () => (
     <ReduxProvider store={store}>
         <SafeAreaProvider>
-            <PaperProvider theme={theme}>
+            <PaperProvider
+                theme={theme}
+                settings={{
+                    icon: props => <MaterialCommunityIcons {...props} />,
+                  }}
+            >
                 <Routes />
             </PaperProvider>
         </SafeAreaProvider>
