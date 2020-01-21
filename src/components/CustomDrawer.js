@@ -26,7 +26,7 @@ export default function CustomDrawer({ navigation }) {
     }, []);
     setMembersFromFamilyAsync = async () => {
         let membersDetails = await getMembersFromFamily();
-        debugger;
+
         console.log(`memberDetails in custom drawer ${membersDetails}`);
         setUserData(membersDetails[0]);
     };

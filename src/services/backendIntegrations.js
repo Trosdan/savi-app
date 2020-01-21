@@ -67,10 +67,11 @@ export const getMembersFromFamily = async () => {
 
     let familyQueryResponse = await client.gfetch(getMembersDetails);
     let familyObj = JSON.parse(familyQueryResponse);
-    debugger;
+
     console.log(familyObj);
     let membersArray = familyObj.data.refugees.results;
     console.log(`Members array: ${membersArray}`);
     storeData("membersDetails", membersArray);
+
     return membersArray;
 };

@@ -43,7 +43,7 @@ export default RefugeeLogin = ({ navigation }) => {
         }`;
 
         let queryResponse = await client.gfetch(getFamilyIDQuery);
-        debugger;
+
         if (JSON.parse(queryResponse).data.refugees.results.length == 0) {
             return 0;
         }
@@ -60,7 +60,7 @@ export default RefugeeLogin = ({ navigation }) => {
         }
         }`;
         queryResponse = await client.gfetch(getFamilyDetailsQuery);
-        debugger;
+
         storeData(
             "refugeeFamily",
             JSON.parse(queryResponse).data.families.results
@@ -91,7 +91,7 @@ export default RefugeeLogin = ({ navigation }) => {
         }
         `;
         const response = await client.gfetch(verifyRefugeeEmailQuery);
-        debugger;
+
         let responseJson = JSON.parse(response);
         console.log(`full json response: ${responseJson}`);
         console.log("response: " + responseJson.data.refugees.results[0]);

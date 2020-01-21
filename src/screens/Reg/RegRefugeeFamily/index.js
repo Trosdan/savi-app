@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
     Text,
     View,
-    SafeAreaView,
     Image,
     StyleSheet,
     ScrollView,
@@ -13,8 +12,8 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { Button, List } from "react-native-paper";
+import { RFPercentage } from "react-native-responsive-fontsize";
+import { Button } from "react-native-paper";
 import { fetchData, seeAllValues, unstring } from "../../../storage";
 import MemberList from "../../../components/MembersList";
 import { getMembersFromFamily } from "../../../services/backendIntegrations";
@@ -30,13 +29,17 @@ export default function RegRefugeeFamily({ navigation }) {
         lastScreen = unstring(lastScreen);
         navigation.navigate(lastScreen);
     };
+    const getAndSetMembers = async () => {
+        let members = await getMembersFromFamily();
+
+        console.log(`members :${members}`);
+
+        setMembers(members);
+    };
     useEffect(() => {
         seeAllValues();
         console.log("RegRefugeeFamily: useEffect");
-
-        const members = getMembersFromFamily();
-        console.log(`members :${members}`);
-        setMembers(members);
+        getAndSetMembers();
     }, []);
 
     useEffect(() => {
@@ -44,7 +47,7 @@ export default function RegRefugeeFamily({ navigation }) {
     }, []);
 
     return (
-        <KeyboardAwareScrollView
+        <View
             style={{ backgroundColor: "#FFF" }}
             resetScrollToCoords={{ x: 0, y: 0 }}
             scrollEnabled={false}
@@ -69,8 +72,9 @@ export default function RegRefugeeFamily({ navigation }) {
                 />
                 <Text style={style.RegFamilyTitle}>Registrar Família</Text>
             </View>
-            <ScrollView style={{ alignSelf: "center", height: hp("65%") }}>
-                <MemberList style={style.member} members={members}></MemberList>
+            <View style={{ alignSelf: "center", height: hp("65%") }}>
+                <MemberList members={members}></MemberList>
+
                 <Button
                     mode="outlined"
                     style={style.addMember}
@@ -80,7 +84,7 @@ export default function RegRefugeeFamily({ navigation }) {
                 >
                     Adicionar membro da Família
                 </Button>
-            </ScrollView>
+            </View>
             <View
                 style={{
                     flexDirection: "row",
@@ -127,7 +131,7 @@ export default function RegRefugeeFamily({ navigation }) {
                     </Text>
                 </Button>
             </View>
-        </KeyboardAwareScrollView>
+        </View>
     );
 }
 

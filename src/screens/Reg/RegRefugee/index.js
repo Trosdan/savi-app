@@ -1,4 +1,4 @@
-import {  } from './../../../services/backendIntegrations';
+import {} from "./../../../services/backendIntegrations";
 import React, { Component } from "react";
 import {
     View,
@@ -223,7 +223,7 @@ export default class index extends Component {
         if (ifNotisSecondaryContact) {
             this.setState({ primaryContact: false });
             familyData = await fetchData("refugeeFamily");
-            debugger;
+
             let familyDataParsed = JSON.parse(familyData);
             this.setState({ familyID: familyDataParsed.id });
             memberid = await this.addMember(
