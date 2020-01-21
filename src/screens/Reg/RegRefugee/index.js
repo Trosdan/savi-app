@@ -24,11 +24,11 @@ import { storeData, fetchData, unstring } from "../../../storage";
 //import {getFamilyMembersQuery, bindMemberToFamily, createFamily, addMember} from '../../../services/backendConnections' =>Possible refactoring
 export default class index extends Component {
     componentDidMount() {
-        if (this.checkIfIsPrimaryContact() == true) {
+        if (this.checkIfisSecondaryContact() == true) {
             this.setEmail();
         }
     }
-    checkIfIsPrimaryContact = async () => {
+    checkIfisSecondaryContact = async () => {
         let isSecondaryContact = await fetchData("isSecondaryContact");
         if (!isSecondaryContact) {
             console.log("é contato primário");
@@ -71,7 +71,6 @@ export default class index extends Component {
             creds.header,
             getFamilyMembersQuery
         );
-        debugger;
         familyQueryResponse = JSON.parse(familyQueryResponse);
         if (familyQueryResponse.data.families.results[0] == undefined) {
             familyMembers = [];
@@ -105,7 +104,6 @@ export default class index extends Component {
         await storeData("refugeeFamily", updatedFamilyInfo);
         familyDetailsFromAsyncStorage = await fetchData("refugeeFamily");
         console.log(familyDetailsFromAsyncStorage);
-        debugger;
         updatedFamilyInfo = JSON.parse(updatedFamilyInfo);
         return updatedFamilyInfo;
     };
@@ -127,7 +125,6 @@ export default class index extends Component {
             creds.header,
             createFamilyQuery
         );
-        debugger;
         response = JSON.parse(response);
         console.log(response.data.createFamily.id);
         const familyid = response.data.createFamily.id;
@@ -179,10 +176,8 @@ export default class index extends Component {
             creds.header,
             createRefugee
         );
-        debugger;
         response = JSON.parse(response);
-
-        return response.data.createRefugee.id;
+        return response;
     };
 
     registrate = async () => {
@@ -221,14 +216,14 @@ export default class index extends Component {
         const diffYears = diffDays / 365;
         this.setState({ age: diffYears });
         const { navigate } = this.props.navigation;
-        let ifNotIsPrimaryContact = await fetchData("isSecondaryContact");
-        console.log(ifNotIsPrimaryContact);
-        if (ifNotIsPrimaryContact) {
+        let ifNotisSecondaryContact = await fetchData("isSecondaryContact");
+        console.log(ifNotisSecondaryContact);
+        if (ifNotisSecondaryContact) {
             this.setState({ primaryContact: false });
             familyData = await fetchData("refugeeFamily");
             debugger;
-            familyDataParsed = JSON.parse(JSON.parse(familyData));
-            this.setState({ familyID: familyDataParsed.data.updateFamily.id });
+            let familyDataParsed = JSON.parse(familyData);
+            this.setState({ familyID: familyDataParsed.id });
             memberid = await this.addMember(
                 this.state.name,
                 this.state.age,
@@ -283,9 +278,13 @@ export default class index extends Component {
         const SCREEN_WIDTH = Dimensions.get("window").width;
         this.state.scrollRef = React.createRef();
         let text;
-        !this.state.isPrimaryContact
-            ? (text = "Registrar contato secundário da família")
-            : (text = "Registrar contato principal da família");
+        let error;
+        this.state.nullForms
+            ? (error = "Complete os formulários obrigatórios")
+            : (error = "");
+        this.state.isSecondaryContact
+            ? (text = "Registrar el contacto principal de la familia.")
+            : (text = "Registrar un contacto secundario de la familia.");
         const { fadeAnim, isMonthSelectorVisible, selectedMonth } = this.state;
         function hideAnimFunc() {
             Animated.spring(fadeAnim, {
@@ -310,6 +309,20 @@ export default class index extends Component {
             inputRange: [0, 100],
             outputRange: [hp("50%"), hp("70%")]
         });
+        checkFirstForm = () => {
+            if (this.state.email != "" && this.state.name != "") {
+                this.scroll.getNode().scrollTo({ x: SCREEN_WIDTH }),
+                    hideAnimFunc();
+            } else if (this.state.email != "" && this.state.name == "") {
+                this.setState({ nullForms: true });
+                console.log("nos informe seu primeiro nome");
+            } else if (this.state.email == "" && this.state.name != "") {
+                this.setState({ nullForms: true });
+                console.log("nos informe seu melhor email");
+            } else {
+                console.log("preencha os campos de email e nome");
+            }
+        };
         return (
             <SafeAreaView
                 style={{ backgroundColor: "#FFF" }}
@@ -346,11 +359,11 @@ export default class index extends Component {
                         resizeMode="contain"
                         style={style.LogoSavi}
                     />
-                    <Text style={style.RegFamilyTitle}>Registrar Família</Text>
+                    <Text style={style.RegFamilyTitle}>Registrar Familia</Text>
                     <Text style={style.RegFamilyText}>
-                        Todos os membros da familia devem estar no mesmo lugar,
-                        se estão em localizações diferentes devem se registrar
-                        em celulares diferentes
+                        Todos los miembros de la familia deben estar en el mismo
+                        lugar, si están en diferentes lugares deben registrarse
+                        en diferentes teléfonos.
                     </Text>
                 </Animated.View>
                 <Animated.ScrollView
@@ -402,7 +415,7 @@ export default class index extends Component {
                         >
                             <TextInput
                                 style={style.EmailInput}
-                                label="Email"
+                                label="Correo electrónico."
                                 mode="outlined"
                                 onChangeText={inputValue =>
                                     this.setState({ email: inputValue })
@@ -411,7 +424,7 @@ export default class index extends Component {
                             />
                             <TextInput
                                 style={style.NameInput}
-                                label="Nome"
+                                label="Primer nombre"
                                 mode="outlined"
                                 onChangeText={name =>
                                     this.setState({ name: name })
@@ -420,7 +433,7 @@ export default class index extends Component {
                             />
                             <TextInput
                                 style={style.LastnameInput}
-                                label="Sobrenome - opcional"
+                                label="Apellido - opcional"
                                 mode="outlined"
                                 onChangeText={lastName =>
                                     this.setState({ lastName: lastName })
@@ -466,12 +479,7 @@ export default class index extends Component {
                                         marginBottom: hp("2%"),
                                         alignSelf: "flex-end"
                                     }}
-                                    onPress={() => {
-                                        this.scroll
-                                            .getNode()
-                                            .scrollTo({ x: SCREEN_WIDTH }),
-                                            hideAnimFunc();
-                                    }}
+                                    onPress={() => checkFirstForm()}
                                 >
                                     <Text
                                         style={{
@@ -503,7 +511,7 @@ export default class index extends Component {
                             }}
                         >
                             <Text style={style.RegFamilySubtitle}>
-                                Precisamos de mais informações
+                                Informaciones adicionales.
                             </Text>
                         </View>
                         <View
@@ -580,6 +588,7 @@ export default class index extends Component {
                                             <ScrollView>
                                                 <List.Item
                                                     title="Janeiro"
+                                                    value={2}
                                                     onPress={() =>
                                                         this.setState({
                                                             selectedMonth: 0
@@ -833,7 +842,7 @@ export default class index extends Component {
                                 <TextInput
                                     value={this.state.gender}
                                     style={style.LastnameInput}
-                                    label="Mês"
+                                    label="Mes"
                                     mode="outlined"
                                     editable={false}
                                     disabled={true}
