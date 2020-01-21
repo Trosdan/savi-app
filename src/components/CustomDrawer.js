@@ -20,11 +20,16 @@ navigateToScreen = route => () => {
 };
 
 export default function CustomDrawer({ navigation }) {
-    const [userData, setUserData] = useState({});
+    const [userData, setUserData] = useState({ name: "", email: "" });
     useEffect(() => {
-        const membersDetails = getMembersFromFamily();
-        setUserData(membersDetails[0]);
+        setMembersFromFamilyAsync();
     }, []);
+    setMembersFromFamilyAsync = async () => {
+        let membersDetails = await getMembersFromFamily();
+        debugger;
+        console.log(`memberDetails in custom drawer ${membersDetails}`);
+        setUserData(membersDetails[0]);
+    };
     const drawerActive = useSelector(state => state.drawerActive);
     const dispatch = useDispatch();
     console.log(`user data: ${userData}`);
@@ -50,7 +55,7 @@ export default function CustomDrawer({ navigation }) {
                         alignSelf: "center"
                     }}
                 >
-                    Hola, {userData.name} {userData.lastname}!
+                    Hola, {userData.name}!
                 </Text>
                 <Text style={{ color: "#fff", alignSelf: "center" }}>
                     {userData.email}

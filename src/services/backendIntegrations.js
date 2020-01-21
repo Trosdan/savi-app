@@ -29,14 +29,15 @@ export const getMemberID = async email => {
     `;
     const memberIDResponse = await client.gfetch(getMemberIdQuery);
     memberIDJSON = JSON.parse(memberIDResponse);
+    console.log(memberIDJSON);
     return memberIDJSON.data.refugees.results[0].Family.id;
 };
 
 export const getMembersFromFamily = async () => {
     seeAllValues();
-    
+
     const email = await fetchData("RefugeeEmail");
-    const familyID = getMemberID(email);
+    const familyID = await getMemberID(email);
     // let familyResponse = await fetchData("refugeeFamily");
     // console.log("family inside asyncqstorage: " + familyResponse);
     // const familyObject = JSON.parse(familyResponse);
@@ -66,6 +67,8 @@ export const getMembersFromFamily = async () => {
 
     let familyQueryResponse = await client.gfetch(getMembersDetails);
     let familyObj = JSON.parse(familyQueryResponse);
+    debugger;
+    console.log(familyObj);
     let membersArray = familyObj.data.refugees.results;
     console.log(`Members array: ${membersArray}`);
     storeData("membersDetails", membersArray);
