@@ -13,7 +13,7 @@ export default function UserProfile({ navigation }) {
     const username = useSelector(state => state.user.name);
     useEffect(async () => {
         const memberDetails = await fetchData("memberDetails");
-        const { name, age } = JSON.parse(memberDetails);
+        const { name, age } = JSON.parse(memberDetails)[0];
     }, []);
     return (
         <View style={styles.container}>

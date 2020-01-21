@@ -1,7 +1,7 @@
 import SafeAreaView from "react-native-safe-area-view";
 import { DrawerNavigatorItems } from "react-navigation-drawer";
 import { ScrollView, StyleSheet, View, Text, AsyncStorage } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
@@ -10,7 +10,7 @@ import { Surface, Divider, List, Button } from "react-native-paper";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { NavigationActions } from "react-navigation";
 import { useSelector, useDispatch } from "react-redux";
-import { storeData } from "../storage";
+import { storeData, fetchData } from "../storage";
 
 navigateToScreen = route => () => {
     const navigateAction = NavigationActions.navigate({
@@ -20,10 +20,19 @@ navigateToScreen = route => () => {
 };
 
 export default function CustomDrawer({ navigation }) {
+    const [userData, setUserData] = useState({});
+    useEffect(() => {
+        getMembersFromStorage();
+    }, []);
+    const getMembersFromStorage = async () => {
+        let membersDetails = await fetchData("membersDetails");
+        membersDetails = JSON.parse(membersDetails);
+        debugger;
+        setUserData(membersDetails[0]);
+    };
     const drawerActive = useSelector(state => state.drawerActive);
     const dispatch = useDispatch();
-    const userData = useSelector(state => state.user);
-
+    console.log(`user data: ${userData}`);
     function changeActive(title) {
         dispatch({ type: "DRAWER_ACTIVE", title: title });
     }
@@ -46,7 +55,7 @@ export default function CustomDrawer({ navigation }) {
                         alignSelf: "center"
                     }}
                 >
-                    Olá, {userData.name} {userData.lastname}
+                    Hola, {userData.name} {userData.lastname}!
                 </Text>
                 <Text style={{ color: "#fff", alignSelf: "center" }}>
                     {userData.email}
