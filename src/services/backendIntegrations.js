@@ -12,8 +12,8 @@ export const deleteRefugee = async memberID => {
     console.log(response);
 };
 
-export const getMemberID = async email => {
-    const getMemberIdQuery = `
+export const getFamilyID = async email => {
+    const getFamilyIDQuery = `
         query{
         refugees(limit:1, where:{email:{equalTo:${email}}}){
             results{
@@ -27,7 +27,7 @@ export const getMemberID = async email => {
         }
         
     `;
-    const memberIDResponse = await client.gfetch(getMemberIdQuery);
+    const memberIDResponse = await client.gfetch(getFamilyIDQuery);
     memberIDJSON = JSON.parse(memberIDResponse);
     console.log(memberIDJSON);
     return memberIDJSON.data.refugees.results[0].Family.id;
@@ -37,7 +37,7 @@ export const getMembersFromFamily = async () => {
     seeAllValues();
 
     const email = await fetchData("RefugeeEmail");
-    const familyID = await getMemberID(email);
+    const familyID = await getFamilyID(email);
     // let familyResponse = await fetchData("refugeeFamily");
     // console.log("family inside asyncqstorage: " + familyResponse);
     // const familyObject = JSON.parse(familyResponse);
