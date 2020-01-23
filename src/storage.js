@@ -9,6 +9,7 @@ export const storeData = async (key, value) => {
         console.log(`saving ${key}:${value}`);
     } catch (error) {
         console.log(`error saving data ${key}:${value} -> ${error}`);
+        return error;
     }
 };
 

@@ -73,14 +73,18 @@ export default class index extends Component {
             creds.header,
             getFamilyMembersQuery
         );
+        debugger;
         familyQueryResponse = JSON.parse(familyQueryResponse);
-        if (familyQueryResponse.data.families.results[0] == undefined) {
+        if (
+            (familyQueryResponse.data.families.results[0] == undefined) |
+            (familyQueryResponse.data.families.results == [])
+        ) {
             familyMembers = [];
         } else {
             familyMembers =
                 familyQueryResponse.data.families.results[0].members.ids;
         }
-
+        debugger;
         familyMembers.push(memberID);
         familyMembers = this.stringfy(familyMembers);
         updateFamilyQuery = `
@@ -102,7 +106,7 @@ export default class index extends Component {
             creds.header,
             updateFamilyQuery
         );
-        console.log(updatedFamilyInfo);
+        console.log(`Updated family info after bind: ${updatedFamilyInfo}`);
         await storeData("refugeeFamily", updatedFamilyInfo);
         familyDetailsFromAsyncStorage = await fetchData("refugeeFamily");
         console.log(familyDetailsFromAsyncStorage);
@@ -183,11 +187,12 @@ export default class index extends Component {
     };
 
     registrate = async () => {
-        console.log("register");
+        this.setState({ primaryContact: true });
+        console.log("primary contact");
         const familyid = await this.createFamily();
         console.log("created family");
         this.setState({ familyID: familyid });
-        const memberID = await this.addMember(
+        const memberIDResponse = await this.addMember(
             this.state.name,
             this.state.age,
             this.state.job,
@@ -200,13 +205,41 @@ export default class index extends Component {
             this.state.needs,
             this.state.doc
         );
+        let memberID = memberIDResponse.data.createRefugee.id;
         console.log("Added memberID");
+        console.log(memberID);
+
         await this.bindMemberToFamily(familyid, memberID);
         console.log("binded memberID to family");
         await storeData("isSecondaryContact", true);
     };
 
-    decideWhichFunctionToUseOnRegisterButton = async () => {
+    registrateAdditionalMember = async () => {
+        console.log(`additional member`);
+        this.setState({ primaryContact: false });
+        let familyData = await fetchData("refugeeFamily"); //fetching refugeeFamily:[{"id":"oAgsC9Dymy","members":{"ids":[]}}]
+
+        let familyDataParsed = JSON.parse(familyData);
+        this.setState({ familyID: familyDataParsed[0].id });
+        const addMemberResponse = await this.addMember(
+            this.state.name,
+            this.state.age,
+            this.state.job,
+            this.state.gender,
+            this.state.docType,
+            this.state.familyID,
+            this.state.primaryContact,
+            this.state.scholarity,
+            this.state.email,
+            this.state.needs,
+            this.state.doc
+        );
+        if (typeof (addMemberResponse != "string")) {
+            memberid = addMemberResponse.data.createRefugee.id;
+        }
+        this.bindMemberToFamily(this.state.familyID, memberid);
+    };
+    calcAge = () => {
         const birthDate = new Date(
             this.state.selectedYear,
             this.state.selectedMonth,
@@ -217,34 +250,19 @@ export default class index extends Component {
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         const diffYears = diffDays / 365;
         this.setState({ age: diffYears });
-        const { navigate } = this.props.navigation;
-        let ifNotisSecondaryContact = await fetchData("isSecondaryContact");
-        console.log(ifNotisSecondaryContact);
-        if (ifNotisSecondaryContact) {
-            this.setState({ primaryContact: false });
-            familyData = await fetchData("refugeeFamily");
+    };
 
-            let familyDataParsed = JSON.parse(familyData);
-            this.setState({ familyID: familyDataParsed.id });
-            memberid = await this.addMember(
-                this.state.name,
-                this.state.age,
-                this.state.job,
-                this.state.gender,
-                this.state.docType,
-                this.state.familyID,
-                this.state.primaryContact,
-                this.state.scholarity,
-                this.state.email,
-                this.state.needs,
-                this.state.doc
-            );
-            this.bindMemberToFamily(this.state.familyID, memberid);
-            console.log(`additional member`);
+    decideWhichFunctionToUseOnRegisterButton = async () => {
+        const { navigate } = this.props.navigation;
+        this.calcAge();
+        let isSecondaryContact = await fetchData("isSecondaryContact");
+        console.log(isSecondaryContact);
+
+        if (isSecondaryContact) {
+            await this.registrateAdditionalMember();
+
             navigate(`RegistrationRefugeeFamily`);
         } else {
-            this.setState({ primaryContact: true });
-            console.log("primary contact");
             await this.registrate();
             if (!this.state.email) navigate("ConfirmationCode");
             navigate(`RegistrationRefugeeFamily`);
@@ -252,6 +270,10 @@ export default class index extends Component {
     };
 
     state = {
+        isSecondaryContact: null,
+        job: "",
+        scholarity: "",
+        needs: "",
         primaryContact: null,
         email: "",
         familyID: "",
@@ -266,7 +288,9 @@ export default class index extends Component {
         fadeAnim: new Animated.Value(0),
         scrollRef: null,
         isMonthSelectorVisible: false,
-        selectedMonth: 2
+        selectedMonth: 0,
+        nullForms: "",
+        error: ""
     };
 
     _showDialog = () => this.setState({ isMonthSelectorVisible: true });
@@ -280,10 +304,7 @@ export default class index extends Component {
         const SCREEN_WIDTH = Dimensions.get("window").width;
         this.state.scrollRef = React.createRef();
         let text;
-        let error;
-        this.state.nullForms
-            ? (error = "Complete os formulários obrigatórios")
-            : (error = "");
+        let error = this.state.nullForms;
         this.state.isSecondaryContact
             ? (text = "Registrar el contacto principal de la familia.")
             : (text = "Registrar un contacto secundario de la familia.");
@@ -311,18 +332,39 @@ export default class index extends Component {
             inputRange: [0, 100],
             outputRange: [hp("50%"), hp("70%")]
         });
-        checkFirstForm = () => {
+        const checkFirstForm = () => {
             if (this.state.email != "" && this.state.name != "") {
                 this.scroll.getNode().scrollTo({ x: SCREEN_WIDTH }),
                     hideAnimFunc();
             } else if (this.state.email != "" && this.state.name == "") {
-                this.setState({ nullForms: true });
-                console.log("nos informe seu primeiro nome");
+                this.setState({ error: "nos informe seu primeiro nome" });
             } else if (this.state.email == "" && this.state.name != "") {
-                this.setState({ nullForms: true });
-                console.log("nos informe seu melhor email");
+                this.setState({ error: "nos informe seu melhor email" });
             } else {
-                console.log("preencha os campos de email e nome");
+                this.setState({ error: "preencha os campos de email e nome" });
+            }
+        };
+        const checkSecondForm = () => {
+            if (
+                this.state.selectedYear != "" &&
+                this.state.selectedMonth != ""
+            ) {
+                this.scroll.getNode().scrollTo({ x: SCREEN_WIDTH * 2 });
+            } else if (
+                this.state.selectedDay != "" &&
+                this.state.selectedMonth == ""
+            ) {
+                this.setState({
+                    error: "nos informe seu primeiro nome"
+                });
+            } else if (this.state.email == "" && this.state.name != "") {
+                this.setState({
+                    error: "nos informe seu melhor email"
+                });
+            } else {
+                this.setState({
+                    error: "preencha os campos de email e nome"
+                });
             }
         };
         return (
@@ -407,6 +449,18 @@ export default class index extends Component {
                         >
                             <Text style={style.RegFamilySubtitle}>{text}</Text>
                         </View>
+                        <Text
+                            style={{
+                                color: "red",
+                                fontWeight: "bold",
+                                marginLeft: wp("5%"),
+                                fontSize: 12,
+                                lineHeight: 12,
+                                height: 12
+                            }}
+                        >
+                            {this.state.error}
+                        </Text>
                         <View
                             style={{
                                 width: SCREEN_WIDTH,
@@ -476,7 +530,7 @@ export default class index extends Component {
                                     mode="contained"
                                     style={{
                                         //height: hp("6%"),
-                                        width: wp("28%"),
+                                        width: wp("32%"),
                                         marginRight: wp("5%"),
                                         marginBottom: hp("2%"),
                                         alignSelf: "flex-end"
@@ -495,6 +549,7 @@ export default class index extends Component {
                             </View>
                         </View>
                     </View>
+
                     <Animated.View
                         style={{
                             width: SCREEN_WIDTH,
@@ -899,11 +954,9 @@ export default class index extends Component {
                                         marginBottom: hp("2%"),
                                         alignSelf: "flex-end"
                                     }}
-                                    onPress={() =>
-                                        this.scroll
-                                            .getNode()
-                                            .scrollTo({ x: SCREEN_WIDTH * 2 })
-                                    }
+                                    onPress={() => {
+                                        checkSecondForm();
+                                    }}
                                 >
                                     <Text
                                         style={{
