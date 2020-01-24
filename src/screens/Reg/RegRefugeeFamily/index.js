@@ -101,7 +101,9 @@ export default function RegRefugeeFamily({ navigation }) {
                         marginBottom: hp("2%"),
                         alignSelf: "flex-end"
                     }}
-                    onPress={() => {}}
+                    onPress={() => {
+                        navigation.navigate("MapScreen");
+                    }}
                 >
                     <Text
                         onPress={async () => {
