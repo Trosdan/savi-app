@@ -5,12 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Attach to Hermes application - Experimental",
+            "name": "Attach to packager 2",
             "cwd": "${workspaceFolder}",
-            "type": "reactnativedirect",
+            "type": "reactnative",
             "request": "attach"
         },
-
         {
             "name": "Debug Android",
             "cwd": "${workspaceFolder}",
@@ -19,18 +18,13 @@
             "platform": "android"
         },
         {
-            "name": "Debug in Exponent",
+            "name": "Attach to packager",
+            
             "cwd": "${workspaceFolder}",
             "type": "reactnative",
-            "request": "launch",
-            "platform": "exponent"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch Program",
-            "skipFiles": ["<node_internals>/**"],
-            "program": "${workspaceFolder}/node_modules/expo/AppEntry.js"
+            "request": "attach",
+            "port": "19001",
+            "sourceMaps": true
         }
     ]
 }

@@ -220,7 +220,21 @@ export default class index extends Component {
         let familyData = await fetchData("refugeeFamily"); //fetching refugeeFamily:[{"id":"oAgsC9Dymy","members":{"ids":[]}}]
 
         let familyDataParsed = JSON.parse(familyData);
-        this.setState({ familyID: familyDataParsed[0].id });
+        if (typeof (familyDataParsed != "object")) {
+            console.log("type error: response is not an object, parsing...");
+            familyDataParsed = JSON.parse(familyDataParsed);
+            try {
+                this.setState({ familyID: familyDataParsed[0].id });
+            } catch (error) {
+                console.log("catching...");
+                console.log(`ID: ${familyDataParsed.data.updateFamily.id}`);
+                const familyIDFromObj = familyDataParsed.data.updateFamily.id;
+                debugger;
+                this.setState({
+                    familyID: familyIDFromObj
+                });
+            }
+        }
         const addMemberResponse = await this.addMember(
             this.state.name,
             this.state.age,
@@ -234,8 +248,15 @@ export default class index extends Component {
             this.state.needs,
             this.state.doc
         );
+        let memberid;
         if (typeof (addMemberResponse != "string")) {
+            console.log(
+                "response from addmember:" + JSON.stringify(addMemberResponse)
+            );
+            debugger;
             memberid = addMemberResponse.data.createRefugee.id;
+        } else {
+            console.error("Wrong type of member ID");
         }
         this.bindMemberToFamily(this.state.familyID, memberid);
     };
@@ -271,24 +292,24 @@ export default class index extends Component {
 
     state = {
         isSecondaryContact: null,
-        job: "",
-        scholarity: "",
-        needs: "",
+        job: "teste",
+        scholarity: "teste",
+        needs: "teste",
         primaryContact: null,
-        email: "",
+        email: "teste",
         familyID: "",
-        name: "",
+        name: "teste",
         lastName: "",
         doc: "",
         docType: "",
         gender: "",
         age: "",
-        selectedYear: "",
-        selectedDay: "",
+        selectedYear: "1988",
+        selectedDay: "31",
         fadeAnim: new Animated.Value(0),
         scrollRef: null,
         isMonthSelectorVisible: false,
-        selectedMonth: 0,
+        selectedMonth: 9,
         nullForms: "",
         error: ""
     };
