@@ -4,11 +4,12 @@ import client from "./client";
 export const deleteRefugee = async memberID => {
     const deleteRefugeeMutation = `
             mutation {
-                deleteRefugee(id:${memberID}}){id}
+                deleteRefugee(id:"${memberID}"){id}
             }
 
         `;
     const response = await client.gfetch(deleteRefugeeMutation);
+    debugger;
     console.log(response);
 };
 
@@ -16,8 +17,7 @@ export const getFamilyID = async email => {
     const getFamilyIDQuery = `
         query{
         refugees(limit:1, where:{email:{equalTo:${email}}}){
-            results{
-                    
+            results{                    
 		Family{
       id
     }
@@ -28,7 +28,7 @@ export const getFamilyID = async email => {
         
     `;
     const memberIDResponse = await client.gfetch(getFamilyIDQuery);
-    memberIDJSON = JSON.parse(memberIDResponse);
+    let memberIDJSON = JSON.parse(memberIDResponse);
     console.log(memberIDJSON);
     return memberIDJSON.data.refugees.results[0].Family.id;
 };
@@ -44,7 +44,7 @@ export const getMembersFromFamily = async () => {
 
     // familyID = familyObject[0].id;
 
-    getMembersDetails = `query refugeeInfoByFamily {
+    let getMembersDetails = `query refugeeInfoByFamily {
                 refugees(where:
                   
                   {
@@ -60,6 +60,7 @@ export const getMembersFromFamily = async () => {
                     identificationDocument
                     identificationDocumentType
                     primaryContact
+                    id
                   }
                 }
               }

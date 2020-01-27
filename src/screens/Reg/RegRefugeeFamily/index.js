@@ -14,9 +14,8 @@ import {
 } from "react-native-responsive-screen";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { Button } from "react-native-paper";
-import { fetchData, seeAllValues, unstring } from "../../../storage";
+import { seeAllValues } from "../../../storage";
 import MemberList from "../../../components/MembersList";
-import { getMembersFromFamily } from "../../../services/backendIntegrations";
 
 export default function RegRefugeeFamily({ navigation }) {
     const [members, setMembers] = useState([]);
@@ -24,22 +23,16 @@ export default function RegRefugeeFamily({ navigation }) {
         navigation.navigate("RegistrationRefugee");
     };
     const handleBackButton = async () => {
-        console.log("handling back button");
+        /*   console.log("handling back button");
         let lastScreen = await fetchData("lastScreen");
         lastScreen = unstring(lastScreen);
-        navigation.navigate(lastScreen);
+        navigation.navigate(lastScreen); */
+        navigation.navigate("MapScreen");
     };
-    const getAndSetMembers = async () => {
-        let members = await getMembersFromFamily();
 
-        console.log(`members :${members}`);
-
-        setMembers(members);
-    };
     useEffect(() => {
         seeAllValues();
         console.log("RegRefugeeFamily: useEffect");
-        getAndSetMembers();
     }, []);
 
     useEffect(() => {
@@ -73,7 +66,7 @@ export default function RegRefugeeFamily({ navigation }) {
                 <Text style={style.RegFamilyTitle}>Registrar Família</Text>
             </View>
             <View style={{ alignSelf: "center", height: hp("65%") }}>
-                <MemberList members={members}></MemberList>
+                <MemberList />
 
                 <Button
                     mode="outlined"
@@ -105,15 +98,7 @@ export default function RegRefugeeFamily({ navigation }) {
                         navigation.navigate("MapScreen");
                     }}
                 >
-                    <Text
-                        onPress={async () => {
-                            const lastScreen = await fetchData("lastScreen");
-                            if (typeof lastScreen == "string") {
-                                navigation.navigate(lastScreen);
-                            }
-                        }}
-                        style={{ color: "#707070", fontSize: 12 }}
-                    >
+                    <Text style={{ color: "#707070", fontSize: 12 }}>
                         Voltar
                     </Text>
                 </Button>
