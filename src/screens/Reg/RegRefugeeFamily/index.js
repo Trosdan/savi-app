@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-    Text,
-    View,
-    Image,
-    StyleSheet,
-    ScrollView,
-    BackHandler
-} from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { Text, View, Image, StyleSheet, BackHandler } from "react-native";
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
