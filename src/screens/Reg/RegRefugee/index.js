@@ -10,7 +10,8 @@ import {
     Dimensions,
     // Keyboard,
     TouchableOpacity,
-    SafeAreaView
+    SafeAreaView,
+    Picker
 } from "react-native";
 // import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"; //Implement later...
 import {
@@ -23,7 +24,7 @@ import { gfetch } from "../../../services/grafetch";
 const creds = require("../../../../creds.json");
 import { storeData, fetchData, unstring } from "../../../storage";
 //import {getFamilyMembersQuery, bindMemberToFamily, createFamily, addMember} from '../../../services/backendConnections' =>Possible refactoring
-
+import DateTimePicker from "@react-native-community/datetimepicker";
 export default class index extends Component {
     componentDidMount() {
         if (this.checkIfisSecondaryContact() == true) {
@@ -49,7 +50,8 @@ export default class index extends Component {
     };
 
     stringfy = array => {
-        stringedArray = "";
+        let stringedArray = "";
+        let item;
         for (index in array) {
             item = array[index];
             item = `"${item}",`;
@@ -59,22 +61,23 @@ export default class index extends Component {
     };
 
     bindMemberToFamily = async (familyID, memberID) => {
-        getFamilyMembersQuery = `
+        const getFamilyMembersQuery = `
             query {
-                families(where: { id: { equalTo: "${familyID}"} }) {
-                results {
-                    members
-                }
-                }
+            families(where: { id: { equalTo: "${familyID}"} }) {
+            results {
+                members
             }
-        `;
+            }
+            }
+            `;
         let familyQueryResponse = await gfetch(
             "https://parseapi.back4app.com/graphql",
             creds.header,
             getFamilyMembersQuery
         );
-        debugger;
+
         familyQueryResponse = JSON.parse(familyQueryResponse);
+        let familyMembers;
         if (
             (familyQueryResponse.data.families.results[0] == undefined) |
             (familyQueryResponse.data.families.results == [])
@@ -84,47 +87,50 @@ export default class index extends Component {
             familyMembers =
                 familyQueryResponse.data.families.results[0].members.ids;
         }
-        debugger;
+
         familyMembers.push(memberID);
         familyMembers = this.stringfy(familyMembers);
-        updateFamilyQuery = `
-        mutation {
-            updateFamily(id: "${familyID}", 
-              fields: {
-              members: {
-                  ids:[ ${familyMembers}]
-                } 
-            }) {
-              id
-              members
-            }
-          }
-          
-          `;
+        const updateFamilyQuery = `
+                mutation {
+                    updateFamily(id: "${familyID}", 
+                    fields: {
+                        members: {
+                            ids:[ ${familyMembers}]
+                        } 
+                      })
+                 {
+                    id
+                    members
+                  }
+                }
+
+    `;
         let updatedFamilyInfo = await gfetch(
             "https://parseapi.back4app.com/graphql",
             creds.header,
             updateFamilyQuery
         );
-        console.log(`Updated family info after bind: ${updatedFamilyInfo}`);
-        await storeData("refugeeFamily", updatedFamilyInfo);
-        familyDetailsFromAsyncStorage = await fetchData("refugeeFamily");
-        console.log(familyDetailsFromAsyncStorage);
         updatedFamilyInfo = JSON.parse(updatedFamilyInfo);
+        console.log(`Updated family info after bind: `);
+        console.log(updatedFamilyInfo);
+        await storeData("refugeeFamily", updatedFamilyInfo.data.updateFamily);
+        let familyDetailsFromAsyncStorage = await fetchData("refugeeFamily");
+        console.log(familyDetailsFromAsyncStorage);
+        familyDetailsFromAsyncStorage = JSON.parse(
+            familyDetailsFromAsyncStorage
+        );
         return updatedFamilyInfo;
     };
 
     createFamily = async () => {
-        createFamilyQuery = `
-        mutation{
-            createFamily(
-              fields :{
-              members:{ids:[]}
-            }){
-              id
-            }
-          }
-        `;
+        const createFamilyQuery = `
+        mutation {
+        createFamily(fields: { members: { ids: [] } }) {
+            id
+        }
+        }
+
+            `;
         console.log("creating family...");
         let response = await gfetch(
             "https://parseapi.back4app.com/graphql",
@@ -137,6 +143,7 @@ export default class index extends Component {
         console.log("Family id: " + familyid);
         const storeOutput = await storeData("familyID", familyid);
         console.log(storeOutput);
+
         return familyid;
     };
 
@@ -155,28 +162,28 @@ export default class index extends Component {
     ) => {
         const createRefugee = `
         mutation {
-            createRefugee(
-              fields: {
-                name: "${name}"
-                age: "${age}"
-                job: "${job}"
-                gender: "${gender}"
-                identificationDocumentType: "${docType}" 
-                Family: {
-                    link: "${familyID}"
-                            }
-                primaryContact: ${primaryContact}
-                scholarity: "${scholarity}" 
-                email: "${email}"
-                needs: "${needs}" 
-                identificationDocument: "${identificationDocument}" 
-              }
-            ) {
-              id
+        createRefugee(
+            fields: {
+            name: "${name}"
+            age: "${age}"
+            job: "${job}"
+            gender: "${gender}"
+            identificationDocumentType: "${docType}"
+            Family: { link: "${familyID}" }
+            primaryContact: ${primaryContact}
+            scholarity: "${scholarity}"
+            email: "${email}"
+            needs: "${needs}"
+            identificationDocument: "${identificationDocument}"
             }
-          }
-          `;
+        ) {
+            id
+        }
+        }
+
+`;
         console.log("Adding memberID...");
+
         let response = await gfetch(
             "https://parseapi.back4app.com/graphql",
             creds.header,
@@ -220,21 +227,30 @@ export default class index extends Component {
         let familyData = await fetchData("refugeeFamily"); //fetching refugeeFamily:[{"id":"oAgsC9Dymy","members":{"ids":[]}}]
 
         let familyDataParsed = JSON.parse(familyData);
-        if (typeof (familyDataParsed != "object")) {
+        if (typeof familyDataParsed != "object") {
             console.log("type error: response is not an object, parsing...");
             familyDataParsed = JSON.parse(familyDataParsed);
+        }
+        try {
+            this.setState({
+                familyID: familyDataParsed[0].id
+            });
+        } catch (error) {
+            console.log("catching...");
             try {
-                this.setState({ familyID: familyDataParsed[0].id });
-            } catch (error) {
-                console.log("catching...");
                 console.log(`ID: ${familyDataParsed.data.updateFamily.id}`);
                 const familyIDFromObj = familyDataParsed.data.updateFamily.id;
-                debugger;
+
                 this.setState({
                     familyID: familyIDFromObj
                 });
+            } catch (error) {
+                this.setState({
+                    familyID: familyDataParsed.id
+                });
             }
         }
+
         const addMemberResponse = await this.addMember(
             this.state.name,
             this.state.age,
@@ -253,7 +269,7 @@ export default class index extends Component {
             console.log(
                 "response from addmember:" + JSON.stringify(addMemberResponse)
             );
-            debugger;
+
             memberid = addMemberResponse.data.createRefugee.id;
         } else {
             console.error("Wrong type of member ID");
@@ -261,13 +277,16 @@ export default class index extends Component {
         this.bindMemberToFamily(this.state.familyID, memberid);
     };
     calcAge = () => {
-        const birthDate = new Date(
+        console.log("calculando idade...");
+        /*        const birthDate = new Date(
             this.state.selectedYear,
             this.state.selectedMonth,
             this.state.selectedDay
-        );
+        ); */
+        const birthDate = this.state.date;
+        this.setState({ date: birthDate });
         const now = new Date();
-        const diffTime = Math.abs(now - birthDate);
+        const diffTime = Math.abs(now - this.state.birthDate);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         const diffYears = diffDays / 365;
         this.setState({ age: diffYears });
@@ -289,8 +308,35 @@ export default class index extends Component {
             navigate(`RegistrationRefugeeFamily`);
         }
     };
+    show = mode => {
+        this.setState({
+            show: true,
+            mode
+        });
+    };
 
+    datepicker = () => {
+        this.show("date");
+    };
+
+    timepicker = () => {
+        this.show("time");
+    };
+
+    setDate = (event, date) => {
+        date = date || this.state.date;
+        let dateObj = new Date(event.date.nativeEvent.timestamp);
+        console.log("date obj");
+        console.log(dateObj);
+        this.setState({
+            show: Platform.OS === "ios" ? true : false,
+            date: dateObj
+        });
+    };
     state = {
+        date: new Date("2020-06-12T14:42:42"),
+        mode: "date",
+        show: false,
         isSecondaryContact: null,
         job: "teste",
         scholarity: "teste",
@@ -321,6 +367,7 @@ export default class index extends Component {
     _selectRadioButton = value => this.setState({ checked: value });
 
     render() {
+        const { show, date, mode } = this.state;
         const { navigate } = this.props.navigation;
         const SCREEN_WIDTH = Dimensions.get("window").width;
         this.state.scrollRef = React.createRef();
@@ -358,23 +405,6 @@ export default class index extends Component {
                 this.scroll.getNode().scrollTo({ x: SCREEN_WIDTH }),
                     hideAnimFunc();
             } else if (this.state.email != "" && this.state.name == "") {
-                this.setState({ error: "nos informe seu primeiro nome" });
-            } else if (this.state.email == "" && this.state.name != "") {
-                this.setState({ error: "nos informe seu melhor email" });
-            } else {
-                this.setState({ error: "preencha os campos de email e nome" });
-            }
-        };
-        const checkSecondForm = () => {
-            if (
-                this.state.selectedYear != "" &&
-                this.state.selectedMonth != ""
-            ) {
-                this.scroll.getNode().scrollTo({ x: SCREEN_WIDTH * 2 });
-            } else if (
-                this.state.selectedDay != "" &&
-                this.state.selectedMonth == ""
-            ) {
                 this.setState({
                     error: "nos informe seu primeiro nome"
                 });
@@ -388,6 +418,23 @@ export default class index extends Component {
                 });
             }
         };
+        const checkSecondForm = () => {
+            if (
+                this.state.selectedYear != "" &&
+                this.state.selectedMonth != ""
+            ) {
+                this.scroll.getNode().scrollTo({ x: SCREEN_WIDTH * 2 });
+            } else if (
+                this.state.selectedDay != "" &&
+                this.state.selectedMonth == ""
+            ) {
+                this.setState({
+                    error: "Nos informe sua idade"
+                });
+            }
+        };
+        console.log(`Estado - data: `);
+        console.log(this.state.date);
         return (
             <SafeAreaView
                 style={{ backgroundColor: "#FFF" }}
@@ -444,7 +491,9 @@ export default class index extends Component {
                         [
                             {
                                 nativeEvent: {
-                                    contentOffset: { x: this.animation }
+                                    contentOffset: {
+                                        x: this.animation
+                                    }
                                 }
                             }
                         ],
@@ -495,7 +544,9 @@ export default class index extends Component {
                                 label="Correo electrónico."
                                 mode="outlined"
                                 onChangeText={inputValue =>
-                                    this.setState({ email: inputValue })
+                                    this.setState({
+                                        email: inputValue
+                                    })
                                 }
                                 value={this.state.email}
                             />
@@ -513,7 +564,9 @@ export default class index extends Component {
                                 label="Apellido - opcional"
                                 mode="outlined"
                                 onChangeText={lastName =>
-                                    this.setState({ lastName: lastName })
+                                    this.setState({
+                                        lastName: lastName
+                                    })
                                 }
                                 value={this.state.lastName}
                             />
@@ -614,7 +667,9 @@ export default class index extends Component {
                                 label="Tipo de Documento de Identidade - opcional"
                                 mode="outlined"
                                 onChangeText={docType =>
-                                    this.setState({ docType: docType })
+                                    this.setState({
+                                        docType: docType
+                                    })
                                 }
                                 value={this.state.docType}
                             />
@@ -627,313 +682,77 @@ export default class index extends Component {
                                     marginBottom: hp("2%")
                                 }}
                             >
-                                <TextInput
-                                    style={style.DayInput}
-                                    label="Dia"
-                                    mode="outlined"
-                                    onChangeText={selectedDay =>
-                                        this.setState({
-                                            selectedDay: selectedDay
-                                        })
-                                    }
-                                    value={this.state.selectedDay}
-                                />
-                                <TouchableOpacity onPress={this._showDialog}>
-                                    <TextInput
-                                        style={style.MonthInput}
-                                        label="Mês"
-                                        mode="outlined"
-                                        editable={false}
-                                        disabled={true}
-                                        //onFocus={ Keyboard.dismiss(), this._showDialog}
-                                        value={`${selectedMonth}`}
-                                        theme={{
-                                            colors: {
-                                                disabled: "#707070",
-                                                placeholder: "#000"
-                                            }
+                                <Text
+                                    style={{
+                                        //height: hp("6%"),
+                                        width: wp("40%"),
+                                        marginLeft: wp("5%"),
+                                        alignSelf: "flex-start",
+                                        fontSize: 24,
+                                        fontWeight: "bold",
+                                        color: "#ff6400"
+                                    }}
+                                >
+                                    {this.state.date.toISOString().slice(0, 10)}
+                                </Text>
+                                <Button
+                                    onPress={this.datepicker}
+                                    style={{
+                                        //height: hp("6%"),
+                                        width: wp("50%"),
+                                        alignSelf: "flex-end"
+                                    }}
+                                >
+                                    <Text>selecionar</Text>
+                                </Button>
+
+                                {show && (
+                                    <DateTimePicker
+                                        value={date}
+                                        mode={mode}
+                                        is24Hour={true}
+                                        display="default"
+                                        onChange={newDate => {
+                                            console.log("new date");
+                                            console.log(newDate);
+                                            this.setDate({ date: newDate });
                                         }}
                                     />
-                                </TouchableOpacity>
-                                <Portal>
-                                    <Dialog
-                                        visible={isMonthSelectorVisible}
-                                        onDismiss={this._hideDialog}
-                                        style={{ height: hp("50%") }}
-                                    >
-                                        <Dialog.Title>Mês</Dialog.Title>
-                                        <Dialog.ScrollArea>
-                                            <ScrollView>
-                                                <List.Item
-                                                    title="Janeiro"
-                                                    value={2}
-                                                    onPress={() =>
-                                                        this.setState({
-                                                            selectedMonth: 0
-                                                        })
-                                                    }
-                                                    style={
-                                                        selectedMonth == 0
-                                                            ? {
-                                                                  backgroundColor:
-                                                                      "#ccc"
-                                                              }
-                                                            : {
-                                                                  backgroundColor:
-                                                                      "#FFF"
-                                                              }
-                                                    }
-                                                />
-                                                <List.Item
-                                                    title="Fevereiro"
-                                                    onPress={() =>
-                                                        this.setState({
-                                                            selectedMonth: 1
-                                                        })
-                                                    }
-                                                    style={
-                                                        selectedMonth == 1
-                                                            ? {
-                                                                  backgroundColor:
-                                                                      "#ccc"
-                                                              }
-                                                            : {
-                                                                  backgroundColor:
-                                                                      "#FFF"
-                                                              }
-                                                    }
-                                                />
-                                                <List.Item
-                                                    title="Março"
-                                                    onPress={() =>
-                                                        this.setState({
-                                                            selectedMonth: 2
-                                                        })
-                                                    }
-                                                    style={
-                                                        selectedMonth == 2
-                                                            ? {
-                                                                  backgroundColor:
-                                                                      "#ccc"
-                                                              }
-                                                            : {
-                                                                  backgroundColor:
-                                                                      "#FFF"
-                                                              }
-                                                    }
-                                                />
-                                                <List.Item
-                                                    title="Abril"
-                                                    onPress={() =>
-                                                        this.setState({
-                                                            selectedMonth: 3
-                                                        })
-                                                    }
-                                                    style={
-                                                        selectedMonth == 3
-                                                            ? {
-                                                                  backgroundColor:
-                                                                      "#ccc"
-                                                              }
-                                                            : {
-                                                                  backgroundColor:
-                                                                      "#FFF"
-                                                              }
-                                                    }
-                                                />
-                                                <List.Item
-                                                    title="Maio"
-                                                    onPress={() =>
-                                                        this.setState({
-                                                            selectedMonth: 4
-                                                        })
-                                                    }
-                                                    style={
-                                                        selectedMonth == 4
-                                                            ? {
-                                                                  backgroundColor:
-                                                                      "#ccc"
-                                                              }
-                                                            : {
-                                                                  backgroundColor:
-                                                                      "#FFF"
-                                                              }
-                                                    }
-                                                />
-                                                <List.Item
-                                                    title="Junho"
-                                                    onPress={() =>
-                                                        this.setState({
-                                                            selectedMonth: 5
-                                                        })
-                                                    }
-                                                    style={
-                                                        selectedMonth == 5
-                                                            ? {
-                                                                  backgroundColor:
-                                                                      "#ccc"
-                                                              }
-                                                            : {
-                                                                  backgroundColor:
-                                                                      "#FFF"
-                                                              }
-                                                    }
-                                                />
-                                                <List.Item
-                                                    title="Julho"
-                                                    onPress={() =>
-                                                        this.setState({
-                                                            selectedMonth: 6
-                                                        })
-                                                    }
-                                                    style={
-                                                        selectedMonth == 6
-                                                            ? {
-                                                                  backgroundColor:
-                                                                      "#ccc"
-                                                              }
-                                                            : {
-                                                                  backgroundColor:
-                                                                      "#FFF"
-                                                              }
-                                                    }
-                                                />
-                                                <List.Item
-                                                    title="Agosto"
-                                                    onPress={() =>
-                                                        this.setState({
-                                                            selectedMonth: 7
-                                                        })
-                                                    }
-                                                    style={
-                                                        selectedMonth == 7
-                                                            ? {
-                                                                  backgroundColor:
-                                                                      "#ccc"
-                                                              }
-                                                            : {
-                                                                  backgroundColor:
-                                                                      "#FFF"
-                                                              }
-                                                    }
-                                                />
-                                                <List.Item
-                                                    title="Setembro"
-                                                    onPress={() =>
-                                                        this.setState({
-                                                            selectedMonth: 8
-                                                        })
-                                                    }
-                                                    style={
-                                                        selectedMonth == 8
-                                                            ? {
-                                                                  backgroundColor:
-                                                                      "#ccc"
-                                                              }
-                                                            : {
-                                                                  backgroundColor:
-                                                                      "#FFF"
-                                                              }
-                                                    }
-                                                />
-                                                <List.Item
-                                                    title="Outubro"
-                                                    onPress={() =>
-                                                        this.setState({
-                                                            selectedMonth: 9
-                                                        })
-                                                    }
-                                                    style={
-                                                        selectedMonth == 9
-                                                            ? {
-                                                                  backgroundColor:
-                                                                      "#ccc"
-                                                              }
-                                                            : {
-                                                                  backgroundColor:
-                                                                      "#FFF"
-                                                              }
-                                                    }
-                                                />
-                                                <List.Item
-                                                    title="Novembro"
-                                                    onPress={() =>
-                                                        this.setState({
-                                                            selectedMonth: 10
-                                                        })
-                                                    }
-                                                    style={
-                                                        selectedMonth == 10
-                                                            ? {
-                                                                  backgroundColor:
-                                                                      "#ccc"
-                                                              }
-                                                            : {
-                                                                  backgroundColor:
-                                                                      "#FFF"
-                                                              }
-                                                    }
-                                                />
-                                                <List.Item
-                                                    title="Dezembro"
-                                                    onPress={() =>
-                                                        this.setState({
-                                                            selectedMonth: 11
-                                                        })
-                                                    }
-                                                    style={
-                                                        selectedMonth == 11
-                                                            ? {
-                                                                  backgroundColor:
-                                                                      "#ccc"
-                                                              }
-                                                            : {
-                                                                  backgroundColor:
-                                                                      "#FFF"
-                                                              }
-                                                    }
-                                                />
-                                            </ScrollView>
-                                        </Dialog.ScrollArea>
-                                        <Dialog.Actions>
-                                            <Button onPress={this._hideDialog}>
-                                                Ok
-                                            </Button>
-                                        </Dialog.Actions>
-                                    </Dialog>
-                                </Portal>
-                                <TextInput
-                                    keyboardType="numeric"
-                                    maxLength={4}
-                                    style={style.YearInput}
-                                    label="Ano"
-                                    mode="outlined"
-                                    value={`${this.state.selectedYear}`}
-                                    onChangeText={year => {
-                                        this.setState({ selectedYear: year });
-                                    }}
-                                />
+                                )}
                             </View>
-                            <TouchableOpacity
-                            //onPress={this._showDialog}
+
+                            <Text
+                                style={{
+                                    marginLeft: wp("7%"),
+                                    fontSize: 16,
+                                    fontWeight: "bold"
+                                }}
                             >
-                                <TextInput
-                                    value={this.state.gender}
-                                    style={style.LastnameInput}
-                                    label="Mes"
-                                    mode="outlined"
-                                    editable={false}
-                                    disabled={true}
-                                    label="Gênero"
-                                    //onFocus={ Keyboard.dismiss(), this._showDialog}
-                                    theme={{
-                                        colors: {
-                                            disabled: "#707070",
-                                            placeholder: "#000"
-                                        }
-                                    }}
+                                Genero
+                            </Text>
+                            <Picker
+                                selectedValue={this.state.gender}
+                                style={{
+                                    marginLeft: wp("5%"),
+                                    width: wp("80%"),
+                                    marginBottom: hp("5%")
+                                }}
+                                onValueChange={(itemValue, itemIndex) =>
+                                    this.setState({ gender: itemValue })
+                                }
+                            >
+                                <Picker.Item
+                                    label="Feminino"
+                                    value="feminine"
                                 />
-                            </TouchableOpacity>
+                                <Picker.Item label="Outro" value="neuter" />
+
+                                <Picker.Item
+                                    label="Masculino"
+                                    value="masculine"
+                                />
+                            </Picker>
+
                             <View
                                 style={{
                                     flexDirection: "row",
@@ -1026,7 +845,9 @@ export default class index extends Component {
                                 mode="outlined"
                                 value={this.state.needs}
                                 onChangeText={need => {
-                                    this.setState({ needs: need });
+                                    this.setState({
+                                        needs: need
+                                    });
                                 }}
                             />
 
@@ -1047,9 +868,9 @@ export default class index extends Component {
                                         alignSelf: "flex-end"
                                     }}
                                     onPress={() =>
-                                        this.scroll
-                                            .getNode()
-                                            .scrollTo({ x: SCREEN_WIDTH })
+                                        this.scroll.getNode().scrollTo({
+                                            x: SCREEN_WIDTH
+                                        })
                                     }
                                 >
                                     <Text
