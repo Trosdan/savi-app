@@ -9,7 +9,7 @@ export const deleteRefugee = async memberID => {
 
         `;
     const response = await client.gfetch(deleteRefugeeMutation);
-    debugger;
+
     console.log(response);
 };
 
@@ -30,24 +30,26 @@ export const getFamilyID = async email => {
     const memberIDResponse = await client.gfetch(getFamilyIDQuery);
     let memberIDJSON = JSON.parse(memberIDResponse);
     console.log(memberIDJSON);
+
     return memberIDJSON.data.refugees.results[0].Family.id;
 };
 export const deleteFamily = async () => {
-    let refugeeFamily = await fetchData('refugeeFamily')
-    const refugeeFamilyObject = JSON.parse(refugeeFamily)
-    refugeeFamily = refugeeFamilyObject.data.updateFamily.id 
-    const familyID = refugeeFamilyObject.id
+    let refugeeFamily = await fetchData("refugeeFamily");
+    const refugeeFamilyObject = JSON.parse(refugeeFamily);
+    const familyID = refugeeFamilyObject.id;
     const deleteFamilyMutation = `
     mutation {
         deleteFamily(id:"${familyID}"){
             id
         }
     }
-    `
-}
+    `;
+    const familyDeletionResponse = await client.gfetch(deleteFamilyMutation);
+    return familyDeletionResponse;
+};
 export const getMembersFromFamily = async () => {
     seeAllValues();
-    
+
     const email = await fetchData("RefugeeEmail");
     const familyID = await getFamilyID(email);
     // let familyResponse = await fetchData("refugeeFamily");
