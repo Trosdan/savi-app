@@ -39,17 +39,7 @@ export default function components() {
         }
     }
 
-    _getLocationAsync = async () => {
-        let { status } = await Permissions.askAsync(Permissions.LOCATION);
-        if (status !== "granted") {
-            console.log("error");
-        }
-        let location = await Location.getCurrentPositionAsync({
-            coords: { latitude, longitude }
-        });
-        changeActive(location.coords.latitude, location.coords.longitude);
-        console.log("essa é a localizacao" + location.coords.latitude, location.coords.longitude);
-    };
+
 
     useEffect(() => {
         // navigator.geolocation.getCurrentPosition(
@@ -64,11 +54,11 @@ export default function components() {
         //         maximumAge: 10000,
         //     }
         // );
-        _getLocationAsync();
         read_offers({
             position: { latitude: latitude, longitude: longitude },
             filter: 0
         });
+        console.log(region);
     }, []);
 
     function changeActive(latitude, longitude) {
