@@ -58,7 +58,7 @@ export default function CustomDrawer({ navigation }) {
                     Hola, {userData.name}!
                 </Text>
                 <Text style={{ color: "#fff", alignSelf: "center" }}>
-                    ggelmisalvo@gmail.com
+                    {userData.email}
                 </Text>
             </View>
             <View style={{ height: hp(".05%"), backgroundColor: "#171f23" }}>

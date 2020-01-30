@@ -286,9 +286,10 @@ export default class index extends Component {
         const birthDate = this.state.date;
         this.setState({ date: birthDate });
         const now = new Date();
-        const diffTime = Math.abs(now - this.state.birthDate);
+        const diffTime = Math.abs(now - this.state.date);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         const diffYears = diffDays / 365;
+        debugger;
         this.setState({ age: diffYears });
     };
 
