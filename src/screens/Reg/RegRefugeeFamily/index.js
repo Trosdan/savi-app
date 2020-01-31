@@ -21,7 +21,6 @@ export default function RegRefugeeFamily({ navigation }) {
         navigation.navigate(lastScreen); */
         navigation.navigate("MapScreen");
     };
-
     useEffect(() => {
         seeAllValues();
         console.log("RegRefugeeFamily: useEffect");
@@ -58,7 +57,7 @@ export default function RegRefugeeFamily({ navigation }) {
                 <Text style={style.RegFamilyTitle}>Registrar Família</Text>
             </View>
             <View style={{ alignSelf: "center", height: hp("65%") }}>
-                <MemberList />
+                <MemberList navigation={navigation} />
 
                 <Button
                     mode="outlined"

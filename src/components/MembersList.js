@@ -1,9 +1,10 @@
 import {
     deleteRefugee,
-    getMembersFromFamily
+    getMembersFromFamily,
+    deleteFamily
 } from "../services/backendIntegrations";
 import React, { useState, useEffect } from "react";
-import { ScrollView, View, Text, Alert } from "react-native";
+import { ScrollView, View, Text, Alert, AsyncStorage } from "react-native";
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
@@ -12,11 +13,19 @@ import { Button, Dialog, Portal } from "react-native-paper";
 import { fetchData } from "../storage";
 import { RadioButton } from "react-native-paper";
 
-const MemberList = () => {
+const MemberList = ({ navigation }) => {
     const [membersState, setMembers] = useState([]);
     const [dialogVisibility, setDialogVisibility] = useState(false);
     const [newPrimaryContact, setPrimaryContact] = useState(null);
-    const showAlert = () => {
+
+    const [listOfMembers, setListOfMembers] = useState(null);
+
+    const getAndSetMembers = async () => {
+        let members = await getMembersFromFamily();
+        console.log(`members `, members);
+        setMembers(members);
+    };
+    const deleteMainMember = async memberid => {
         Alert.alert(
             "Exclusão de conta",
             "Tem certeza que quer excluir a conta principal deste aparelho?",
@@ -24,37 +33,22 @@ const MemberList = () => {
                 {
                     text: "Si",
                     onPress: () => {
-                        setDialogVisibility(true);
+                        deleteMemberAndUpdate(memberid);
+                        deleteFamily();
+                        navigation.navigate("ConfirmationWho");
+                        AsyncStorage.clear();
                     }
                 },
                 { text: "Cancelar", onPress: () => console.log("cancelar") }
             ]
         );
     };
-    const [listOfMembers, setListOfMembers] = useState(null);
-
-    const getAndSetMembers = async () => {
-        let members = await getMembersFromFamily();
-        console.log(`members :${members}`);
-        setMembers(members);
-    };
-    const deleteMainMember = memberid => {
-        if (showAlert() == true) {
-            deleteMember(memberid);
-            deleteFamily();
-        }
-    };
-    const deleteMember = async memberid => {
+    const deleteMemberAndUpdate = async memberid => {
         if (memberid) await deleteRefugee(memberid);
         let newList = membersState.filter(
             thisMember => thisMember.id !== memberid
         );
         setMembers(newList);
-    };
-
-    const verifyMemberInStorage = async member => {
-        let refugeeFamily = await fetchData("refugeeFamily");
-        refugeeFamily = JSON.parse(refugeeFamily);
     };
 
     useEffect(() => {
@@ -86,7 +80,9 @@ const MemberList = () => {
                                 height: 50,
                                 color: "#ff6400"
                             }}
-                            onPress={() => deleteMainMember(member.id)}
+                            onPress={() => {
+                                deleteMainMember(member.id);
+                            }}
                             // onPress={() => {
                             //    console.log(`Deletando ${member.name}`);
                             // }}
@@ -102,7 +98,7 @@ const MemberList = () => {
                                 height: 50,
                                 color: "#ff6400"
                             }}
-                            onPress={() => deleteMember(member.id)}
+                            onPress={() => deleteMemberAndUpdate(member.id)}
                             // onPress={() => {
                             //    console.log(`Deletando ${member.name}`);
                             // }}

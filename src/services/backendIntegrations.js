@@ -2,15 +2,76 @@ import { fetchData, storeData, seeAllValues } from "../storage";
 import client from "./client";
 
 export const deleteRefugee = async memberID => {
+    stringfy = array => {
+        let stringedArray = "";
+        let item;
+        for (index in array) {
+            item = array[index];
+            item = `"${item}",`;
+            stringedArray = stringedArray.concat(item);
+        }
+        return stringedArray;
+    };
+
     const deleteRefugeeMutation = `
             mutation {
-                deleteRefugee(id:"${memberID}"){id}
+                deleteRefugee(id:"${memberID}"){id
+                     Family{id}}
             }
 
         `;
-    const response = await client.gfetch(deleteRefugeeMutation);
+    let deletionResponse = await client.gfetch(deleteRefugeeMutation);
+    deletionResponse = JSON.parse(deletionResponse);
+    debugger;
+    const familyID = deletionResponse.data.deleteRefugee.Family.id;
+    debugger;
+    unbindMemberFromFamily(memberID, familyID);
+};
 
-    console.log(response);
+export const unbindMemberFromFamily = async (memberID, familyID) => {
+    const refugeeFamilyRaw = await fetchData("refugeeFamily");
+    let refugeeFamily = JSON.parse(refugeeFamilyRaw);
+    debugger;
+    const newRefugeesArray = refugeeFamily.members.ids.filter(
+        (value, index) => {
+            if (value != memberID) {
+                return value;
+            }
+        }
+    );
+    refugeeFamily.members.ids = newRefugeesArray;
+    const newRefugeesArrayStringed = stringfy(newRefugeesArray);
+    const unbindMemberFromFamilyQuery = `
+        mutation UpdateFamilyByID{
+            updateFamily(id: "${familyID}", 
+              fields: {
+              members: {
+                  ids:[  {ids:[${newRefugeesArrayStringed}]}  ]
+                } 
+            }) {
+              id
+              members
+            }
+          }
+          
+    `;
+
+    const unbindFromDatabaseResponse = await client.gfetch(
+        unbindMemberFromFamilyQuery
+    );
+
+    const unbindFromDatabaseResponseObject = JSON.parse(
+        unbindFromDatabaseResponse
+    );
+
+    if (unbindFromDatabaseResponse.error) {
+        console.log("Deu ruim: ", unbindFromDatabaseResponseObject.error);
+    } else {
+        storeData("refugeeFamily", refugeeFamily);
+        return unbindFromDatabaseResponse;
+    }
+
+    debugger;
 };
 
 export const getFamilyID = async email => {
@@ -36,7 +97,7 @@ export const getFamilyID = async email => {
 export const deleteFamily = async () => {
     let refugeeFamily = await fetchData("refugeeFamily");
     const refugeeFamilyObject = JSON.parse(refugeeFamily);
-    const familyID = refugeeFamilyObject.id;
+    const familyID = refugeeFamilyObject[0].id;
     const deleteFamilyMutation = `
     mutation {
         deleteFamily(id:"${familyID}"){
@@ -45,6 +106,7 @@ export const deleteFamily = async () => {
     }
     `;
     const familyDeletionResponse = await client.gfetch(deleteFamilyMutation);
+    debugger;
     return familyDeletionResponse;
 };
 export const getMembersFromFamily = async () => {
