@@ -28,8 +28,7 @@ export default function MarkerSearch({ navigation }) {
     const markers = useSelector(state => state.markers);
 
     const search = async keyword => {
-        const results = await fetch()
-        
+        const results = await fetch();
     };
     async function read_offers(data) {
         if (data === 0) {
@@ -142,8 +141,9 @@ export default function MarkerSearch({ navigation }) {
                     alignSelf: "flex-end"
                 }}
             >
-                {markers.map(marker => (
+                {markers.map((marker, i) => (
                     <Card
+                        key={i}
                         style={{
                             width: wp("92%"),
                             //alignSelf: 'center',
@@ -201,7 +201,7 @@ export default function MarkerSearch({ navigation }) {
                                 backgroundColor: "#ff7043"
                             }}
                             small
-                            icon="arro-collapse-right"
+                            icon="chevron-right"
                             onPress={() => {
                                 navigation.navigate("MarkerPage"),
                                     selectMarker(

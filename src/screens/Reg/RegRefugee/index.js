@@ -18,13 +18,13 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import { Button, TextInput, Portal, Dialog, List } from "react-native-paper";
+import { Button, TextInput } from "react-native-paper";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { gfetch } from "../../../services/grafetch";
 const creds = require("../../../../creds.json");
 import { storeData, fetchData, unstring } from "../../../storage";
-//import {getFamilyMembersQuery, bindMemberToFamily, createFamily, addMember} from '../../../services/backendConnections' =>Possible refactoring
 import DateTimePicker from "@react-native-community/datetimepicker";
+
 export default class index extends Component {
     componentDidMount() {
         if (this.checkIfisSecondaryContact() == true) {
@@ -63,11 +63,11 @@ export default class index extends Component {
     bindMemberToFamily = async (familyID, memberID) => {
         const getFamilyMembersQuery = `
             query {
-            families(where: { id: { equalTo: "${familyID}"} }) {
-            results {
-                members
-            }
-            }
+                families(where: { id: { equalTo: "${familyID}"} }) {
+                    results {
+                        members
+                    }
+                }
             }
             `;
         let familyQueryResponse = await gfetch(
@@ -111,8 +111,10 @@ export default class index extends Component {
             updateFamilyQuery
         );
         updatedFamilyInfo = JSON.parse(updatedFamilyInfo);
+        debugger;
         console.log(`Updated family info after bind: `);
         console.log(updatedFamilyInfo);
+
         await storeData("refugeeFamily", updatedFamilyInfo.data.updateFamily);
         let familyDetailsFromAsyncStorage = await fetchData("refugeeFamily");
         console.log(familyDetailsFromAsyncStorage);
@@ -335,7 +337,7 @@ export default class index extends Component {
         });
     };
     state = {
-        date: new Date("2020-06-12T14:42:42"),
+        date: new Date("2000-06-12T14:42:42"),
         mode: "date",
         show: false,
         isSecondaryContact: null,

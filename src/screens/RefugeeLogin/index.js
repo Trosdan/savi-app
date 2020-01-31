@@ -125,30 +125,6 @@ export default RefugeeLogin = ({ navigation }) => {
         setIsLoading(false);
     };
 
-    const styles = StyleSheet.create({
-        button: {
-            width: wp("28%"),
-            marginLeft: wp("5%"),
-            marginBottom: hp("2%"),
-            alignSelf: "center",
-            color: "black"
-        },
-        email: {
-            width: wp("84%"),
-            marginLeft: wp("8%")
-        },
-        title: {
-            fontSize: RFPercentage(3),
-            marginLeft: wp("7%"),
-            marginRight: wp("7%"),
-            alignSelf: "center",
-            color: "#000",
-            textAlign: "center",
-            marginTop: hp("10%")
-        },
-        container: {}
-    });
-
     useEffect(() => {
         console.log(email);
     });
@@ -182,3 +158,26 @@ export default RefugeeLogin = ({ navigation }) => {
         </SafeAreaView>
     );
 };
+const styles = StyleSheet.create({
+    button: {
+        width: wp("28%"),
+        marginLeft: wp("5%"),
+        marginBottom: hp("2%"),
+        alignSelf: "center",
+        color: "black"
+    },
+    email: {
+        width: wp("84%"),
+        marginLeft: wp("8%")
+    },
+    title: {
+        fontSize: RFPercentage(3),
+        marginLeft: wp("7%"),
+        marginRight: wp("7%"),
+        alignSelf: "center",
+        color: "#000",
+        textAlign: "center",
+        marginTop: hp("10%")
+    },
+    container: {}
+});

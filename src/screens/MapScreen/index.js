@@ -12,7 +12,7 @@ import {
     StyleSheet,
     Text,
     ScrollView,
-    Animated,
+    Animated
 } from "react-native";
 import {
     Appbar,
@@ -31,6 +31,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import axios from "axios";
 import { axheaders } from "../../../creds.json";
+import { storeData } from "../../storage";
 
 //import { } from 'react-navigation';
 
@@ -75,15 +76,15 @@ export default function MapScreen({ navigation }) {
     function markerCardShowAnimFunc() {
         Animated.timing(markerCardAnimNum, {
             toValue: 1000,
-            duration: 300,
+            duration: 300
         }).start();
         //console.log('abriu');
     }
-    
+
     function markerCardHideAnimFunc() {
         Animated.timing(markerCardAnimNum, {
             toValue: 0,
-            duration: 300,
+            duration: 300
         }).start();
         //console.log('fecho');
     }
@@ -177,7 +178,10 @@ export default function MapScreen({ navigation }) {
             coords: { latitude, longitude }
         });
         changeActive(location.coords.latitude, location.coords.longitude);
-        console.log("essa é a localizacao" + location.coords.latitude, location.coords.longitude);
+        console.log(
+            "essa é a localizacao" + location.coords.latitude,
+            location.coords.longitude
+        );
         dispatch({ type: "INITIAL_REGION" });
     };
 
@@ -192,18 +196,18 @@ export default function MapScreen({ navigation }) {
     const insets = useSafeArea();
 
     useEffect(() => {
-        if(isMarkerSelected==true){
-            markerCardShowAnimFunc()
+        if (isMarkerSelected == true) {
+            markerCardShowAnimFunc();
         } else {
-            markerCardHideAnimFunc()
+            markerCardHideAnimFunc();
         }
     }, [isMarkerSelected]);
 
     useEffect(() => {
         _getLocationAsync();
-        console.log("está é a region:")
-        console.log(region)
-    },[])
+        console.log("está é a region:");
+        console.log(region);
+    }, []);
     return (
         <View style={{ backgroundColor: "#000", paddingTop: insets.top }}>
             <View
@@ -256,22 +260,21 @@ export default function MapScreen({ navigation }) {
                 </TouchableOpacity>
             */}
             <Animated.View style={{ height: MapAnimPerc }}>
-                {
-                    isInitialRegion ? 
-                        <Map />
-                        :
-                        <MapView
-                            style={{ flex: 1 }}
-                            loadingEnabled
-                            customMapStyle={MapStyle}
-                        />
-                }
+                {isInitialRegion ? (
+                    <Map />
+                ) : (
+                    <MapView
+                        style={{ flex: 1 }}
+                        loadingEnabled
+                        customMapStyle={MapStyle}
+                    />
+                )}
                 {filterTabActive ? (
                     <>
                         {!filterTabLoading ? (
                             <FAB
                                 style={styles.fab}
-                                icon="arrow-collapse-right"
+                                icon="magnify"
                                 onPress={() =>
                                     read_offers({
                                         position: 0,
@@ -310,7 +313,7 @@ export default function MapScreen({ navigation }) {
                 ) : (
                     <FAB
                         style={styles.fab}
-                        icon="search-web"
+                        icon="chevron-up"
                         onPress={() => {
                             changeTabActive(), filterTabShowAnimFunc();
                         }}
@@ -535,12 +538,16 @@ export default function MapScreen({ navigation }) {
                     alignSelf: "center",
                     bottom: wp("2%"),
                     zIndex: 100,
-                    elevation: 15,
+                    elevation: 15
                 }}
             >
                 <Card.Content>
-                        <Text style={{fontSize: RFPercentage(3), fontWeight: '600'}}>{markerName}</Text>
-                        <Text>{markerDesc}</Text> 
+                    <Text
+                        style={{ fontSize: RFPercentage(3), fontWeight: "600" }}
+                    >
+                        {markerName}
+                    </Text>
+                    <Text>{markerDesc}</Text>
                 </Card.Content>
             </Card>
         </View>

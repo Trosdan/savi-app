@@ -115,7 +115,7 @@ function reducer(state = INITIAL_STATE, action) {
             return {
                 ...state,
                 isInitialRegion: true
-            }
+            };
         default:
             return state;
     }
