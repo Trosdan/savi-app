@@ -5,6 +5,7 @@ export const deleteRefugee = async memberID => {
     stringfy = array => {
         let stringedArray = "";
         let item;
+        let index;
         for (index in array) {
             item = array[index];
             item = `"${item}",`;
@@ -22,7 +23,6 @@ export const deleteRefugee = async memberID => {
         `;
     let deletionResponse = await client.gfetch(deleteRefugeeMutation);
     deletionResponse = JSON.parse(deletionResponse);
-    debugger;
     const familyID = deletionResponse.data.deleteRefugee.Family.id;
     debugger;
     unbindMemberFromFamily(memberID, familyID);
@@ -31,7 +31,6 @@ export const deleteRefugee = async memberID => {
 export const unbindMemberFromFamily = async (memberID, familyID) => {
     const refugeeFamilyRaw = await fetchData("refugeeFamily");
     let refugeeFamily = JSON.parse(refugeeFamilyRaw);
-    debugger;
     const newRefugeesArray = refugeeFamily.members.ids.filter(
         (value, index) => {
             if (value != memberID) {
@@ -89,15 +88,17 @@ export const getFamilyID = async email => {
         
     `;
     const memberIDResponse = await client.gfetch(getFamilyIDQuery);
+    debugger;
     let memberIDJSON = JSON.parse(memberIDResponse);
-    console.log(memberIDJSON);
-
+    console.log("member id json: ", memberIDJSON);
+    debugger;
     return memberIDJSON.data.refugees.results[0].Family.id;
 };
 export const deleteFamily = async () => {
     let refugeeFamily = await fetchData("refugeeFamily");
     const refugeeFamilyObject = JSON.parse(refugeeFamily);
-    const familyID = refugeeFamilyObject[0].id;
+    debugger;
+    const familyID = refugeeFamilyObject.id;
     const deleteFamilyMutation = `
     mutation {
         deleteFamily(id:"${familyID}"){
@@ -149,6 +150,6 @@ export const getMembersFromFamily = async () => {
     let membersArray = familyObj.data.refugees.results;
     console.log(`Members array: ${membersArray}`);
     storeData("membersDetails", membersArray);
-
+    debugger;
     return membersArray;
 };
