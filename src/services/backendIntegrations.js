@@ -88,16 +88,13 @@ export const getFamilyID = async email => {
         
     `;
     const memberIDResponse = await client.gfetch(getFamilyIDQuery);
-    debugger;
     let memberIDJSON = JSON.parse(memberIDResponse);
     console.log("member id json: ", memberIDJSON);
-    debugger;
     return memberIDJSON.data.refugees.results[0].Family.id;
 };
 export const deleteFamily = async () => {
     let refugeeFamily = await fetchData("refugeeFamily");
     const refugeeFamilyObject = JSON.parse(refugeeFamily);
-    debugger;
     const familyID = refugeeFamilyObject.id;
     const deleteFamilyMutation = `
     mutation {
@@ -150,6 +147,5 @@ export const getMembersFromFamily = async () => {
     let membersArray = familyObj.data.refugees.results;
     console.log(`Members array: ${membersArray}`);
     storeData("membersDetails", membersArray);
-    debugger;
     return membersArray;
 };

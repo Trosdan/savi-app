@@ -32,7 +32,7 @@ export default function CustomDrawer({ navigation }) {
     };
     const drawerActive = useSelector(state => state.drawerActive);
     const dispatch = useDispatch();
-    console.log(`user data: ${userData}`);
+    console.log(`user data: `, userData);
     function changeActive(title) {
         dispatch({ type: "DRAWER_ACTIVE", title: title });
     }
