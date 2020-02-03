@@ -19,8 +19,8 @@ ConfCode = ({ navigation }) => {
     const checkCode = async () => {
         console.log("checkcode");
 
-        code = await fetchData("code");
-        loginType = await fetchData("loginType");
+        let code = await fetchData("code");
+        let loginType = await fetchData("loginType");
         loginType = unstring(loginType);
         code = unstring(code);
 
@@ -51,6 +51,7 @@ ConfCode = ({ navigation }) => {
                 value={inputCode}
                 style={styles.CodeInput}
                 onChangeText={code => setInputCode(code)}
+                keyboardType="numeric"
             />
             {/* <Text style={{color:'red'}}>{failedWarn ? 'Código incorreto :/' : ""}</Text> */}
             <Button style={styles.continueButton} onPress={() => checkCode()}>
