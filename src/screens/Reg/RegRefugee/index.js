@@ -26,27 +26,51 @@ import { storeData, fetchData, unstring } from "../../../storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default class index extends Component {
-    componentDidMount() {
-        if (this.checkIfisSecondaryContact() == true) {
-            this.setEmail();
-        }
-    }
-    checkIfisSecondaryContact = async () => {
-        let isSecondaryContact = await fetchData("isSecondaryContact");
-        if (!isSecondaryContact) {
-            console.log("é contato primário");
-            this.setState({ primaryContact: true });
-            return true;
-        } else {
-            console.log("é contato secundario");
-            return false;
-        }
+    state = {
+        date: new Date("2000-06-12T14:42:42"),
+        mode: "date",
+        show: false,
+        isSecondaryContact: null,
+        job: "teste",
+        scholarity: "teste",
+        needs: "teste",
+        primaryContact: null,
+        email: "",
+        familyID: "",
+        name: "teste",
+        lastName: "",
+        doc: "",
+        docType: "",
+        gender: "",
+        age: "",
+        selectedYear: "1988",
+        selectedDay: "31",
+        fadeAnim: new Animated.Value(0),
+        scrollRef: null,
+        isMonthSelectorVisible: false,
+        selectedMonth: 9,
+        nullForms: "",
+        error: ""
     };
     setEmail = async () => {
         let RefugeeEmail = await fetchData("RefugeeEmail");
         RefugeeEmail = unstring(RefugeeEmail);
         this.setState({ email: RefugeeEmail });
         console.log(`setting default email value: ${RefugeeEmail}`);
+    };
+    detectAndSetEmail = async () => {
+        let isSecondaryContact = await fetchData("isSecondaryContact");
+        debugger;
+        if (!isSecondaryContact) {
+            console.log("é contato primário");
+            await this.setEmail();
+
+            this.setState({ primaryContact: true });
+            return false;
+        } else {
+            console.log("é contato secundario");
+            this.setState({ primaryContact: false });
+        }
     };
 
     stringfy = array => {
@@ -304,7 +328,7 @@ export default class index extends Component {
         if (isSecondaryContact) {
             await this.registrateAdditionalMember();
 
-            navigate(`RegistrationRefugeeFamily`);
+            navigate(`MapScreen`);
         } else {
             await this.registrate();
             if (!this.state.email) navigate("ConfirmationCode");
@@ -336,38 +360,16 @@ export default class index extends Component {
             date: dateObj
         });
     };
-    state = {
-        date: new Date("2000-06-12T14:42:42"),
-        mode: "date",
-        show: false,
-        isSecondaryContact: null,
-        job: "teste",
-        scholarity: "teste",
-        needs: "teste",
-        primaryContact: null,
-        email: "teste",
-        familyID: "",
-        name: "teste",
-        lastName: "",
-        doc: "",
-        docType: "",
-        gender: "",
-        age: "",
-        selectedYear: "1988",
-        selectedDay: "31",
-        fadeAnim: new Animated.Value(0),
-        scrollRef: null,
-        isMonthSelectorVisible: false,
-        selectedMonth: 9,
-        nullForms: "",
-        error: ""
-    };
 
     _showDialog = () => this.setState({ isMonthSelectorVisible: true });
 
     _hideDialog = () => this.setState({ isMonthSelectorVisible: false });
 
     _selectRadioButton = value => this.setState({ checked: value });
+
+    componentDidMount() {
+        this.setState({ scrollToBeginning: true });
+    }
 
     render() {
         const { show, date, mode } = this.state;
@@ -404,7 +406,12 @@ export default class index extends Component {
             outputRange: [hp("50%"), hp("70%")]
         });
         const checkFirstForm = () => {
-            if (this.state.email != "" && this.state.name != "") {
+            console.log(this.state.primaryContact);
+            debugger;
+            if (
+                (this.state.email != "" && this.state.name != "") ||
+                !this.state.primaryContact
+            ) {
                 this.scroll.getNode().scrollTo({ x: SCREEN_WIDTH }),
                     hideAnimFunc();
             } else if (this.state.email != "" && this.state.name == "") {
@@ -543,17 +550,6 @@ export default class index extends Component {
                             }}
                         >
                             <TextInput
-                                style={style.EmailInput}
-                                label="Correo electrónico."
-                                mode="outlined"
-                                onChangeText={inputValue =>
-                                    this.setState({
-                                        email: inputValue
-                                    })
-                                }
-                                value={this.state.email}
-                            />
-                            <TextInput
                                 style={style.NameInput}
                                 label="Primer nombre"
                                 mode="outlined"
@@ -612,7 +608,11 @@ export default class index extends Component {
                                         marginBottom: hp("2%"),
                                         alignSelf: "flex-end"
                                     }}
-                                    onPress={() => checkFirstForm()}
+                                    onPress={async () => {
+                                        await this.detectAndSetEmail();
+
+                                        checkFirstForm();
+                                    }}
                                 >
                                     <Text
                                         style={{
@@ -676,6 +676,16 @@ export default class index extends Component {
                                 }
                                 value={this.state.docType}
                             />
+                            <Text
+                                style={{
+                                    marginLeft: wp("7%"),
+                                    fontSize: 16,
+                                    color: "#757575"
+                                }}
+                            >
+                                Data de nascimento
+                            </Text>
+
                             <View
                                 style={{
                                     flexDirection: "row",
@@ -708,7 +718,6 @@ export default class index extends Component {
                                 >
                                     <Text>selecionar</Text>
                                 </Button>
-
                                 {show && (
                                     <DateTimePicker
                                         value={date}
@@ -728,7 +737,7 @@ export default class index extends Component {
                                 style={{
                                     marginLeft: wp("7%"),
                                     fontSize: 16,
-                                    fontWeight: "bold"
+                                    color: "#757575"
                                 }}
                             >
                                 Genero
