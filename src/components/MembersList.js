@@ -67,6 +67,19 @@ const MemberList = ({ navigation }) => {
                         {console.log(`Rendering ${member.name}`)}
                         {member.name}
                     </Text>
+                    {member.primaryContact == true ? (
+                        <Text
+                            style={{
+                                fontSize: 15,
+                                color: "#757575",
+                                width: wp("40%")
+                            }}
+                        >
+                            Membro principal
+                        </Text>
+                    ) : (
+                        <></>
+                    )}
                     <Text>{Math.trunc(member.age)} anos</Text>
                 </View>
 
