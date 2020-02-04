@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { List } from "react-native-paper";
 import {
     widthPercentageToDP as wp,
@@ -10,12 +10,14 @@ import { fetchData, unstring } from "../../../storage";
 // import { Container } from './styles';
 
 const ConfWho = ({ navigation }) => {
+    useEffect(() => {
+        navigation.navigate("MapScreen");
+    }, []);
     const handleLoginPressEvent = async () => {
         console.log("handleLoginPressEvent");
         const isLogged = await fetchData("logged");
 
         if (isLogged) {
-            
             navigation.navigate("MapScreen");
             console.log("Navegando para MapScreen");
         } else if (isLogged == null) {
@@ -31,6 +33,7 @@ const ConfWho = ({ navigation }) => {
                 justifyContent: "flex-end"
             }}
         >
+            {navigation.navigate("MapScreen")}
             <Image
                 source={require("../../../assets/images/savi.png")}
                 resizeMode="contain"
