@@ -1,6 +1,15 @@
 import SafeAreaView from "react-native-safe-area-view";
+import { useSafeArea } from "react-native-safe-area-context";
+
 import { DrawerNavigatorItems } from "react-navigation-drawer";
-import { ScrollView, StyleSheet, View, Text, AsyncStorage } from "react-native";
+import {
+    ScrollView,
+    StyleSheet,
+    View,
+    Text,
+    AsyncStorage,
+    Share
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import {
     widthPercentageToDP as wp,
@@ -20,9 +29,10 @@ navigateToScreen = route => () => {
 };
 
 export default function CustomDrawer({ navigation }) {
+    const insets = useSafeArea();
     const [userData, setUserData] = useState({ name: "", email: "" });
     useEffect(() => {
-        setMembersFromFamilyAsync();
+        //setMembersFromFamilyAsync();
     }, []);
     setMembersFromFamilyAsync = async () => {
         let membersDetails = await getMembersFromFamily();
@@ -36,12 +46,37 @@ export default function CustomDrawer({ navigation }) {
     function changeActive(title) {
         dispatch({ type: "DRAWER_ACTIVE", title: title });
     }
+    const onShare = async () => {
+        try {
+            const result = await Share.share({
+                message: "Savi - Primer clic para un refugiado: savi.today"
+            });
+
+            if (result.action === Share.sharedAction) {
+                if (result.activityType) {
+                    // shared with activity type of result.activityType
+                } else {
+                    // shared
+                }
+            } else if (result.action === Share.dismissedAction) {
+                // dismissed
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+    };
 
     return (
-        <View style={{ flex: 1, justifyContent: "space-between" }}>
+        <View
+            style={{
+                flex: 1,
+                justifyContent: "space-between"
+            }}
+        >
             <View
                 style={{
-                    height: hp("15%"),
+                    paddingTop: insets.top + 5,
+                    //height: hp("15%"),
                     backgroundColor: "#171f23",
                     justifyContent: "center",
                     alignItems: "center"
@@ -55,17 +90,17 @@ export default function CustomDrawer({ navigation }) {
                         alignSelf: "center"
                     }}
                 >
-                    Hola, {userData.name}!
+                    Hola, visitante!
                 </Text>
-                <Text style={{ color: "#fff", alignSelf: "center" }}>
+                {/*           <Text style={{ color: "#fff", alignSelf: "center" }}>
                     {userData.email}
-                </Text>
+                </Text> */}
             </View>
             <View style={{ height: hp(".05%"), backgroundColor: "#171f23" }}>
                 <View
                     style={{
                         height: hp(".05%"),
-                        backgroundColor: "#444444",
+                        backgroundColor: "#ff6400",
                         width: "90%",
                         alignSelf: "center"
                     }}
@@ -79,7 +114,7 @@ export default function CustomDrawer({ navigation }) {
                 }}
             >
                 <List.Section>
-                    <List.Item
+                    {/*  <List.Item
                         onPress={() => {
                             navigation.navigate("UserProfile"),
                                 changeActive("Minha Conta");
@@ -91,8 +126,8 @@ export default function CustomDrawer({ navigation }) {
                                 : styles.myAccountList
                         }
                         titleStyle={styles.myAccountListTitle}
-                    />
-                    <List.Item
+                    /> */}
+                    {/*         <List.Item
                         // onPress={() => {
                         //     changeActive("Minha Familia");
                         // }}
@@ -111,7 +146,7 @@ export default function CustomDrawer({ navigation }) {
                                 : styles.myFamilyList
                         }
                         titleStyle={styles.myFamilyListTitle}
-                    />
+                    /> */}
                 </List.Section>
             </View>
             <ScrollView style={{ backgroundColor: "#242f3e" }}>
@@ -148,6 +183,7 @@ export default function CustomDrawer({ navigation }) {
                         <List.Item
                             onPress={() => {
                                 changeActive("Convidar Amigos");
+                                onShare();
                             }}
                             title="Convidar Amigos"
                             style={
@@ -310,15 +346,16 @@ const styles = StyleSheet.create({
         backgroundColor: "#e65c00"
     },
     myLocalizationListActive: {
-        backgroundColor: "#ddd"
+        backgroundColor: "#ff6400",
+        color: "black"
     },
     inviteFriendsListActive: {
-        backgroundColor: "#ddd"
+        backgroundColor: "#ff6400"
     },
     newsListActive: {
-        backgroundColor: "#ddd"
+        backgroundColor: "#ff6400"
     },
     searchListActive: {
-        backgroundColor: "#ddd"
+        backgroundColor: "#ff6400"
     }
 });
