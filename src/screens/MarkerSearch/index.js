@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Image, ScrollView } from "react-native";
 import {
     Appbar,
@@ -17,6 +17,7 @@ import {
 } from "react-native-responsive-screen";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSelector, useDispatch } from "react-redux";
+import { fetchData } from "../../storage";
 
 // import { Container } from './styles';
 
@@ -25,35 +26,18 @@ export default function MarkerSearch({ navigation }) {
     const longitude = useSelector(state => state.user.location.longitude);
     const dispatch = useDispatch();
     const [keyword, setKeyword] = useState("");
-    const markers = useSelector(state => state.markers);
+    const [markers, setMarkers] = useState([]);
 
+    const markersFromRedux = useSelector(state => state.markers);
+    useEffect(() => {
+        search("");
+    }, []);
+    useEffect(() => {
+        setMarkers(markersFromRedux);
+    }, []);
     const search = async keyword => {
         const results = await fetch();
     };
-    async function read_offers(data) {
-        if (data === 0) {
-            return await axios.post(url, {}, config).then(res => {
-                console.log(res.data.result);
-                return (
-                    addMarkers(res.data.result),
-                    changeTabActive(),
-                    toggleLoading(),
-                    filterTabHideAnimFunc()
-                );
-            });
-        } else {
-            return await axios.post(url, data, config).then(res => {
-                console.log(res.data.result);
-                sleep(2000);
-                return (
-                    addMarkers(res.data.result),
-                    changeTabActive(),
-                    toggleLoading(),
-                    filterTabHideAnimFunc()
-                );
-            });
-        }
-    }
 
     function addMarkers(markers) {
         dispatch({ type: "ADD_MARKERS", markers: markers });
@@ -101,8 +85,44 @@ export default function MarkerSearch({ navigation }) {
                 />
                 <Searchbar
                     placeholder="Search"
-                    //onChangeText={query => {  }}
-                    //value={firstQuery}
+                    onIconPress={async () => {
+                        console.log("pressed");
+                        let markersFromAsyncStorage = await fetchData(
+                            "markers"
+                        );
+
+                        markersFromAsyncStorage = JSON.parse(
+                            markersFromAsyncStorage
+                        );
+                        debugger;
+                        const keywordInLowercase = keyword.toLowerCase();
+                        let newMarkers = markersFromAsyncStorage.filter(
+                            marker => {
+                                if (
+                                    marker.description.portuguese
+                                        .toLocaleLowerCase()
+                                        .includes(keywordInLowercase) |
+                                    marker.description.english
+                                        .toLocaleLowerCase()
+                                        .includes(keywordInLowercase) |
+                                    marker.description.spanish
+                                        .toLocaleLowerCase()
+                                        .includes(keywordInLowercase) |
+                                    marker.name
+                                        .toLocaleLowerCase()
+                                        .includes(keywordInLowercase)
+                                ) {
+                                    return marker;
+                                }
+                            }
+                        );
+                        debugger;
+                        setMarkers(newMarkers);
+                    }}
+                    onChangeText={query => {
+                        setKeyword(query);
+                    }}
+                    value={keyword}
                     style={{
                         width: wp("94%"),
                         alignSelf: "center",

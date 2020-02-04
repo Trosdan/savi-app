@@ -138,6 +138,7 @@ export default function MapScreen({ navigation }) {
                 console.log(res.data.result);
                 return (
                     addMarkers(res.data.result),
+                    storeData("markers", res.data.result),
                     changeTabActive(),
                     toggleLoading(),
                     filterTabHideAnimFunc()
@@ -149,6 +150,7 @@ export default function MapScreen({ navigation }) {
                 console.log(res.data.result);
                 return (
                     addMarkers(res.data.result),
+                    storeData("markers", res.data.result),
                     changeTabActive(),
                     toggleLoading(),
                     filterTabHideAnimFunc()
@@ -177,6 +179,8 @@ export default function MapScreen({ navigation }) {
         let location = await Location.getCurrentPositionAsync({
             coords: { latitude, longitude }
         });
+        storeData("latitude", location.coords.latitude);
+        storeData("longitude", location.coords.longitude);
         changeActive(location.coords.latitude, location.coords.longitude);
         console.log(
             "essa é a localizacao" + location.coords.latitude,
@@ -205,8 +209,7 @@ export default function MapScreen({ navigation }) {
 
     useEffect(() => {
         _getLocationAsync();
-        console.log("está é a region:");
-        console.log(region);
+        console.log("está é a region: ", region);
     }, []);
     return (
         <View style={{ backgroundColor: "#000", paddingTop: insets.top }}>
