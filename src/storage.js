@@ -7,6 +7,7 @@ export const storeData = async (key, value) => {
         if (typeof (value !== "string")) {
             value = JSON.stringify(value);
         }
+        console.log('saving ', key, ': ', value)
         await AsyncStorage.setItem(key, value);
     } catch (error) {
         console.log(`error saving data ${key}:${value} -> ${error}`);

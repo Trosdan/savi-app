@@ -13,6 +13,7 @@ import {
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import { axheaders } from "../../creds.json";
+import { storeData } from "../storage";
 
 export default function components() {
     const url = "https://parseapi.back4app.com/functions/get_offer_points";
@@ -26,16 +27,20 @@ export default function components() {
     const filterTabActive = useSelector(state => state.filterTabActive);
 
     async function read_offers(data) {
+        console.log('reading offers')
         if (data === 0) {
             return await axios.post(url, {}, config).then(res => {
-                console.log(res.data.result);
+                // console.log(res.data.result);
+                storeData('markers', res.data.result)
                 return addMarkers(res.data.result);
-            });
+            }).catch(err => {console.log("deu ruim amigo: ", err)})
         } else {
             return await axios.post(url, data, config).then(res => {
-                console.log(res.data.result);
+                // console.log(res.data.result);
+                storeData('markers', res.data.result)
                 return addMarkers(res.data.result);
-            });
+
+            }).catch(err => {console.log("deu ruim amigo: ",err)})
         }
     }
 
@@ -60,7 +65,12 @@ export default function components() {
         });
         console.log(region);
     }, []);
-
+    useEffect(() => {
+        read_offers({
+            position: { latitude: latitude, longitude: longitude },
+            filter: 0
+        });
+    })
     function changeActive(latitude, longitude) {
         dispatch({
             type: "UPDATE_LOCATION",

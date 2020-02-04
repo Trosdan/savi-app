@@ -182,10 +182,10 @@ export default function MapScreen({ navigation }) {
         storeData("latitude", location.coords.latitude);
         storeData("longitude", location.coords.longitude);
         changeActive(location.coords.latitude, location.coords.longitude);
-        console.log(
+/*         console.log(
             "essa é a localizacao" + location.coords.latitude,
             location.coords.longitude
-        );
+        ); */
         dispatch({ type: "INITIAL_REGION" });
     };
 
@@ -211,6 +211,14 @@ export default function MapScreen({ navigation }) {
         _getLocationAsync();
         console.log("está é a region: ", region);
     }, []);
+
+    useEffect(() => {
+        console.log('reading offers: useEffect MapScreen')
+        read_offers({
+            position: 0,
+            filter: filters
+        })
+    }, [])
     return (
         <View style={{ backgroundColor: "#000", paddingTop: insets.top }}>
             <View
