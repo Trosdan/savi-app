@@ -18,7 +18,8 @@ import {
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchData } from "../../storage";
-
+import verifyConnection from "../../services/verifyConnection";
+import { getAllOffers } from "../../services/Parse";
 // import { Container } from './styles';
 
 export default function MarkerSearch({ navigation }) {
@@ -28,6 +29,31 @@ export default function MarkerSearch({ navigation }) {
     const [keyword, setKeyword] = useState("");
     const [markers, setMarkers] = useState([]);
 
+    const getMarkersAndFilter = async () => {
+        let markersFromAsyncStorage = await fetchData("markers");
+
+        markersFromAsyncStorage = JSON.parse(markersFromAsyncStorage);
+        debugger;
+        const keywordInLowercase = keyword.toLowerCase();
+        let newMarkers = markersFromAsyncStorage.filter(marker => {
+            if (
+                marker.description.portuguese
+                    .toLocaleLowerCase()
+                    .includes(keywordInLowercase) |
+                marker.description.english
+                    .toLocaleLowerCase()
+                    .includes(keywordInLowercase) |
+                marker.description.spanish
+                    .toLocaleLowerCase()
+                    .includes(keywordInLowercase) |
+                marker.name.toLocaleLowerCase().includes(keywordInLowercase)
+            ) {
+                return marker;
+            }
+        });
+        debugger;
+        return newMarkers;
+    };
     const markersFromRedux = useSelector(state => state.markers);
     useEffect(() => {
         search("");
@@ -86,37 +112,14 @@ export default function MarkerSearch({ navigation }) {
                 <Searchbar
                     placeholder="Search"
                     onIconPress={async () => {
-                        console.log("pressed");
-                        let markersFromAsyncStorage = await fetchData(
-                            "markers"
-                        );
+                        let newMarkers;
+                        let connectionStatus = await verifyConnection();
+                        if (connectionStatus != 200) {
+                            newMarkers = await getMarkersFromAsyncStorage();
+                        } else {
+                            newMarkers = await getAllOffers();
+                        }
 
-                        markersFromAsyncStorage = JSON.parse(
-                            markersFromAsyncStorage
-                        );
-                        debugger;
-                        const keywordInLowercase = keyword.toLowerCase();
-                        let newMarkers = markersFromAsyncStorage.filter(
-                            marker => {
-                                if (
-                                    marker.description.portuguese
-                                        .toLocaleLowerCase()
-                                        .includes(keywordInLowercase) |
-                                    marker.description.english
-                                        .toLocaleLowerCase()
-                                        .includes(keywordInLowercase) |
-                                    marker.description.spanish
-                                        .toLocaleLowerCase()
-                                        .includes(keywordInLowercase) |
-                                    marker.name
-                                        .toLocaleLowerCase()
-                                        .includes(keywordInLowercase)
-                                ) {
-                                    return marker;
-                                }
-                            }
-                        );
-                        debugger;
                         setMarkers(newMarkers);
                     }}
                     onChangeText={query => {
