@@ -22,6 +22,7 @@ import OrgConfirmNumber from "./OrgConfirmNumber";
 import RefugeeLogin from "./RefugeeLogin";
 import ContactUs from "./ContactUs";
 import Teste from "./Teste";
+import Welcome from "./Welcome";
 /*
 const Routes = createAppContainer(
     createStackNavigator({
@@ -121,13 +122,20 @@ const Stack = createStackNavigator({
     //         header: null
     //     }
     // },
-    Teste: {
-        screen: Teste,
+    Welcome: {
+        screen: Welcome,
         navigationOptions: {
-            title: "Teste",
+            title: "Welcome",
             header: null
         }
     },
+    // Teste: {
+    //     screen: Teste,
+    //     navigationOptions: {
+    //         title: "Teste",
+    //         header: null
+    //     }
+    // },
     ConfirmationWho: {
         screen: ConfWho,
         navigationOptions: {
