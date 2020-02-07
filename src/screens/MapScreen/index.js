@@ -5,7 +5,7 @@ import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import MapStyle from "../../components/MapStyle";
 import MapView from "react-native-maps";
-
+import { fetchData } from "../../storage";
 import {
     View,
     Image,
@@ -32,12 +32,14 @@ import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import axios from "axios";
 import { axheaders } from "../../../creds.json";
 import { storeData } from "../../storage";
-
+import verifyConnection from "../../services/verifyConnection";
 //import { } from 'react-navigation';
 
 // import { Container } from './styles';
 
 export default function MapScreen({ navigation }) {
+    const [connectionStatus, setConnectionStatus] = useState(false);
+
     const food = useSelector(state => state.filterActive.food);
     const documentation = useSelector(
         state => state.filterActive.documentation
@@ -134,28 +136,55 @@ export default function MapScreen({ navigation }) {
     async function read_offers(data) {
         if (data === 0) {
             toggleLoading();
-            return await axios.post(url, {}, config).then(res => {
-                console.log(res.data.result);
-                return (
-                    addMarkers(res.data.result),
-                    storeData("markers", res.data.result),
-                    changeTabActive(),
-                    toggleLoading(),
-                    filterTabHideAnimFunc()
-                );
-            });
+            return await axios
+                .post(url, {}, config)
+                .then(res => {
+                    //console.log(res.data.result);
+                    return (
+                        addMarkers(res.data.result),
+                        storeData("markers", res.data.result),
+                        changeTabActive(),
+                        toggleLoading(),
+                        filterTabHideAnimFunc()
+                    );
+                })
+                .catch(err => {
+                    if (exception.config && exception.config.url) {
+                        let offlineMarkers = getMarkersFromAsyncStorage();
+                        addMarkers(offlineMarkers);
+                        changeTabActive(),
+                            toggleLoading(),
+                            filterTabHideAnimFunc();
+
+                        // network error
+                    }
+                });
         } else {
             toggleLoading();
-            return await axios.post(url, data, config).then(res => {
-                console.log(res.data.result);
-                return (
-                    addMarkers(res.data.result),
-                    storeData("markers", res.data.result),
-                    changeTabActive(),
-                    toggleLoading(),
-                    filterTabHideAnimFunc()
-                );
-            });
+            return await axios
+                .post(url, data, config)
+                .then(res => {
+                    //console.log(res.data.result);
+                    return (
+                        addMarkers(res.data.result),
+                        storeData("markers", res.data.result),
+                        changeTabActive(),
+                        toggleLoading(),
+                        filterTabHideAnimFunc()
+                    );
+                })
+                .catch(async exception => {
+                    if (exception.config && exception.config.url) {
+                        let markersFromAsyncStorage = await fetchData(
+                            "markers"
+                        );
+                        addMarkers(JSON.parse(markersFromAsyncStorage));
+                        changeTabActive(),
+                            toggleLoading(),
+                            filterTabHideAnimFunc();
+                        // network error
+                    }
+                });
         }
     }
 
@@ -182,7 +211,7 @@ export default function MapScreen({ navigation }) {
         storeData("latitude", location.coords.latitude);
         storeData("longitude", location.coords.longitude);
         changeActive(location.coords.latitude, location.coords.longitude);
-/*         console.log(
+        /*         console.log(
             "essa é a localizacao" + location.coords.latitude,
             location.coords.longitude
         ); */
@@ -213,14 +242,53 @@ export default function MapScreen({ navigation }) {
     }, []);
 
     useEffect(() => {
-        console.log('reading offers: useEffect MapScreen')
+        console.log("reading offers: useEffect MapScreen");
         read_offers({
             position: 0,
             filter: filters
-        })
-    }, [])
+        });
+    }, []);
+
+    useEffect(() => {
+        console.log("verificando conexão...");
+        verifyConnection().then(connStatus => {
+            setConnectionStatus(connStatus);
+        });
+    }, []);
+
+    useEffect(() => {
+        fetchData("markers").then(result => {
+            if (result == null) {
+                console.log("asyncstorage ta: null");
+                storeData("markers", []).then();
+            } else {
+                console.log("markers no asyncStorage n tao null n");
+            }
+        });
+    }, []);
+
     return (
         <View style={{ backgroundColor: "#000", paddingTop: insets.top }}>
+            {console.log("connection status on render is...", connectionStatus)}
+            {connectionStatus ? (
+                <></>
+            ) : (
+                <View
+                    style={{
+                        height: hp("3%"),
+                        width: wp("100%"),
+                        backgroundColor: "red",
+                        //flex: 1,
+                        justifyContent: "center",
+                        zIndex: 100,
+                        top: 0
+                    }}
+                >
+                    <Text style={{ color: "white", textAlign: "center" }}>
+                        Estás desconectado :/
+                    </Text>
+                </View>
+            )}
             <View
                 style={{
                     backgroundColor: "#ff7043",
@@ -270,6 +338,7 @@ export default function MapScreen({ navigation }) {
                     />
                 </TouchableOpacity>
             */}
+
             <Animated.View style={{ height: MapAnimPerc }}>
                 {isInitialRegion ? (
                     <Map />
