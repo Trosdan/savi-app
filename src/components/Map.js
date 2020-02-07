@@ -3,6 +3,7 @@
 //import Geolocation from '@react-native-community/geolocation';
 import React, { useEffect, Fragment } from "react";
 import MapView, { Marker } from "react-native-maps";
+import { View, Text } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import MapStyle from "../components/MapStyle";
@@ -27,50 +28,52 @@ export default function components() {
     const filterTabActive = useSelector(state => state.filterTabActive);
 
     async function read_offers(data) {
-        console.log('reading offers')
+        console.log("reading offers");
         if (data === 0) {
-            return await axios.post(url, {}, config).then(res => {
-                // console.log(res.data.result);
-                storeData('markers', res.data.result)
-                return addMarkers(res.data.result);
-            }).catch(err => {console.log("deu ruim amigo: ", err)})
+            return await axios
+                .post(url, {}, config)
+                .then(res => {
+                    // console.log(res.data.result);
+                    storeData("markers", res.data.result);
+                    return addMarkers(res.data.result);
+                })
+                .catch(err => {
+                    console.log;
+                });
         } else {
-            return await axios.post(url, data, config).then(res => {
-                // console.log(res.data.result);
-                storeData('markers', res.data.result)
-                return addMarkers(res.data.result);
-
-            }).catch(err => {console.log("deu ruim amigo: ",err)})
+            return await axios
+                .post(url, data, config)
+                .then(res => {
+                    // console.log(res.data.result);
+                    storeData("markers", res.data.result);
+                    return addMarkers(res.data.result);
+                })
+                .catch(err => {
+                    console.log;
+                });
         }
     }
 
+    // useEffect(() => {
+    //     // navigator.geolocation.getCurrentPosition(
+    //     //     ({ coords: { latitude, longitude } }) => {
+    //     //        changeActive(latitude, longitude);
+    //     //        console.log(latitude, longitude);
+    //     //     },
+    //     //     () => {},
+    //     //     {
+    //     //         timeout: 20000,
+    //     //         enableHighAccuracy: false,
+    //     //         maximumAge: 10000,
+    //     //     }
+    //     // );
+    //     read_offers({
+    //         position: { latitude: latitude, longitude: longitude },
+    //         filter: 0
+    //     });
+    //     console.log(region);
+    // }, []);
 
-
-    useEffect(() => {
-        // navigator.geolocation.getCurrentPosition(
-        //     ({ coords: { latitude, longitude } }) => {
-        //        changeActive(latitude, longitude);
-        //        console.log(latitude, longitude);
-        //     },
-        //     () => {},
-        //     {
-        //         timeout: 20000,
-        //         enableHighAccuracy: false,
-        //         maximumAge: 10000,
-        //     }
-        // );
-        read_offers({
-            position: { latitude: latitude, longitude: longitude },
-            filter: 0
-        });
-        console.log(region);
-    }, []);
-    useEffect(() => {
-        read_offers({
-            position: { latitude: latitude, longitude: longitude },
-            filter: 0
-        });
-    })
     function changeActive(latitude, longitude) {
         dispatch({
             type: "UPDATE_LOCATION",
@@ -97,7 +100,8 @@ export default function components() {
 
     const dispatch = useDispatch();
     const region = useSelector(state => state.user.location);
-    const markers = useSelector(state => state.markers);
+    let markers = useSelector(state => state.markers);
+    markers == null ? (markers = []) : console.log("markers nem ta null");
     const list = [];
     //const onShowAnim = this.props.onShowAnim;
     return (
