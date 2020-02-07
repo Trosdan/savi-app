@@ -3,7 +3,6 @@
 //import Geolocation from '@react-native-community/geolocation';
 import React, { useEffect, Fragment } from "react";
 import MapView, { Marker } from "react-native-maps";
-import { View, Text } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import MapStyle from "../components/MapStyle";

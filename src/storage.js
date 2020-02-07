@@ -1,13 +1,13 @@
 import { AsyncStorage } from "react-native";
 
 export const storeData = async (key, value) => {
-    console.log(`saving `, key, ": ", value);
+    //console.log(`saving `, key, ": ", value);
 
     try {
         if (typeof (value !== "string")) {
             value = JSON.stringify(value);
         }
-        console.log('saving ', key, ': ', value)
+        //console.log('saving ', key, ': ', value)
         await AsyncStorage.setItem(key, value);
     } catch (error) {
         console.log(`error saving data ${key}:${value} -> ${error}`);
@@ -18,7 +18,7 @@ export const storeData = async (key, value) => {
 export const fetchData = async key => {
     try {
         const value = await AsyncStorage.getItem(key);
-        console.log(`fetching `, key, ": ", value);
+        //console.log(`fetching `, key, ": ", value);
         return value;
     } catch (error) {
         console.log(`error fetching data ${key} -> ${error}`);
