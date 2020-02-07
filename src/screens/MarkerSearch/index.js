@@ -18,8 +18,6 @@ import {
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchData } from "../../storage";
-import verifyConnection from "../../services/verifyConnection";
-import { getAllOffers } from "../../services/Parse";
 // import { Container } from './styles';
 
 export default function MarkerSearch({ navigation }) {
@@ -28,6 +26,12 @@ export default function MarkerSearch({ navigation }) {
     const dispatch = useDispatch();
     const [keyword, setKeyword] = useState("");
     const [markers, setMarkers] = useState([]);
+    const [connectionStatus, setConnectionStatus] = useState(200);
+    const verifyConnection = async () => {
+        let response = await fetch("https://ifconfig.me/");
+        console.log("connection status: ", response.status);
+        return response.status;
+    };
 
     const getMarkersAndFilter = async () => {
         let markersFromAsyncStorage = await fetchData("markers");
@@ -54,13 +58,18 @@ export default function MarkerSearch({ navigation }) {
         debugger;
         return newMarkers;
     };
+
     const markersFromRedux = useSelector(state => state.markers);
+
     useEffect(() => {
-        search("");
+        let connectionStatus = verifyConnection();
+        setConnectionStatus(connectionStatus);
     }, []);
+
     useEffect(() => {
         setMarkers(markersFromRedux);
     }, []);
+
     const search = async keyword => {
         const results = await fetch();
     };
@@ -113,13 +122,7 @@ export default function MarkerSearch({ navigation }) {
                     placeholder="Search"
                     onIconPress={async () => {
                         let newMarkers;
-                        let connectionStatus = await verifyConnection();
-                        if (connectionStatus != 200) {
-                            newMarkers = await getMarkersFromAsyncStorage();
-                        } else {
-                            newMarkers = await getAllOffers();
-                        }
-
+                        newMarkers = await getMarkersAndFilter();
                         setMarkers(newMarkers);
                     }}
                     onChangeText={query => {
