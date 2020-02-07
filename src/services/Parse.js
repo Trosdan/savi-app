@@ -21,6 +21,17 @@ export const getOffers = async (filters, logicalOperator = "and") => {
             queryMarkers = queryMarkers.orEqualTo(filter.key, filter.value);
         });
     }
-    results = await newMarkers.find()
-    return results
+    results = await newMarkers.find();
+    return results;
+};
+
+export const getAllOffers = async () => {
+    const Marker = Parse.Object.extend("offer");
+    let queryMarkers = new Parse.Query(Marker);
+    let resultsRaw = await queryMarkers.find();
+    let results = resultsRaw.map(result => {
+        result = result.attributes;
+    });
+    debugger;
+    return results;
 };

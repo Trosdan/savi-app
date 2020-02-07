@@ -13,3 +13,4 @@ creds*
 # macOS
 .DS_Store
 gfConfig.js
+*.lock
