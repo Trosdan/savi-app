@@ -143,6 +143,7 @@ export default function MapScreen({ navigation }) {
                     return (
                         addMarkers(res.data.result),
                         storeData("markers", res.data.result),
+                        setConnectionStatus(true),
                         changeTabActive(),
                         toggleLoading(),
                         filterTabHideAnimFunc()
@@ -152,9 +153,10 @@ export default function MapScreen({ navigation }) {
                     if (exception.config && exception.config.url) {
                         let offlineMarkers = getMarkersFromAsyncStorage();
                         addMarkers(offlineMarkers);
-                        changeTabActive(),
-                            toggleLoading(),
-                            filterTabHideAnimFunc();
+                        setConnectionStatus(false);
+                        changeTabActive();
+                        toggleLoading();
+                        filterTabHideAnimFunc();
 
                         // network error
                     }
@@ -168,6 +170,7 @@ export default function MapScreen({ navigation }) {
                     return (
                         addMarkers(res.data.result),
                         storeData("markers", res.data.result),
+                        setConnectionStatus(true),
                         changeTabActive(),
                         toggleLoading(),
                         filterTabHideAnimFunc()
@@ -179,9 +182,10 @@ export default function MapScreen({ navigation }) {
                             "markers"
                         );
                         addMarkers(JSON.parse(markersFromAsyncStorage));
-                        changeTabActive(),
-                            toggleLoading(),
-                            filterTabHideAnimFunc();
+                        setConnectionStatus(false);
+                        changeTabActive();
+                        toggleLoading();
+                        filterTabHideAnimFunc();
                         // network error
                     }
                 });
@@ -243,24 +247,21 @@ export default function MapScreen({ navigation }) {
 
     useEffect(() => {
         console.log("reading offers: useEffect MapScreen");
-        read_offers({
-            position: 0,
-            filter: filters
-        });
-    }, []);
-
-    useEffect(() => {
-        console.log("verificando conexão...");
-        verifyConnection().then(connStatus => {
-            setConnectionStatus(connStatus);
-        });
+        try {
+            read_offers({
+                position: 0,
+                filter: filters
+            });
+        } catch (error) {
+            setConnectionStatus(false);
+        }
     }, []);
 
     useEffect(() => {
         fetchData("markers").then(result => {
             if (result == null) {
                 console.log("asyncstorage ta: null");
-                storeData("markers", []).then();
+                storeData("markers", []).then(setConnectionStatus(true));
             } else {
                 console.log("markers no asyncStorage n tao null n");
             }
