@@ -1,13 +1,13 @@
 export const ENTRIES1 = [
     {
-        title: "Beautiful and dramatic Antelope Canyon",
-        subtitle: "Lorem ipsum dolor sit amet et nuncat mergitur",
-        illustration: "https://i.imgur.com/UYiroysl.jpg"
+        title: "Help points",
+        subtitle: "Lorem ipsum dolor sit amet",
+        illustration: "https://i.imgur.com/0DIQsWy.png"
     },
     {
-        title: "Earlier this morning, NYC",
-        subtitle: "Lorem ipsum dolor sit amet",
-        illustration: "https://i.imgur.com/UPrs1EWl.jpg"
+        title: "Offers",
+        subtitle: "Lorem ipsum dolor sit amet et nuncat mergitur",
+        illustration: "https://i.imgur.com/TRpSKN9.png?2"
     },
     {
         title: "White Pocket Sunset",

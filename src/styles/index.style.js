@@ -5,10 +5,10 @@ import {
 } from "react-native-responsive-screen";
 
 export const colors = {
-    black: "#1a1917",
+    black: "#000000",
     gray: "#888888",
-    background1: "#B721FF",
-    background2: "#21D4FD"
+    background1: "#222222",
+    background2: "#222222"
 };
 
 export default StyleSheet.create({
@@ -27,10 +27,9 @@ export default StyleSheet.create({
         flex: 1
     },
     exampleContainer: {
-        backgroundColor: "#fff",
+        backgroundColor: "#222222",
         flex: 1,
-        alignContent: "space-between",
-        marginTop: hp(4)
+        alignContent: "space-between"
     },
     exampleContainerDark: {
         backgroundColor: colors.black
@@ -59,14 +58,14 @@ export default StyleSheet.create({
         textAlign: "center"
     },
     slider: {
-        marginTop: 15,
+        marginTop: hp(4),
         overflow: "visible" // for custom animations
     },
     sliderContentContainer: {
-        paddingVertical: 10 // for custom animation
+        paddingVertical: 0 // for custom animation
     },
     paginationContainer: {
-        paddingVertical: 8
+        paddingVertical: 0
     },
     paginationDot: {
         width: 8,
