@@ -10,14 +10,13 @@ const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
     "window"
 );
 
-
-const slideHeight = viewportHeight * 0.869;
+const slideHeight = viewportHeight * 0.9;
 const slideWidth = wp("90%");
 const itemHorizontalMargin = wp("2%");
 
 export const sliderWidth = viewportWidth;
 export const itemWidth = slideWidth + itemHorizontalMargin * 2;
-export const padBottom = viewportHeight*.075;
+export const padBottom = viewportHeight * 0.11;
 
 const entryBorderRadius = 8;
 
@@ -26,7 +25,7 @@ export default StyleSheet.create({
         width: itemWidth,
         height: slideHeight,
         paddingHorizontal: itemHorizontalMargin,
-        paddingBottom: padBottom// needed for shadow
+        paddingBottom: padBottom // needed for shadow
     },
     shadow: {
         position: "absolute",
@@ -43,19 +42,21 @@ export default StyleSheet.create({
     imageContainer: {
         flex: 1,
         marginBottom: IS_IOS ? 0 : -1, // Prevent a random Android rendering issue
-        backgroundColor: "#ff6400",
+        backgroundColor: "#222222",
         borderTopLeftRadius: entryBorderRadius,
         borderTopRightRadius: entryBorderRadius
     },
     imageContainerEven: {
-        backgroundColor: colors.black
+        backgroundColor: "#222222"
     },
     image: {
         ...StyleSheet.absoluteFillObject,
-        resizeMode: "cover",
+        resizeMode: "contain",
         borderRadius: IS_IOS ? entryBorderRadius : 0,
         borderTopLeftRadius: entryBorderRadius,
-        borderTopRightRadius: entryBorderRadius
+        borderTopRightRadius: entryBorderRadius,
+        borderBottomLeftRadius: entryBorderRadius,
+        borderBottomRightRadius: entryBorderRadius
     },
     // image's border radius is buggy on iOS; let's hack it!
     radiusMask: {

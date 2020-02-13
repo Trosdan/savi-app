@@ -11,9 +11,9 @@ import { sliderWidth, itemWidth } from "../../styles/SliderEntry.style";
 import SliderEntry from "../../components/SliderEntry";
 import styles, { colors } from "../../styles/index.style";
 import { ENTRIES1 } from "../../static/welcomingEntries";
-import { useSafeArea } from "react-native-safe-area-context";
+import { SafeAreaConsumer } from "react-native-safe-area-context";
 
-const SLIDER_1_FIRST_ITEM = 1;
+const SLIDER_1_FIRST_ITEM = 0;
 
 export default class Welcome extends Component {
     constructor(props) {
@@ -33,7 +33,7 @@ export default class Welcome extends Component {
             <SliderEntry
                 data={item}
                 even={(index + 1) % 2 === 0}
-                parallax={true}
+                parallax={false}
                 parallaxProps={parallaxProps}
             />
         );
@@ -51,45 +51,58 @@ export default class Welcome extends Component {
         const { slider1ActiveSlide } = this.state;
 
         return (
-            <View style={styles.exampleContainer}>
-                <Carousel
-                    ref={c => (this._slider1Ref = c)}
-                    data={ENTRIES1}
-                    renderItem={this._renderItemWithParallax}
-                    sliderWidth={sliderWidth}
-                    itemWidth={itemWidth}
-                    hasParallaxImages={true}
-                    firstItem={SLIDER_1_FIRST_ITEM}
-                    inactiveSlideScale={0.94}
-                    inactiveSlideOpacity={0.7}
-                    // inactiveSlideShift={20}
-                    containerCustomStyle={styles.slider}
-                    contentContainerCustomStyle={styles.sliderContentContainer}
-                    loop={true}
-                    loopClonesPerSide={2}
-                    autoplay={true}
-                    autoplayDelay={1000}
-                    autoplayInterval={3000}
-                    onSnapToItem={index =>
-                        this.setState({
-                            slider1ActiveSlide: index
-                        })
-                    }
-                />
+            <SafeAreaConsumer>
+                {insets => (
+                    <View
+                        style={[
+                            { paddingTop: insets.top },
+                            styles.exampleContainer
+                        ]}
+                    >
+                        <Carousel
+                            ref={c => (this._slider1Ref = c)}
+                            data={ENTRIES1}
+                            renderItem={this._renderItemWithParallax}
+                            sliderWidth={sliderWidth}
+                            itemWidth={itemWidth}
+                            hasParallaxImages={false}
+                            firstItem={SLIDER_1_FIRST_ITEM}
+                            inactiveSlideScale={0.84}
+                            inactiveSlideOpacity={0.7}
+                            // inactiveSlideShift={20}
+                            containerCustomStyle={styles.slider}
+                            contentContainerCustomStyle={
+                                styles.sliderContentContainer
+                            }
+                            loop={true}
+                            // loopClhttps://i.imgur.com/UYiroysl.jpgonesPerSide={2}
+                            autoplay={true}
+                            autoplayDelay={1000}
+                            autoplayInterval={3000}
+                            onSnapToItem={index =>
+                                this.setState({
+                                    slider1ActiveSlide: index
+                                })
+                            }
+                        />
 
-                <Button
-                    dark={true}
-                    style={{
-                        height: hp("10%"),
-                        alignContent: "center",
-                        justifyContent: "center"
-                    }}
-                    mode="contained"
-                    onPress={() => this.props.navigation.navigate("MapScreen")}
-                >
-                    LISTO!
-                </Button>
-            </View>
+                        <Button
+                            dark={true}
+                            style={{
+                                height: hp("10%"),
+                                alignContent: "center",
+                                justifyContent: "center"
+                            }}
+                            mode="contained"
+                            onPress={() =>
+                                this.props.navigation.navigate("MapScreen")
+                            }
+                        >
+                            LISTO!
+                        </Button>
+                    </View>
+                )}
+            </SafeAreaConsumer>
         );
     }
 }
