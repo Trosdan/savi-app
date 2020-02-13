@@ -100,7 +100,7 @@ export default function components() {
     const dispatch = useDispatch();
     const region = useSelector(state => state.user.location);
     let markers = useSelector(state => state.markers);
-    markers == null ? (markers = []) : console.log("markers nem ta null");
+    markers == null ? (markers = []) : console.log;
     const list = [];
     //const onShowAnim = this.props.onShowAnim;
     return (

@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import Map from "../../components/Map";
 import { useSafeArea } from "react-native-safe-area-context";
 import * as Location from "expo-location";
@@ -38,8 +38,10 @@ import verifyConnection from "../../services/verifyConnection";
 // import { Container } from './styles';
 
 export default function MapScreen({ navigation }) {
-    const [connectionStatus, setConnectionStatus] = useState(false);
-
+    const [connectionStatus, setConnectionStatus] = useState(true);
+    const [permStatus, setPermStatus] = useState(false);
+    const [position, setPosition] = useState(undefined);
+    const [offersRead, setOffersRead] = useState(false);
     const food = useSelector(state => state.filterActive.food);
     const documentation = useSelector(
         state => state.filterActive.documentation
@@ -132,13 +134,13 @@ export default function MapScreen({ navigation }) {
             }
         }
     }
-
     async function read_offers(data) {
         if (data === 0) {
             toggleLoading();
             return await axios
                 .post(url, {}, config)
                 .then(res => {
+                    debugger;
                     //console.log(res.data.result);
                     return (
                         addMarkers(res.data.result),
@@ -149,10 +151,12 @@ export default function MapScreen({ navigation }) {
                         filterTabHideAnimFunc()
                     );
                 })
-                .catch(err => {
+                .catch(exception => {
                     if (exception.config && exception.config.url) {
+                        debugger;
                         let offlineMarkers = getMarkersFromAsyncStorage();
                         addMarkers(offlineMarkers);
+
                         setConnectionStatus(false);
                         changeTabActive();
                         toggleLoading();
@@ -164,6 +168,7 @@ export default function MapScreen({ navigation }) {
         } else {
             toggleLoading();
             return await axios
+
                 .post(url, data, config)
                 .then(res => {
                     //console.log(res.data.result);
@@ -177,6 +182,7 @@ export default function MapScreen({ navigation }) {
                     );
                 })
                 .catch(async exception => {
+                    debugger;
                     if (exception.config && exception.config.url) {
                         let markersFromAsyncStorage = await fetchData(
                             "markers"
@@ -186,6 +192,8 @@ export default function MapScreen({ navigation }) {
                         changeTabActive();
                         toggleLoading();
                         filterTabHideAnimFunc();
+                        console.warn("deu ruim amigo 2: ", exception);
+
                         // network error
                     }
                 });
@@ -205,21 +213,33 @@ export default function MapScreen({ navigation }) {
     }
 
     const _getLocationAsync = async () => {
-        let { status } = await Permissions.askAsync(Permissions.LOCATION);
-        if (status !== "granted") {
-            console.log("error");
+        if (position == null) {
+            const { locationPerm } = await Permissions.askAsync(
+                Permissions.LOCATION
+            );
         }
-        let location = await Location.getCurrentPositionAsync({
-            coords: { latitude, longitude }
-        });
-        storeData("latitude", location.coords.latitude);
-        storeData("longitude", location.coords.longitude);
-        changeActive(location.coords.latitude, location.coords.longitude);
-        /*         console.log(
-            "essa é a localizacao" + location.coords.latitude,
-            location.coords.longitude
-        ); */
-        dispatch({ type: "INITIAL_REGION" });
+        await Location.startLocationUpdatesAsync("refugee");
+        await Location.watchPositionAsync(
+            {
+                enableHighAccuracy: true
+            },
+            location => {
+                setPosition({
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude
+                });
+                console.log("a position ta tipo: ", position);
+                changeActive(
+                    location.coords.latitude,
+                    location.coords.longitude
+                );
+                storeData("latitude", location.coords.latitude);
+                storeData("longitude", location.coords.longitude);
+
+                dispatch({ type: "INITIAL_REGION" });
+            }
+        );
+        debugger;
     };
 
     function changeActive(latitude, longitude) {
@@ -233,6 +253,8 @@ export default function MapScreen({ navigation }) {
     const insets = useSafeArea();
 
     useEffect(() => {
+        _getLocationAsync();
+        console.log("está é a region: ", region);
         if (isMarkerSelected == true) {
             markerCardShowAnimFunc();
         } else {
@@ -242,22 +264,17 @@ export default function MapScreen({ navigation }) {
 
     useEffect(() => {
         _getLocationAsync();
-        console.log("está é a region: ", region);
-    }, []);
-
-    useEffect(() => {
         console.log("reading offers: useEffect MapScreen");
-        try {
-            read_offers({
-                position: 0,
-                filter: filters
-            });
-        } catch (error) {
-            setConnectionStatus(false);
-        }
+
+        read_offers({
+            position: position,
+            filter: filters
+        });
+        debugger;
     }, []);
 
     useEffect(() => {
+        _getLocationAsync();
         fetchData("markers").then(result => {
             if (result == null) {
                 console.log("asyncstorage ta: null");
@@ -268,6 +285,10 @@ export default function MapScreen({ navigation }) {
         });
     }, []);
 
+    // useLayoutEffect(() => {
+    //     changeTabActive();
+    //     filterTabShowAnimFunc();
+    // }, []);
     return (
         <View style={{ backgroundColor: "#000", paddingTop: insets.top }}>
             {console.log("connection status on render is...", connectionStatus)}
@@ -358,7 +379,7 @@ export default function MapScreen({ navigation }) {
                                 icon="magnify"
                                 onPress={() =>
                                     read_offers({
-                                        position: 0,
+                                        position: position,
                                         filter: filters
                                     })
                                 }
