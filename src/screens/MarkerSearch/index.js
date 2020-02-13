@@ -135,7 +135,7 @@ export default function MarkerSearch({ navigation }) {
                         backgroundColor: "#66707d"
                     }}
                 />
-                <Button
+                {/* <Button
                     contentStyle={{
                         //borderRadius: hp("4%"),
                         height: hp("4%")
@@ -156,7 +156,7 @@ export default function MarkerSearch({ navigation }) {
                     onPress={() => console.log("Pressed")}
                 >
                     <Text style={{ color: "#fff" }}>FILTRAR</Text>
-                </Button>
+                </Button> */}
             </View>
             <ScrollView
                 style={{
