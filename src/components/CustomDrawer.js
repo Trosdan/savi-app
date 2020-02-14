@@ -8,7 +8,8 @@ import {
     View,
     Text,
     AsyncStorage,
-    Share
+    Share,
+    Linking
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import {
@@ -193,7 +194,24 @@ export default function CustomDrawer({ navigation }) {
                             titleStyle={styles.inviteFriendsTitle}
                         />
                         <List.Item
-                            /*onPress={()=>{changeActive('Noticias')}}*/ title="Noticias"
+                            onPress={() => {
+                                const url = "https://savi.today";
+                                changeActive("Noticias");
+                                Linking.canOpenURL(url)
+                                    .then(supported => {
+                                        if (!supported) {
+                                            console.log(
+                                                "Can't handle url: " + url
+                                            );
+                                        } else {
+                                            return Linking.openURL(url);
+                                        }
+                                    })
+                                    .catch(err =>
+                                        console.error("An error occurred", err)
+                                    );
+                            }}
+                            title="Noticias"
                             style={
                                 drawerActive == "Noticias"
                                     ? styles.newsListActive
@@ -279,7 +297,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold"
     },
     newsTitle: {
-        color: "#aaa",
+        color: "#fff",
         fontSize: RFPercentage(2.1),
         fontWeight: "bold"
     },
