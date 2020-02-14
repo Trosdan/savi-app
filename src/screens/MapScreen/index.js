@@ -134,6 +134,12 @@ export default function MapScreen({ navigation }) {
             }
         }
     }
+
+    async function storeDataOnce(res) {
+        const markersInStorage = await fetchData("markers");
+        markersInStorage ? () => {} : storeData("markers", res.data.result);
+    }
+
     async function read_offers(data) {
         if (data === 0) {
             toggleLoading();
@@ -144,7 +150,7 @@ export default function MapScreen({ navigation }) {
                     //console.log(res.data.result);
                     return (
                         addMarkers(res.data.result),
-                        storeData("markers", res.data.result),
+                        storeDataOnce(res),
                         setConnectionStatus(true),
                         changeTabActive(),
                         toggleLoading(),
@@ -156,7 +162,6 @@ export default function MapScreen({ navigation }) {
                         debugger;
                         let offlineMarkers = getMarkersFromAsyncStorage();
                         addMarkers(offlineMarkers);
-
                         setConnectionStatus(false);
                         changeTabActive();
                         toggleLoading();
@@ -174,7 +179,7 @@ export default function MapScreen({ navigation }) {
                     //console.log(res.data.result);
                     return (
                         addMarkers(res.data.result),
-                        storeData("markers", res.data.result),
+                        storeDataOnce(res),
                         setConnectionStatus(true),
                         changeTabActive(),
                         toggleLoading(),
