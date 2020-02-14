@@ -214,7 +214,7 @@ export default function MarkerSearch({ navigation }) {
                                     marginBottom: hp("2%")
                                 }}
                             >
-                                categoria, categoria
+                                Está a {marker.distance.toFixed(2)} kilómetros de aquí.
                             </Text>
                         </Card.Content>
                         <FAB
