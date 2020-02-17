@@ -30,7 +30,7 @@ export default function MarkerSearch({ navigation }) {
         const keywordInLowercase = keyword.toLowerCase();
         let newMarkers = markersFromAsyncStorage.filter(marker => {
             if (
-                marker.description.portuguese
+                marker.description.spanish
                     .toLocaleLowerCase()
                     .includes(keywordInLowercase) |
                 marker.description.english
@@ -185,7 +185,7 @@ export default function MarkerSearch({ navigation }) {
                                     marginTop: hp(".5%")
                                 }}
                             >
-                                {marker.description.portuguese}
+                                {marker.description.spanish}
                             </Text>
                             <Text
                                 style={{
@@ -195,7 +195,7 @@ export default function MarkerSearch({ navigation }) {
                                     marginBottom: hp("2%")
                                 }}
                             >
-                                Está a {marker.distance.toFixed(2)} kilómetros
+                                Está a {Math.floor(marker.distance)} kilómetros
                                 de aquí.
                             </Text>
                         </Card.Content>

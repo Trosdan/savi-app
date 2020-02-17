@@ -61,6 +61,7 @@ export default function MapScreen({ navigation }) {
     const isMarkerSelected = useSelector(state => state.isMarkerSelected);
     const markerName = useSelector(state => state.markerSelected.name);
     const markerDesc = useSelector(state => state.markerSelected.description);
+    const markerDistance = useSelector(state => state.markerSelected.distance);
 
     const [filterTabAnimNum] = useState(new Animated.Value(0));
     const [markerCardAnimNum] = useState(new Animated.Value(0));
@@ -653,7 +654,10 @@ export default function MapScreen({ navigation }) {
                     >
                         {markerName}
                     </Text>
-                    <Text>{markerDesc}</Text>
+                    <Text style={{ marginBottom: hp("1.5%") }}>
+                        {markerDesc}
+                    </Text>
+                    <Text> {markerDistance.toFixed(2)} Kilómetros daqui</Text>
                 </Card.Content>
             </Card>
         </View>

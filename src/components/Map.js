@@ -4,11 +4,12 @@ import { useSelector, useDispatch } from "react-redux";
 import MapStyle from "../components/MapStyle";
 
 export default function components() {
-    function selectMarker(name, description) {
+    function selectMarker(name, description, distance) {
         dispatch({
             type: "SELECT_MARKER",
             name: name,
-            description: description
+            description: description,
+            distance: distance
         });
     }
 
@@ -37,11 +38,12 @@ export default function components() {
                         longitude: marker.longitude
                     }}
                     title={marker.name}
-                    description={marker.description.portuguese}
+                    description={marker.description.spanish}
                     onPress={() => {
                         selectMarker(
                             marker.name,
-                            marker.description.portuguese
+                            marker.description.spanish,
+                            marker.distance
                         );
                     }}
                 />

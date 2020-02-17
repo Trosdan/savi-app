@@ -38,7 +38,8 @@ const INITIAL_STATE = {
     isMarkerSelected: false,
     markerSelected: {
         name: "",
-        description: ""
+        description: "",
+        distance: 0
     },
     markerCardAnimNum: new Animated.Value(0),
     isInitialRegion: false
@@ -99,7 +100,8 @@ function reducer(state = INITIAL_STATE, action) {
                 markerSelected: {
                     ...state.markerSelected,
                     name: action.name,
-                    description: action.description
+                    description: action.description,
+                    distance: action.distance
                 },
                 isMarkerSelected: true
             };
