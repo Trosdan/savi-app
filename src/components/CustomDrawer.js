@@ -1,7 +1,5 @@
 import SafeAreaView from "react-native-safe-area-view";
 import { useSafeArea } from "react-native-safe-area-context";
-
-import { DrawerNavigatorItems } from "react-navigation-drawer";
 import {
     ScrollView,
     StyleSheet,
@@ -11,17 +9,16 @@ import {
     Share,
     Linking
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import { Surface, Divider, List, Button } from "react-native-paper";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { List } from "react-native-paper";
+import { RFPercentage } from "react-native-responsive-fontsize";
 import { NavigationActions } from "react-navigation";
 import { useSelector, useDispatch } from "react-redux";
-import { storeData, fetchData } from "../storage";
-import { getMembersFromFamily } from "../services/backendIntegrations";
+
 navigateToScreen = route => () => {
     const navigateAction = NavigationActions.navigate({
         routeName: route
@@ -31,16 +28,7 @@ navigateToScreen = route => () => {
 
 export default function CustomDrawer({ navigation }) {
     const insets = useSafeArea();
-    const [userData, setUserData] = useState({ name: "", email: "" });
-    useEffect(() => {
-        //setMembersFromFamilyAsync();
-    }, []);
-    setMembersFromFamilyAsync = async () => {
-        let membersDetails = await getMembersFromFamily();
 
-        console.log(`memberDetails in custom drawer ${membersDetails}`);
-        setUserData(membersDetails[0]);
-    };
     const drawerActive = useSelector(state => state.drawerActive);
     const dispatch = useDispatch();
     function changeActive(title) {
@@ -112,43 +100,7 @@ export default function CustomDrawer({ navigation }) {
                     justifyContent: "center"
                     //alignItems: 'center'
                 }}
-            >
-                <List.Section>
-                    {/*  <List.Item
-                        onPress={() => {
-                            navigation.navigate("UserProfile"),
-                                changeActive("Minha Conta");
-                        }}
-                        title="Minha Conta"
-                        style={
-                            drawerActive == "Minha Conta"
-                                ? styles.myAccountListActive
-                                : styles.myAccountList
-                        }
-                        titleStyle={styles.myAccountListTitle}
-                    /> */}
-                    {/*         <List.Item
-                        // onPress={() => {
-                        //     changeActive("Minha Familia");
-                        // }}
-                        onPress={() => {
-                            storeData(
-                                "lastScreen",
-                                "RegistrationRefugeeFamily"
-                            );
-
-                            navigation.navigate("RegistrationRefugeeFamily");
-                        }}
-                        title="Minha Familia"
-                        style={
-                            drawerActive == "Minha Familia"
-                                ? styles.myFamilyListActive
-                                : styles.myFamilyList
-                        }
-                        titleStyle={styles.myFamilyListTitle}
-                    /> */}
-                </List.Section>
-            </View>
+            ></View>
             <ScrollView style={{ backgroundColor: "#242f3e" }}>
                 <SafeAreaView
                     style={styles.container}
@@ -158,6 +110,7 @@ export default function CustomDrawer({ navigation }) {
                         <List.Item
                             onPress={() => {
                                 changeActive("Minha Localização");
+                                navigation.navigate("MapScreen");
                             }}
                             title="Minha Localização"
                             style={

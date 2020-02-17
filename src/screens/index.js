@@ -1,27 +1,10 @@
-import AuthLoading from "./AuthLoading";
-import ConfNumber from "./Conf/ConfNumber";
-import ConfCode from "./Conf/ConfCode";
-import ConfMap from "./Conf/ConfMap";
-import ConfWho from "./Conf/ConfWho";
-import RegRefugee from "./Reg/RegRefugee";
-import RegRefugeeCont from "./Reg/RegRefugeeCont";
 import MapScreen from "./MapScreen";
 import CustomDrawer from "../components/CustomDrawer";
 import { createStackNavigator } from "react-navigation-stack";
 import { createDrawerNavigator } from "react-navigation-drawer";
 import { createAppContainer, createSwitchNavigator } from "react-navigation";
-import { nullLiteral } from "@babel/types";
-import RegRefugeeFamily from "./Reg/RegRefugeeFamily";
-import UserProfile from "./Profile/UserProfile";
 import SearchMarker from "./MarkerSearch";
 import MarkerPage from "./Marker/MarkerPage";
-import OrgHub from "./OrgHub";
-import OrgLogin from "./OrgLogin";
-import OrgRegister from "./OrgRegister";
-import OrgConfirmNumber from "./OrgConfirmNumber";
-import RefugeeLogin from "./RefugeeLogin";
-import ContactUs from "./ContactUs";
-import Teste from "./Teste";
 import Welcome from "./Welcome";
 /*
 const Routes = createAppContainer(
@@ -85,12 +68,7 @@ const Drawer = createDrawerNavigator(
                 title: "MapScreen"
             }
         },
-        UserProfile: {
-            screen: UserProfile,
-            navigationOptions: {
-                title: "UserProfile"
-            }
-        },
+
         SearchMarker: {
             screen: SearchMarker,
             navigationOptions: {
@@ -122,13 +100,13 @@ const Stack = createStackNavigator({
     //         header: null
     //     }
     // },
-    Welcome: {
-        screen: Welcome,
+    MapScreen: {
+        screen: MapScreen,
         navigationOptions: {
-            title: "Welcome",
+            title: "MapScreen",
             header: null
         }
-    },
+    }
     // Teste: {
     //     screen: Teste,
     //     navigationOptions: {
@@ -136,98 +114,6 @@ const Stack = createStackNavigator({
     //         header: null
     //     }
     // },
-    ConfirmationWho: {
-        screen: ConfWho,
-        navigationOptions: {
-            title: "ConfirmationWho",
-            header: null
-        }
-    },
-    ConfirmationNumber: {
-        screen: ConfNumber,
-        navigationOptions: {
-            title: "ConfirmationNumber",
-            header: null
-        }
-    },
-    RefugeeLogin: {
-        screen: RefugeeLogin,
-        navigationOptions: {
-            title: "RefugeeLogin",
-            header: null
-        }
-    },
-    ContactUs: {
-        screen: ContactUs,
-        navigationOptions: {
-            title: "ContactUs",
-            header: null
-        }
-    },
-    ConfirmationCode: {
-        screen: ConfCode,
-        navigationOptions: {
-            title: "ConfirmationCode",
-            header: null
-        }
-    },
-    ConfirmationMap: {
-        screen: ConfMap,
-        navigationOptions: {
-            title: "ConfirmationMap",
-            header: null
-        }
-    },
-
-    RegistrationRefugee: {
-        screen: RegRefugee,
-        navigationOptions: {
-            title: "RegistrationRefugee",
-            header: null
-        }
-    },
-    RegistrationRefugeeContinue: {
-        screen: RegRefugeeCont,
-        navigationOptions: {
-            title: "RegistrationRefugeeContinue",
-            header: null
-        }
-    },
-    RegistrationRefugeeFamily: {
-        screen: RegRefugeeFamily,
-        navigationOptions: {
-            title: "RegistrationRefugeeFamily",
-            header: null
-        }
-    },
-    OrgLogin: {
-        screen: OrgLogin,
-        navigationOptions: {
-            title: "OrgLogin",
-            header: null
-        }
-    },
-    OrgConfirmNumber: {
-        screen: OrgConfirmNumber,
-        navigationOptions: {
-            title: "OrgConfirmNumber",
-            header: null
-        }
-    },
-    OrgRegister: {
-        screen: OrgRegister,
-        navigationOptions: {
-            title: "OrgRegister",
-            header: null
-        }
-    },
-    OrgHub: {
-        screen: OrgHub,
-        navigationOptions: {
-            title: "OrgHub",
-            header: null
-        }
-    }
 });
 
 const Switch = createSwitchNavigator({ Stack, Drawer });

@@ -6,6 +6,8 @@ import * as Permissions from "expo-permissions";
 import MapStyle from "../../components/MapStyle";
 import MapView from "react-native-maps";
 import { fetchData } from "../../storage";
+import { DrawerActions } from "react-navigation-drawer";
+
 import {
     View,
     Image,
@@ -32,16 +34,13 @@ import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import axios from "axios";
 import { axheaders } from "../../../creds.json";
 import { storeData } from "../../storage";
-import verifyConnection from "../../services/verifyConnection";
 //import { } from 'react-navigation';
 
 // import { Container } from './styles';
 
 export default function MapScreen({ navigation }) {
     const [connectionStatus, setConnectionStatus] = useState(true);
-    const [permStatus, setPermStatus] = useState(false);
     const [position, setPosition] = useState(undefined);
-    const [offersRead, setOffersRead] = useState(false);
     const food = useSelector(state => state.filterActive.food);
     const documentation = useSelector(
         state => state.filterActive.documentation
@@ -57,8 +56,6 @@ export default function MapScreen({ navigation }) {
     const filterTabActive = useSelector(state => state.filterTabActive);
     const filterTabLoading = useSelector(state => state.filterTabLoading);
 
-    const latitude = useSelector(state => state.user.location.latitude);
-    const longitude = useSelector(state => state.user.location.longitude);
     const filters = useSelector(state => state.filterActive);
 
     const isMarkerSelected = useSelector(state => state.isMarkerSelected);
@@ -330,7 +327,9 @@ export default function MapScreen({ navigation }) {
                     <Appbar.Action
                         style={{ marginLeft: wp("4%") }}
                         icon="menu"
-                        onPress={() => navigation.openDrawer()}
+                        onPress={() =>
+                            navigation.dispatch(DrawerActions.openDrawer())
+                        }
                         color="#fff"
                     />
                 </View>

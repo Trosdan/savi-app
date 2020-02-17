@@ -1,28 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { DrawerActions } from "react-navigation-drawer";
 import { View, Text, Image, ScrollView } from "react-native";
-import {
-    Appbar,
-    Searchbar,
-    Button,
-    Card,
-    Title,
-    Paragraph,
-    Surface,
-    Caption,
-    FAB
-} from "react-native-paper";
+import { Appbar, Searchbar, Card } from "react-native-paper";
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { RFPercentage } from "react-native-responsive-fontsize";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchData } from "../../storage";
 // import { Container } from './styles';
 
 export default function MarkerSearch({ navigation }) {
-    const latitude = useSelector(state => state.user.location.latitude);
-    const longitude = useSelector(state => state.user.location.longitude);
     const dispatch = useDispatch();
     const [keyword, setKeyword] = useState("");
     const [markers, setMarkers] = useState([]);
@@ -70,22 +59,6 @@ export default function MarkerSearch({ navigation }) {
         setMarkers(markersFromRedux);
     }, []);
 
-    const search = async keyword => {
-        const results = await fetch();
-    };
-
-    function addMarkers(markers) {
-        dispatch({ type: "ADD_MARKERS", markers: markers });
-    }
-
-    function selectMarker(name, description) {
-        dispatch({
-            type: "SELECT_MARKER",
-            name: name,
-            description: description
-        });
-    }
-
     return (
         <View
             style={{
@@ -115,9 +88,12 @@ export default function MarkerSearch({ navigation }) {
                 <Appbar.Action
                     style={{ marginLeft: wp("4%") }}
                     icon={{ source: "menu", color: "#fff" }}
-                    onPress={() => navigation.openDrawer()}
+                    onPress={() =>
+                        navigation.dispatch(DrawerActions.openDrawer())
+                    }
                     color="#fff"
                 />
+
                 <Searchbar
                     placeholder="Search"
                     onIconPress={async () => {
@@ -223,25 +199,6 @@ export default function MarkerSearch({ navigation }) {
                                 de aquí.
                             </Text>
                         </Card.Content>
-                        <FAB
-                            style={{
-                                position: "absolute",
-                                marginRight: wp("3%"),
-                                marginBottom: hp("1.5%"),
-                                right: 0,
-                                bottom: 0,
-                                backgroundColor: "#ff7043"
-                            }}
-                            small
-                            icon="chevron-right"
-                            onPress={() => {
-                                navigation.navigate("MarkerPage"),
-                                    selectMarker(
-                                        marker.name,
-                                        marker.description.portuguese
-                                    );
-                            }}
-                        />
                     </Card>
                 ))}
             </ScrollView>
