@@ -125,8 +125,13 @@ export default function MarkerSearch({ navigation }) {
                         newMarkers = await getMarkersAndFilter();
                         setMarkers(newMarkers);
                     }}
-                    onChangeText={query => {
+                    onChangeText={async query => {
                         setKeyword(query);
+                    }}
+                    onSubmitEditing={async () => {
+                        let newMarkers;
+                        newMarkers = await getMarkersAndFilter();
+                        setMarkers(newMarkers);
                     }}
                     value={keyword}
                     style={{
@@ -214,7 +219,8 @@ export default function MarkerSearch({ navigation }) {
                                     marginBottom: hp("2%")
                                 }}
                             >
-                                Está a {marker.distance.toFixed(2)} kilómetros de aquí.
+                                Está a {marker.distance.toFixed(2)} kilómetros
+                                de aquí.
                             </Text>
                         </Card.Content>
                         <FAB
